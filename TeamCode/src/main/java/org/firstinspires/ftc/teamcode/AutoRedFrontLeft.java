@@ -122,7 +122,7 @@ public class AutoRedFrontLeft extends LinearOpMode {
     // road runner variables
     Pose2d startPose;
 
-    final int WAIT_ALLIANCE_SECONDS = 3;
+    final int WAIT_ALLIANCE_SECONDS = 6;
 
     /**
      * Set robot starting location on the field:
@@ -162,7 +162,7 @@ public class AutoRedFrontLeft extends LinearOpMode {
                 frontOrBack = -1;
                 break;
         }
-        startPose = new Pose2d((6 * Params.HALF_MAT - Params.CHASSIS_HALF_LENGTH) * blueOrRed,
+        startPose = new Pose2d((6 * Params.HALF_MAT - Params.CHASSIS_HALF_LENGTH - Params.CHASSIS_START_EXTRA) * blueOrRed,
                 //Params.HALF_MAT + (3 * Params.HALF_MAT - Params.CHASSIS_HALF_WIDTH) * frontOrBack,
                 Params.HALF_MAT + 2 * Params.HALF_MAT * frontOrBack,
                 Math.toRadians(90.0 + 90.0 * blueOrRed));
@@ -222,7 +222,7 @@ public class AutoRedFrontLeft extends LinearOpMode {
         Params.blueOrRed = blueOrRed;
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
-                "Finger", "Switch", "Switch2");
+                "Finger", "SwitchR", "SwitchL");
         intake.resetArmEncoder();
 
         runtime.reset();
@@ -295,8 +295,8 @@ public class AutoRedFrontLeft extends LinearOpMode {
         Vector2d startArmFlip = new Vector2d(startPose.position.x - blueOrRed * 6, startPose.position.y);
 
         double pausePoseY = -2 * Params.HALF_MAT - 6;
-        Vector2d vMatCenter = new Vector2d(blueOrRed * (3 * Params.HALF_MAT + 0.75), startPose.position.y);
-        Vector2d vParkPos = new Vector2d(blueOrRed * 3 * Params.HALF_MAT - 2.2 * leftOrRight * Params.HALF_MAT, -3.5 * Params.HALF_MAT);
+        Vector2d vMatCenter = new Vector2d(blueOrRed * (3 * Params.HALF_MAT), startPose.position.y);
+        Vector2d vParkPos = new Vector2d(blueOrRed * 3 * Params.HALF_MAT - 2 * leftOrRight * Params.HALF_MAT, -3.2 * Params.HALF_MAT);
         Vector2d vBackdrop = new Vector2d(blueOrRed * 3 * Params.HALF_MAT, -4 * Params.HALF_MAT);
 
         Vector2d vAprilTag = null;
@@ -306,11 +306,11 @@ public class AutoRedFrontLeft extends LinearOpMode {
         } else {
             vAprilTag = new Vector2d(vBackdrop.x + (5 - desiredTagNum) * Params.BACKDROP_SIDEWAYS, vBackdrop.y);
         }
-        Vector2d vCheckingAprilTagPose = new Vector2d(vAprilTag.x, vAprilTag.y + 10);
-        Vector2d vDropYellow = new Vector2d(vAprilTag.x + BUCKET_SHIFT, vAprilTag.y - 1.2);
+        Vector2d vCheckingAprilTagPose = new Vector2d(vAprilTag.x, vAprilTag.y + Params.HALF_MAT);
+        Vector2d vDropYellow = new Vector2d(vAprilTag.x + BUCKET_SHIFT, vAprilTag.y + 2.5); // 3 seem good
 
         Vector2d vDropPurple = null;
-        double xDelta = -3.0;
+        double xDelta = -7.0;
         double yDelta = 10.0;
 
         switch (checkStatus) {
@@ -319,32 +319,36 @@ public class AutoRedFrontLeft extends LinearOpMode {
             case 2:
             case -2:
                 // pass the test
-                xDelta = 5.0;
-                yDelta = (frontOrBack > 0) ? 4.0 : 0;
+                xDelta = 9.0;
+                yDelta = 0;
                 break;
             case -1:
             case 4:
                 // pass the test
-                xDelta = 8.0;
-                yDelta = 10.0;
+                xDelta = 12.0;
+                yDelta = blueOrRed * -10.0;
                 break;
             case -3:
-            case 1:
             case -4:
+                xDelta = -6; // 0;
+                yDelta = -9;
+                startArmFlip = new Vector2d(blueOrRed * (3 * Params.HALF_MAT + xDelta), startPose.position.y - 15);
+                break;
+            case 1:
             case 6:
                 // near gate cases
-                xDelta = -4; // 0;
-                yDelta = 5;
-                startArmFlip = new Vector2d(blueOrRed * (3 * Params.HALF_MAT + xDelta), startPose.position.y + frontOrBack * 10);
+                xDelta = -5; // 0;
+                yDelta = 9;
+                startArmFlip = new Vector2d(blueOrRed * (3 * Params.HALF_MAT + xDelta), startPose.position.y + 15);
                 break;
             case 3:
             case -6:
                 // pass the test
-                xDelta = 8.0;
-                yDelta = 15.0;
+                xDelta = 12.0;
+                yDelta = blueOrRed * 14.0;
                 break;
         }
-        vDropPurple = new Vector2d(blueOrRed * (3 * Params.HALF_MAT + xDelta), startPose.position.y + frontOrBack * yDelta);
+        vDropPurple = new Vector2d(blueOrRed * (3 * Params.HALF_MAT + xDelta), startPose.position.y + yDelta);
 
         Logging.log("check status = %d, xDelta = %.2f, yDelta = %.2f ", checkStatus, xDelta, yDelta);
         logVector("Back drop pose", vBackdrop);
@@ -353,6 +357,7 @@ public class AutoRedFrontLeft extends LinearOpMode {
         logRobotHeading("robot drive: before strafe");
         logVector("robot drive: start position", startPose.position);
 
+        intake.setArmCountPosition(intake.ARM_POS_AUTO);
         // move forward
         Actions.runBlocking(
                 drive.actionBuilder(startPose)
@@ -397,14 +402,21 @@ public class AutoRedFrontLeft extends LinearOpMode {
 
         double armPower = intake.armMotor.getPower();
         intake.armMotor.setPower(0.1); // use slow speed
+
         intake.underTheBeam();
+
         sleep(300);
         intake.armMotor.setPower(armPower);
         intake.switchServoClose();
 
-        if ((2 == checkStatus) || (5 == checkStatus)) {
-            intake.setArmModeRunToPosition(intake.ARM_POS_READY_FOR_HANG);
-            sleep(1000);
+        if(checkStatus == 2 || checkStatus == 5 ||
+                4 == checkStatus || 3 == checkStatus) {
+            Actions.runBlocking(
+                    drive.actionBuilder(drive.pose)
+                            // move away from gate, and avoid stamp on purple pixel
+                            .strafeTo(new Vector2d(vMatCenter.x + blueOrRed * 4, vMatCenter.y + 1.5 * Params.HALF_MAT))
+                            .build()
+            );//strafe several inches left to avoid hitting the beam
         }
 
         // there is a bug somewhere in turn() function when using PI/2, it actually turn PI */
@@ -436,22 +448,24 @@ public class AutoRedFrontLeft extends LinearOpMode {
             logVector("robot drive: turn after drop purple required", vDropPurple);
         }
 
-        // flip down the arm to get ready to go through the gate
-        if ((2 == checkStatus) || (5 == checkStatus)) {
-            intake.underTheBeam();
-            sleep(500);
-        }
-
         // move to the center of second mat to go through gate.
         if (frontOrBack > 0) {
+            // add 2 inch to avoid drive on purple pixel, always 2 inch more to right
+            Vector2d driveThroughGate = null;
+            if (1 == checkStatus || 6 == checkStatus) {
+                driveThroughGate = new Vector2d(vMatCenter.x - 2, vMatCenter.y);
+            }
+            else {
+                driveThroughGate = new Vector2d(vMatCenter.x, vMatCenter.y);
+            }
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
-                            .strafeTo(vMatCenter)
+                            .strafeTo(driveThroughGate)
                             .build()
             );
 
             logVector("robot drive: drive.pose move to 2nd mat center", drive.pose.position);
-            logVector("robot drive: move to 2nd mat center required", vMatCenter);
+            logVector("robot drive: move to 2nd mat center required", driveThroughGate);
         }
 
         if (frontOrBack < 0) {
@@ -511,12 +525,16 @@ public class AutoRedFrontLeft extends LinearOpMode {
                     drive.pose.position.y - aprilTagPose.position.y + Params.AUTO_DISTANCE_TO_TAG);
             logVector("robot drive: drop yellow pose required after april tag adjust", vDropYellow);
         }
-
-        if (frontOrBack > 0) {
-            intake.readyToDropYellow(intake.ARM_POS_DROP_YELLOW);
-        } else {
-            intake.readyToDropYellow(intake.ARM_POS_DROP_YELLOW + 100); // lower for back to avoid pixel jump away
+        else {
+            if(-3 == checkStatus || -4 == checkStatus) {
+                // adjust yellow drop-off position according to testing results
+                vDropYellow = new Vector2d(vDropYellow.x, vDropYellow.y - 1.0); // advance 1 inch more for -3/-4 cases
+                logVector("robot drive: drop yellow pose required after adjust for -3/-4", vDropYellow);
+            }
+            Logging.log("Can not found required AprilTag to drop yellow pixel");
         }
+
+        intake.readyToDropYellow(intake.ARM_POS_DROP_YELLOW);
 
         // shift to AprilTag
         Actions.runBlocking(

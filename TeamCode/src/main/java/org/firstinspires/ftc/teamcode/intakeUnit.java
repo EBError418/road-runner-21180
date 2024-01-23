@@ -60,8 +60,9 @@ public class intakeUnit
 
     private Servo switchRightServo = null;
     private Servo switchLeftServo = null;
-    final double SWITCH_CLOSE_POS = 0.215;
-    final double SWITCH_RIGHT_RELEASE = 0.3;
+    final double SWITCH_RIGHT_CLOSE_POS = 0.24;
+    final double SWITCH_LEFT_CLOSE_POS = 0.21;
+    final double SWITCH_RIGHT_RELEASE = 0.32;
     final double SWITCH_LEFT_RELEASE = 0.05;
 
     public Servo wristServo = null;
@@ -74,16 +75,16 @@ public class intakeUnit
 
     // arm servo variables, not used in current prototype version.
     public DcMotor armMotor = null;
-    int ARM_POS_INTAKE = 3600;//3600; 3560 for finger down, 3600 for finger up
-    int ARM_MIN_COUNT_POS = ARM_POS_INTAKE - 3600; //0;
+    int ARM_POS_INTAKE = 3350;//3600; 3560 for finger down, 3600 for finger up
+    int ARM_MIN_COUNT_POS = ARM_POS_INTAKE - 3350; //0;
     int ARM_MAX_COUNT_POS = ARM_POS_INTAKE + 100; //3620;
-    int ARM_POS_AUTO = ARM_POS_INTAKE - 3480; //80;
+    int ARM_POS_AUTO = ARM_POS_INTAKE - 3300; //80;
     int ARM_POS_HANG = ARM_POS_INTAKE - 3060; //500;
     int ARM_POS_READY_FOR_HANG = ARM_POS_INTAKE - 1760; // 1800
     int ARM_POS_DROP = ARM_POS_INTAKE - 1000; //2550;
     int ARM_POS_CAMERA_READ = ARM_POS_INTAKE - 1060; //2500;
-    int ARM_POS_DROP_YELLOW = ARM_POS_INTAKE - 760; //2800;
-    int ARM_POS_UNDER_BEAM = ARM_POS_INTAKE - 460; //3100;
+    int ARM_POS_DROP_YELLOW = ARM_POS_INTAKE - 700; //2800;
+    int ARM_POS_UNDER_BEAM = ARM_POS_INTAKE - 360; //3200;
     int ARM_POS_DROP_PURPLE = ARM_POS_INTAKE - 180; //3380;
     int ARM_POS_PUSH_PROP = ARM_POS_INTAKE - 100;
     int ARM_POS_INTAKE2 = ARM_POS_INTAKE - 25;
@@ -97,18 +98,20 @@ public class intakeUnit
      * @param hardwareMap the Hardware Mappings.
      * @param armMotorName the name string for arm servo motor
      * @param wristMotorName the name string for wrist servo motor
-     * @param switchMotorName the name string for switch servo motor
+     * @param rightSwitchName the name string for right switch servo motor
+     * @param leftSwitchName the name string for left switch servo motor
      */
-    public intakeUnit(HardwareMap hardwareMap, String armMotorName, String wristMotorName, String fingerMotorName, String switchMotorName, String switchMotorTwo) {
+    public intakeUnit(HardwareMap hardwareMap, String armMotorName, String wristMotorName,
+                      String fingerMotorName, String rightSwitchName, String leftSwitchName) {
         // Save reference to Hardware map
         this.hardwareMap = hardwareMap;
 
         Logging.log("init motors for finger, wrist and arm.");
-        switchRightServo = hardwareMap.get(Servo.class, switchMotorName);
-        switchRightServo.setPosition(SWITCH_CLOSE_POS);
+        switchRightServo = hardwareMap.get(Servo.class, rightSwitchName);
+        switchRightServo.setPosition(SWITCH_RIGHT_CLOSE_POS);
 
-        switchLeftServo = hardwareMap.get(Servo.class, switchMotorTwo);
-        switchLeftServo.setPosition(SWITCH_CLOSE_POS);
+        switchLeftServo = hardwareMap.get(Servo.class, leftSwitchName);
+        switchLeftServo.setPosition(SWITCH_LEFT_CLOSE_POS);
 
         fingerServo = hardwareMap.get(Servo.class, fingerMotorName);
         fingerStop();
@@ -122,12 +125,12 @@ public class intakeUnit
     }
 
     public void setSwitchRightPosition(double switchPos) {
-        switchPos = Range.clip(switchPos, SWITCH_CLOSE_POS, SWITCH_RIGHT_RELEASE);
+        switchPos = Range.clip(switchPos, SWITCH_RIGHT_CLOSE_POS, SWITCH_RIGHT_RELEASE);
         switchRightServo.setPosition(switchPos);
     }
 
     public void setSwitchLeftPosition(double switchPos){
-        switchPos = Range.clip(switchPos, SWITCH_LEFT_RELEASE, SWITCH_CLOSE_POS);
+        switchPos = Range.clip(switchPos, SWITCH_LEFT_RELEASE, SWITCH_LEFT_CLOSE_POS);
         switchLeftServo.setPosition(switchPos);
     }
 
@@ -146,8 +149,8 @@ public class intakeUnit
     }
 
     public void switchServoClose() {
-        setSwitchRightPosition(SWITCH_CLOSE_POS);
-        setSwitchLeftPosition(SWITCH_CLOSE_POS);
+        setSwitchRightPosition(SWITCH_RIGHT_CLOSE_POS);
+        setSwitchLeftPosition(SWITCH_LEFT_CLOSE_POS);
     }
 
     /**
@@ -317,15 +320,15 @@ public class intakeUnit
 
     public void resetArmPositions(int intakePos) {
         ARM_POS_INTAKE = intakePos;
-        ARM_MIN_COUNT_POS = ARM_POS_INTAKE - 3600; //0;
+        ARM_MIN_COUNT_POS = ARM_POS_INTAKE - 3350; //0;
         ARM_MAX_COUNT_POS = ARM_POS_INTAKE + 100; //3620; 
-        ARM_POS_AUTO = ARM_POS_INTAKE - 3480; //80;
+        ARM_POS_AUTO = ARM_POS_INTAKE - 3300; //80;
         ARM_POS_HANG = ARM_POS_INTAKE - 3060; //500;
         ARM_POS_READY_FOR_HANG = ARM_POS_INTAKE - 1760; // 1800
         ARM_POS_DROP = ARM_POS_INTAKE - 1000; //2550;
         ARM_POS_CAMERA_READ = ARM_POS_INTAKE - 1060; //2500;
-        ARM_POS_DROP_YELLOW = ARM_POS_INTAKE - 760; //2800;
-        ARM_POS_UNDER_BEAM = ARM_POS_INTAKE - 460; //3100;
+        ARM_POS_DROP_YELLOW = ARM_POS_INTAKE - 700; //2800;
+        ARM_POS_UNDER_BEAM = ARM_POS_INTAKE - 360; //3100;
         ARM_POS_DROP_PURPLE = ARM_POS_INTAKE - 180; //3380;
         ARM_POS_PUSH_PROP = ARM_POS_INTAKE - 100;
         ARM_POS_INTAKE2 = ARM_POS_INTAKE - 25;
