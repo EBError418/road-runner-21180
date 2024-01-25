@@ -282,6 +282,10 @@ public class intakeUnit
         wristServo.setPosition(WRIST_POS_DROP_PURPLE);
     }
 
+    public void underTheBeamIntake(){
+        setArmCountPosition(ARM_POS_UNDER_BEAM);
+        wristServo.setPosition(WRIST_POS_INTAKE);
+    }
     /**
      * Get the arm servo motor current position value
      * @return the current arm servo motor position value

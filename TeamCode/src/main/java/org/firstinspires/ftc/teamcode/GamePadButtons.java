@@ -53,6 +53,7 @@ public class GamePadButtons {
     public boolean lowDropPos;
     public boolean speedDown;
     public boolean speedUp;
+    public boolean armBeamPosition;
     public boolean armUp;
     public boolean armDown;
     public boolean armReset;
@@ -128,9 +129,10 @@ public class GamePadButtons {
         switchClose = gamepad2.a;
         switchDropRight = gamepad2.b;
         switchDropLeft = gamepad2.x;
-        dropAndBack = gamepad2.right_bumper;
+        //dropAndBack = gamepad2.right_bumper;
         
         //arms
+        armBeamPosition = gamepad2.right_bumper;
         armUp = gamepad2.right_stick_y < 0;
         armDown = gamepad2.right_stick_y > 0;
         armReset = gamepad2.start;

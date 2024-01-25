@@ -179,6 +179,10 @@ public class TeleopRR extends LinearOpMode {
                 }
             }
 
+            if (gpButtons.armBeamPosition) {
+                intake.underTheBeamIntake();
+            }
+
             if (gpButtons.readyToIntake) {
                 intake.intakePositions(intake.ARM_POS_INTAKE);
             }
