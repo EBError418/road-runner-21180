@@ -54,7 +54,8 @@ public class Params {
     static final double CHASSIS_START_EXTRA = 3.25;
 
     // moving distance variables
-    static final double AUTO_DISTANCE_TO_TAG = 10.0; //this is how close the camera should get to the target (inches)
+    static final double AUTO_DISTANCE_TO_TAG = 8.5; //this is how close the camera should get to the target (inches)
+
     static final double TELEOP_DISTANCE_TO_TAG = 7.0;
 
     static final double BACKDROP_SIDEWAYS = 7.0; // 1 inch more to side tag

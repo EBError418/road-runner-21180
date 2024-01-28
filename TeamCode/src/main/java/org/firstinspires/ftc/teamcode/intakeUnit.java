@@ -83,7 +83,7 @@ public class intakeUnit
     int ARM_POS_READY_FOR_HANG = ARM_POS_INTAKE - 1760; // 1800
     int ARM_POS_DROP = ARM_POS_INTAKE - 1000; //2550;
     int ARM_POS_CAMERA_READ = ARM_POS_INTAKE - 1060; //2500;
-    int ARM_POS_DROP_YELLOW = ARM_POS_INTAKE - 700; //2800;
+    int ARM_POS_DROP_YELLOW = ARM_POS_INTAKE - 690; //2800;
     int ARM_POS_UNDER_BEAM = ARM_POS_INTAKE - 360; //3200;
     int ARM_POS_DROP_PURPLE = ARM_POS_INTAKE - 180; //3380;
     int ARM_POS_PUSH_PROP = ARM_POS_INTAKE - 100;
@@ -282,6 +282,10 @@ public class intakeUnit
         wristServo.setPosition(WRIST_POS_DROP_PURPLE);
     }
 
+    public void underTheBeamIntake(){
+        setArmCountPosition(ARM_POS_UNDER_BEAM);
+        wristServo.setPosition(WRIST_POS_INTAKE);
+    }
     /**
      * Get the arm servo motor current position value
      * @return the current arm servo motor position value
@@ -327,7 +331,7 @@ public class intakeUnit
         ARM_POS_READY_FOR_HANG = ARM_POS_INTAKE - 1760; // 1800
         ARM_POS_DROP = ARM_POS_INTAKE - 1000; //2550;
         ARM_POS_CAMERA_READ = ARM_POS_INTAKE - 1060; //2500;
-        ARM_POS_DROP_YELLOW = ARM_POS_INTAKE - 700; //2800;
+        ARM_POS_DROP_YELLOW = ARM_POS_INTAKE - 690; //2800;
         ARM_POS_UNDER_BEAM = ARM_POS_INTAKE - 360; //3100;
         ARM_POS_DROP_PURPLE = ARM_POS_INTAKE - 180; //3380;
         ARM_POS_PUSH_PROP = ARM_POS_INTAKE - 100;
