@@ -380,7 +380,7 @@ public class TeleopRR extends LinearOpMode {
 
     private void logRobotHeading(String sTag) {
         Logging.log("%s drive.pose: %.2f", sTag, Math.toDegrees(mecanum.pose.heading.log()));
-        Logging.log("%s imu: %.2f", sTag, mecanum.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) - Math.toDegrees(Params.startPose.heading.log()));
+        //Logging.log("%s imu: %.2f", sTag, mecanum.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) - Math.toDegrees(Params.startPose.heading.log()));
     }
 
     private void moveForward(double moveDistance) {

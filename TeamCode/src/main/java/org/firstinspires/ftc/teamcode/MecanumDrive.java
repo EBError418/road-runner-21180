@@ -216,7 +216,7 @@ public final class MecanumDrive {
         motors = Arrays.asList(leftFront, leftBack, rightBack, rightFront);
 
         // TODO: make sure your config has motors with these names (or change them)
-        //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
+        // see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
 
         leftFront.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         leftBack.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
@@ -236,12 +236,12 @@ public final class MecanumDrive {
         // TODO: make sure your config has an IMU with this name (can be BNO or BHI)
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
 
-        //imu = hardwareMap.get(IMU.class, "imu");
-        imu = new LazyImu(hardwareMap, "imu", new RevHubOrientationOnRobot(
-        IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
-                PARAMS.logoFacingDirection, PARAMS.usbFacingDirection));
+        // imu = hardwareMap.get(IMU.class, "imu");
+        // IMU.Parameters parameters = new IMU.Parameters(new RevHubOrientationOnRobot(
+        // PARAMS.logoFacingDirection, PARAMS.usbFacingDirection));
 
-        imu.resetYaw();
+        imu = new LazyImu(hardwareMap, "imu", new RevHubOrientationOnRobot(
+                PARAMS.logoFacingDirection, PARAMS.usbFacingDirection));
 
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
