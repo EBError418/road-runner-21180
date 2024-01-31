@@ -58,7 +58,7 @@ public class Params {
 
     static final double TELEOP_DISTANCE_TO_TAG = 7.0;
 
-    static final double BACKDROP_SIDEWAYS = 7.0; // 1 inch more to side tag
+    static final double BACKDROP_SIDEWAYS = 6.0; // 1 inch more to side tag
 
     // chassis power factors
     static final double POWER_LOW = 0.3;

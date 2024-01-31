@@ -122,7 +122,7 @@ public class AutoRedFrontLeft extends LinearOpMode {
     // road runner variables
     Pose2d startPose;
 
-    final int WAIT_ALLIANCE_SECONDS = 6;
+    final int WAIT_ALLIANCE_SECONDS = 3;
 
     /**
      * Set robot starting location on the field:
@@ -295,7 +295,7 @@ public class AutoRedFrontLeft extends LinearOpMode {
         Vector2d startArmFlip = new Vector2d(startPose.position.x - blueOrRed * 6, startPose.position.y);
 
         double pausePoseY = -2 * Params.HALF_MAT - 6;
-        Vector2d vMatCenter = new Vector2d(blueOrRed * (3 * Params.HALF_MAT), startPose.position.y);
+        Vector2d vMatCenter = new Vector2d(blueOrRed * Params.HALF_MAT, startPose.position.y);
         Vector2d vParkPos = new Vector2d(blueOrRed * 3 * Params.HALF_MAT - 2 * leftOrRight * Params.HALF_MAT, -3.2 * Params.HALF_MAT);
         Vector2d vBackdrop = new Vector2d(blueOrRed * 3 * Params.HALF_MAT, -4 * Params.HALF_MAT);
 
@@ -384,7 +384,6 @@ public class AutoRedFrontLeft extends LinearOpMode {
             logVector("robot drive: after turn pose starting Arm Flip required", startArmFlip);
         }
 
-
         intake.pushPropPose();
         sleep(2000);
 
@@ -409,14 +408,21 @@ public class AutoRedFrontLeft extends LinearOpMode {
         intake.armMotor.setPower(armPower);
         intake.switchServoClose();
 
-        if(checkStatus == 2 || checkStatus == 5 ||
-                4 == checkStatus || 3 == checkStatus) {
+        // move forward to 3rd mat avoid step on purple pixel.
+        if (frontOrBack > 0) {
+            intake.setArmCountPosition(intake.ARM_POS_READY_FOR_HANG);
+        }
+        if(checkStatus == 3 || checkStatus == 4){
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
-                            // move away from gate, and avoid stamp on purple pixel
-                            .strafeTo(new Vector2d(vMatCenter.x + blueOrRed * 4, vMatCenter.y + 1.5 * Params.HALF_MAT))
+                            .lineToXConstantHeading(vMatCenter.x)
                             .build()
-            );//strafe several inches left to avoid hitting the beam
+            );
+        }
+
+        // drive back before strafe to avoid hitting bins
+        if(6 == checkStatus || 1 == checkStatus){
+            sleep(200); // wait arm lift before strafe to avoid hitting
         }
 
         // there is a bug somewhere in turn() function when using PI/2, it actually turn PI */
@@ -437,7 +443,6 @@ public class AutoRedFrontLeft extends LinearOpMode {
 
         Logging.log("turn angle = %f", turnAngleToDrop);
 
-
         if ((6 != checkStatus) && (1 != checkStatus) && (turnAngleToDrop != 0.0)) {
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
@@ -448,28 +453,23 @@ public class AutoRedFrontLeft extends LinearOpMode {
             logVector("robot drive: turn after drop purple required", vDropPurple);
         }
 
-        // move to the center of second mat to go through gate.
+        // move to the center of third mat to go through gate.
         if (frontOrBack > 0) {
-            // add 2 inch to avoid drive on purple pixel, always 2 inch more to right
-            Vector2d driveThroughGate = null;
-            if (1 == checkStatus || 6 == checkStatus) {
-                driveThroughGate = new Vector2d(vMatCenter.x - 2, vMatCenter.y);
-            }
-            else {
-                driveThroughGate = new Vector2d(vMatCenter.x, vMatCenter.y);
-            }
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
-                            .strafeTo(driveThroughGate)
+                            .strafeTo(vMatCenter)
                             .build()
             );
 
             logVector("robot drive: drive.pose move to 2nd mat center", drive.pose.position);
-            logVector("robot drive: move to 2nd mat center required", driveThroughGate);
+            logVector("robot drive: move to 2nd mat center required", vMatCenter);
         }
 
         if (frontOrBack < 0) {
             intake.setArmCountPosition(intake.ARM_POS_CAMERA_READ  + 20); // lift arm to avoid blocking camera
+        }
+        else {
+            intake.underTheBeam(); // lower arm to go through gate
         }
         // fine tune heading angle
 
