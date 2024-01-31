@@ -90,7 +90,7 @@ public class intakeUnit
     int ARM_POS_INTAKE2 = ARM_POS_INTAKE - 25;
     int ARM_POS_INTAKE3 = ARM_POS_INTAKE - 50;
     int ARM_POS_INTAKE4 = ARM_POS_INTAKE - 75;
-    int ARM_POS_INTAKE5 = ARM_POS_INTAKE - 100;
+    int ARM_POS_INTAKE5 = ARM_POS_INTAKE - 130;
 
 
     /**
@@ -338,6 +338,6 @@ public class intakeUnit
         ARM_POS_INTAKE2 = ARM_POS_INTAKE - 25;
         ARM_POS_INTAKE3 = ARM_POS_INTAKE - 50;
         ARM_POS_INTAKE4 = ARM_POS_INTAKE - 75;
-        ARM_POS_INTAKE5 = ARM_POS_INTAKE - 100;
+        ARM_POS_INTAKE5 = ARM_POS_INTAKE - 130;
     }
 }

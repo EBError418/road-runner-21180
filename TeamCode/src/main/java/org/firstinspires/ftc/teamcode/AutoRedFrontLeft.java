@@ -122,7 +122,7 @@ public class AutoRedFrontLeft extends LinearOpMode {
     // road runner variables
     Pose2d startPose;
 
-    final int WAIT_ALLIANCE_SECONDS = 3;
+    final double WAIT_ALLIANCE_SECONDS = 0.02;
 
     /**
      * Set robot starting location on the field:
@@ -325,7 +325,7 @@ public class AutoRedFrontLeft extends LinearOpMode {
             case -1:
             case 4:
                 // pass the test
-                xDelta = 12.0;
+                xDelta = 20.0;
                 yDelta = blueOrRed * -10.0;
                 break;
             case -3:
@@ -413,6 +413,34 @@ public class AutoRedFrontLeft extends LinearOpMode {
             intake.setArmCountPosition(intake.ARM_POS_READY_FOR_HANG);
         }
         if(checkStatus == 3 || checkStatus == 4){
+            Vector2d pickWhite5Ready = new Vector2d(blueOrRed * (3 * Params.HALF_MAT -  BUCKET_SHIFT), 3.5 * Params.HALF_MAT);
+            Vector2d pickWhite5 = new Vector2d(blueOrRed * (3 * Params.HALF_MAT - BUCKET_SHIFT), 3.5 * Params.HALF_MAT + 4);
+            intake.intakePositions(intake.ARM_POS_UNDER_BEAM);
+
+            Actions.runBlocking(
+                    drive.actionBuilder(drive.pose)
+                            .strafeTo(pickWhite5Ready)
+                            .turn(Math.PI / 2.0)
+                            .build()
+            );
+
+            intake.intakePositions(intake.ARM_POS_INTAKE5);
+
+            Actions.runBlocking(
+                    drive.actionBuilder(drive.pose)
+                            .strafeTo(pickWhite5)
+                            .build()
+            );
+            sleep(1000);
+
+            intake.setArmCountPosition(intake.ARM_POS_READY_FOR_HANG);
+
+            Actions.runBlocking(
+                    drive.actionBuilder(drive.pose)
+                            .turn(-Math.PI / 2.0)
+                            .build()
+            );
+
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
                             .lineToXConstantHeading(vMatCenter.x)
@@ -571,6 +599,8 @@ public class AutoRedFrontLeft extends LinearOpMode {
     }
     private void dropYellowAction(){
         intake.setSwitchRightPosition(intake.SWITCH_RIGHT_RELEASE);
+        sleep(200);
+        intake.setSwitchLeftPosition(intake.SWITCH_LEFT_RELEASE);
         sleep(500);
         intake.setArmCountPosition(intake.getArmPosition() - 500);
         sleep(500);
