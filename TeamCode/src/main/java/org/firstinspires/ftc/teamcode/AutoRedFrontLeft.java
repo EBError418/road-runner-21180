@@ -37,14 +37,10 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.Arclength;
 import com.acmerobotics.roadrunner.ParallelAction;
-import com.acmerobotics.roadrunner.Pose2dDual;
-import com.acmerobotics.roadrunner.PosePath;
 import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.VelConstraint;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -55,7 +51,6 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.openftc.easyopencv.OpenCvCamera;
 import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
@@ -290,8 +285,6 @@ public class AutoRedFrontLeft extends LinearOpMode {
     }
 
     private void autoCore() {
-        Vector2d startArmFlip = new Vector2d(startPose.position.x - blueOrRed * 6, startPose.position.y);
-
         double pausePoseY = -2 * Params.HALF_MAT - 6;
         Vector2d vMatCenter = new Vector2d(blueOrRed * Params.HALF_MAT, startPose.position.y);
         Vector2d vParkPos = new Vector2d(blueOrRed * 3 * Params.HALF_MAT - 2 * leftOrRight * Params.HALF_MAT, -3.2 * Params.HALF_MAT);
@@ -312,41 +305,54 @@ public class AutoRedFrontLeft extends LinearOpMode {
         double yDelta = 10.0;
         double splineTangent = startPose.heading.toDouble();
 
+        double pickWhiteReady_x = blueOrRed * (3.1 * Params.HALF_MAT -  BUCKET_SHIFT);;
+        double pickWhiteReady_y = 3.5 * Params.HALF_MAT;;
+        double pickWhiteReady_Angle = Math.PI / 2.0;
+
         switch (checkStatus) {
             case 5:
             case -5:
             case 2:
             case -2:
                 // pass the test
-                xDelta = 7.0;
-                yDelta = -3.0 * blueOrRed;
-                splineTangent = startPose.heading.toDouble() - Math.PI / 20;
+                xDelta = 10.0;
+                yDelta = 1.0 * blueOrRed;
+                splineTangent = startPose.heading.toDouble() - Math.PI / 15;
+
+                pickWhiteReady_x = blueOrRed * (3.1 * Params.HALF_MAT -  BUCKET_SHIFT);
+                pickWhiteReady_y = 3.5 * Params.HALF_MAT;
+                pickWhiteReady_Angle = Math.PI / 2.0;
                 break;
             case -1:
             case 4:
                 // pass the test
-                xDelta = 18.0;
-                yDelta = blueOrRed * -10.0;
+                xDelta = 14.0;
+                yDelta = blueOrRed * -3.0;
+                splineTangent = startPose.heading.toDouble() - blueOrRed * Math.PI / 10;
                 break;
             case -3:
             case -4:
                 xDelta = -6; // 0;
                 yDelta = -9;
-                startArmFlip = new Vector2d(blueOrRed * (3 * Params.HALF_MAT + xDelta), startPose.position.y - 15);
                 break;
             case 1:
+                // near gate cases
+                xDelta = 11; // 0;
+                yDelta = 1;
+                splineTangent = startPose.heading.toDouble() + blueOrRed * Math.PI / 5;
+                break;
             case 6:
                 // near gate cases
-                xDelta = -5; // 0;
-                yDelta = 9;
-                startArmFlip = new Vector2d(blueOrRed * (3 * Params.HALF_MAT + xDelta), startPose.position.y + 15);
+                xDelta = 13; // 0;
+                yDelta = -1;
                 splineTangent = startPose.heading.toDouble() + blueOrRed * Math.PI / 5;
                 break;
             case 3:
             case -6:
                 // pass the test
-                xDelta = 12.0;
-                yDelta = blueOrRed * 14.0;
+                xDelta = 14.0;
+                yDelta = blueOrRed * 0.0;
+                splineTangent = startPose.heading.toDouble() - blueOrRed * Math.PI / 5;
                 break;
         }
         vDropPurple = new Vector2d(blueOrRed * (3 * Params.HALF_MAT + xDelta), startPose.position.y + yDelta);
@@ -360,65 +366,103 @@ public class AutoRedFrontLeft extends LinearOpMode {
         Logging.log("Autonomous time - robot start moving time: " + runtime);
 
         intake.setArmCountPosition(intake.ARM_POS_PUSH_PROP);
-        // move forward
-        if ((2 == checkStatus) || (5 == checkStatus) || (-2 == checkStatus) || (-5 == checkStatus) ) {
-            Actions.runBlocking(
-                    drive.actionBuilder(startPose)
-                            .splineTo(vDropPurple, splineTangent)
-                            .build()
-            );
-        }
-        logVector("robot drive: arm to push pose", drive.pose.position);
-        logVector("robot drive: start Arm Flip pose required", startArmFlip);
-
-        double tAngle = Math.PI / 2.0 * frontOrBack * blueOrRed + 0.0001; // add 0.0001 to avoid 0 degree turning.
-        Logging.log("frontOrBack = %d, blueOrRed = %d, turn angle = %f", frontOrBack, blueOrRed, tAngle);
         intake.setWristPosition(intake.WRIST_POS_INTAKE);
 
-        // Near gate cases
-        if (((6 == checkStatus) || (-3 == checkStatus) || (1 == checkStatus) || (-4 == checkStatus)) &&
-                (tAngle != 0.0)) {
-            startArmFlip = new Vector2d(blueOrRed * 4 * Params.HALF_MAT, frontOrBack * 3 * Params.HALF_MAT);
-            vDropPurple = new Vector2d(blueOrRed * (4 * Params.HALF_MAT + 1), frontOrBack * (3 * Params.HALF_MAT - 1));
-            Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
-                            .splineTo(vDropPurple, splineTangent)
-                            .build()
-            );
-            logRobotHeading("robot drive: after turn before arm flip");
-            logVector("robot drive: after turn pose starting Arm Flip required", drive.pose.position);
-            logVector("robot drive: after turn pose starting Arm Flip required", startArmFlip);
-        }
-        else {
-            /*
-            Actions.runBlocking(
-                    new ParallelAction(
-                            // Paral 1. turn on camera for april tag detect
-                            (drive.actionBuilder(drive.pose)
-                                    .strafeTo(vDropPurple)
-                                    .build()),
-                            new CloseCamera()
-                    )
-            );
+        // spline to drop purple
+        /*
+        Actions.runBlocking(
+                drive.actionBuilder(startPose)
+                        .splineToSplineHeading(new Pose2d(vDropPurple, splineTangent), splineTangent)
+                        .build()
+        );
 
-             */
-        }
+         */
+        Actions.runBlocking(
+                new ParallelAction(
+                        // paral 1.
+                        drive.actionBuilder(drive.pose)
+                                .splineToSplineHeading(new Pose2d(vDropPurple, splineTangent), splineTangent)
+                                .build(),
+
+                        // Paral 2.
+                        new CloseCamera()
+                )
+        );
+
+        /*
+        Actions.runBlocking(
+                new ParallelAction(
+                        // Paral 1. turn on camera for april tag detect
+                        drive.actionBuilder(drive.pose)
+                                .splineTo(vDropPurple, splineTangent)
+                                .build(),
+
+                        // Paral 2.
+                        new CloseCamera(),
+
+                        // Paral 3.
+                        new SequentialAction(
+                                // Seq b. waiting alliance move out the way if at front side
+                                new SleepAction(1.0),
+
+                                new intakeUnitActions((int)NO_ACT, intake.WRIST_POS_INTAKE, 1000, 0)
+                        )
+                )
+        );
+         */
+
         logVector("robot drive: drop purple pose", drive.pose.position);
         logVector("robot drive: drop purple pose required", vDropPurple);
-
         Logging.log("Autonomous time - ready to drop purple time: " + runtime);
 
         // drop off the purple pixel by arm and wrist actions
         dropPurpleAction();
-        intake.underTheBeam();
-        sleep(300);
+        intake.liftArmToDropPurple();
+        sleep(200);
+        Logging.log("Autonomous time - after drop purple time: " + runtime);
+
+        // temp code to move away from purple
+        //Vector2d vPickWhite1Ready = new Vector2d(blueOrRed * (3.2 * Params.HALF_MAT -  BUCKET_SHIFT), 3.5 * Params.HALF_MAT);
+        Vector2d pickWhite5 = new Vector2d( pickWhiteReady_x, pickWhiteReady_y + 6);
+        Pose2d pPickWhite1Ready = new Pose2d(pickWhiteReady_x, pickWhiteReady_y, pickWhiteReady_Angle);
+
+        intake.intakePositions(intake.ARM_POS_INTAKE5);
+  /*
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-
-                        .strafeTo(new Vector2d(blueOrRed * 5 * Params.HALF_MAT, frontOrBack * 3 * Params.HALF_MAT))
-
+                        .splineToLinearHeading(pPickWhite1Ready, pickWhiteReady_Angle)
+                        .strafeTo(pickWhite5)
                         .build()
         );
+
+         */
+
+        Actions.runBlocking(
+                drive.actionBuilder(drive.pose)
+                        .splineToLinearHeading(pPickWhite1Ready, pickWhiteReady_Angle)
+                        .strafeTo(pickWhite5)
+                        .build()
+        );
+
+        Actions.runBlocking(
+                drive.actionBuilder(drive.pose)
+                        .splineToLinearHeading(new Pose2d(blueOrRed * Params.HALF_MAT,  2 * Params.HALF_MAT, -Math.PI/2), -Math.PI/2)
+                        .build()
+        );
+
+        sleep(200);
+        Logging.log("Autonomous time - after pickup white time: " + runtime);
+
+        // move away
+        /*
+        Actions.runBlocking(
+                drive.actionBuilder(drive.pose)
+                        .strafeTo(new Vector2d(blueOrRed * (5 * Params.HALF_MAT), 3 * Params.HALF_MAT))
+                        .build()
+        );
+
+         */
+
 /*
         double armPower = intake.armMotor.getPower();
         intake.armMotor.setPower(0.1); // use slow speed

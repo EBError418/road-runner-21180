@@ -282,6 +282,11 @@ public class intakeUnit
         wristServo.setPosition(WRIST_POS_DROP_PURPLE);
     }
 
+    public void liftArmToDropPurple(){
+        setArmCountPosition(ARM_POS_DROP_YELLOW);
+        wristServo.setPosition(WRIST_POS_DROP_PURPLE);
+    }
+
     public void underTheBeamIntake(){
         setArmCountPosition(ARM_POS_UNDER_BEAM);
         wristServo.setPosition(WRIST_POS_INTAKE);
