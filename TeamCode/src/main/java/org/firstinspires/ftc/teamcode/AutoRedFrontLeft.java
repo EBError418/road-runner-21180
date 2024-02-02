@@ -312,6 +312,7 @@ public class AutoRedFrontLeft extends LinearOpMode {
 
         double pickupAngle = Math.PI/2;
 
+
         switch (checkStatus) {
             case 5:
             case -5:
@@ -321,10 +322,6 @@ public class AutoRedFrontLeft extends LinearOpMode {
                 xDelta = 10.0;
                 yDelta = 1.0 * blueOrRed;
                 splineTangent = startPose.heading.toDouble() - Math.PI / 15;
-
-                pickWhiteReady_x = blueOrRed * (3.1 * Params.HALF_MAT -  BUCKET_SHIFT);
-                pickWhiteReady_y = 3.5 * Params.HALF_MAT;
-                pickupAngle = Math.PI / 2.0;
                 break;
             case -1:
             case 4:
