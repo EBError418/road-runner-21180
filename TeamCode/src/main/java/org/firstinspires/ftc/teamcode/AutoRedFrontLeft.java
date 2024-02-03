@@ -37,9 +37,6 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.ParallelAction;
-import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.acmerobotics.roadrunner.Pose2d;
@@ -49,6 +46,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Version;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -56,6 +54,7 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.List;
+import java.util.Vector;
 
 /**
  * Hardware config:
@@ -99,6 +98,8 @@ public class AutoRedFrontLeft extends LinearOpMode {
      * blue: 1,2,3; red: 4,5,6
      */
     private int desiredTagNum = 0; // blue: 1,2,3; red: 4,5,6
+    private int desiredTagNum2nd = 0; // blue: 1,2,3; red: 4,5,6
+
     private int checkStatus = 1;
     final private double BUCKET_SHIFT = 2.0; // yellow pixel is in the right bucket.
     // USE LATER: boolean debug_flag = true;
@@ -252,6 +253,15 @@ public class AutoRedFrontLeft extends LinearOpMode {
         desiredTagNum = spikeMarkLoc + ((blueOrRed > 0)? 0 : 3); // blue: 1,2,3; red: 4,5,6
         checkStatus = desiredTagNum * frontOrBack;
 
+        if ((2 == desiredTagNum) || (5 ==desiredTagNum)) {
+            desiredTagNum2nd = desiredTagNum - 1;
+        }
+        else {
+            desiredTagNum2nd = (desiredTagNum < 3.5)? 2 : 5;
+        }
+        desiredTagNum2nd = (desiredTagNum < 3.5)? 2 : 5; // center for safe
+
+
         tag = new AprilTagTest(drive, hardwareMap, desiredTagNum, webcamName);
 
         // bulk reading setting - auto refresh mode
@@ -297,18 +307,32 @@ public class AutoRedFrontLeft extends LinearOpMode {
         } else {
             vAprilTag = new Vector2d(vBackdrop.x + (5 - desiredTagNum) * Params.BACKDROP_SIDEWAYS, vBackdrop.y);
         }
+
         Vector2d vCheckingAprilTagPose = new Vector2d(vAprilTag.x, vAprilTag.y + Params.HALF_MAT);
+        Vector2d vCheckingAprilTag2nd = new Vector2d(vAprilTag.x - (desiredTagNum2nd - desiredTagNum) * 6, vAprilTag.y + Params.HALF_MAT); // TODO
+
         Vector2d vDropYellow = new Vector2d(vAprilTag.x + BUCKET_SHIFT, vAprilTag.y + 2.5); // 3 seem good
+        Vector2d vDropWhite = new Vector2d(vCheckingAprilTag2nd.x + BUCKET_SHIFT, vAprilTag.y + 2.5); // 3 seem good
+
 
         Vector2d vDropPurple = null;
         double xDelta = -7.0;
         double yDelta = 10.0;
         double splineTangent = startPose.heading.toDouble();
 
-        double pickWhiteReady_x = blueOrRed * (3.1 * Params.HALF_MAT -  BUCKET_SHIFT);;
-        double pickWhiteReady_y = 3.5 * Params.HALF_MAT;;
+        double pickWhiteReady_x = blueOrRed * 3.1 * Params.HALF_MAT +  BUCKET_SHIFT;
+        double pickWhiteReady_y = 3.5 * Params.HALF_MAT;
 
-        double dropOffAngle = -Math.PI/2 + 0.001;
+        double startTurn1stDrop_x = 3 * Params.HALF_MAT * blueOrRed;
+
+        double delta_x = 2.0; // temp compensation
+        double delta_y = 1.0; // temp compensation
+        double startTurn2ndDrop_x = pickWhiteReady_x - 2 * Params.HALF_MAT * blueOrRed;
+
+        Vector2d vStartTurn1stDrop = new Vector2d(startTurn1stDrop_x, vCheckingAprilTagPose.y + Params.HALF_MAT);
+        Vector2d vStartTurn2ndDrop = new Vector2d(startTurn2ndDrop_x, vCheckingAprilTagPose.y + Params.HALF_MAT * 1.7); // 1.7 to avoid step on purple
+
+        double dropOffAngle = -Math.PI/2 - 0.04 * blueOrRed; // 0.04 for turn orientation control
 
         double pickupAngle = Math.PI/2;
 
@@ -319,8 +343,8 @@ public class AutoRedFrontLeft extends LinearOpMode {
             case 2:
             case -2:
                 // pass the test
-                xDelta = 10.0;
-                yDelta = 1.0 * blueOrRed;
+                xDelta = 9.0;
+                yDelta = 2.0 * blueOrRed;
                 splineTangent = startPose.heading.toDouble() - Math.PI / 15;
                 break;
             case -1:
@@ -328,6 +352,7 @@ public class AutoRedFrontLeft extends LinearOpMode {
                 // pass the test
                 xDelta = 14.0;
                 yDelta = blueOrRed * -3.0;
+                pickWhiteReady_x = pickWhiteReady_x - blueOrRed * Params.HALF_MAT;
                 splineTangent = startPose.heading.toDouble() - blueOrRed * Math.PI / 10;
                 break;
             case -3:
@@ -339,12 +364,14 @@ public class AutoRedFrontLeft extends LinearOpMode {
                 // near gate cases
                 xDelta = 11; // 0;
                 yDelta = 1;
+                pickWhiteReady_x = pickWhiteReady_x - blueOrRed * Params.HALF_MAT;
                 splineTangent = startPose.heading.toDouble() + blueOrRed * Math.PI / 5;
                 break;
             case 6:
                 // near gate cases
                 xDelta = 13; // 0;
                 yDelta = -1;
+                pickWhiteReady_x = pickWhiteReady_x - blueOrRed * Params.HALF_MAT;
                 splineTangent = startPose.heading.toDouble() + blueOrRed * Math.PI / 5;
                 break;
             case 3:
@@ -352,6 +379,7 @@ public class AutoRedFrontLeft extends LinearOpMode {
                 // pass the test
                 xDelta = 14.0;
                 yDelta = blueOrRed * 0.0;
+                pickWhiteReady_x = pickWhiteReady_x - blueOrRed * Params.HALF_MAT;
                 splineTangent = startPose.heading.toDouble() - blueOrRed * Math.PI / 5;
                 break;
         }
@@ -366,35 +394,27 @@ public class AutoRedFrontLeft extends LinearOpMode {
         Logging.log("Autonomous time - robot start moving time: " + runtime);
 
         // spline to drop purple
-        Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
-                        .afterTime(0.001, new CloseCamera()) // close camera
-                        .afterDisp(1, new intakeUnitActions(intake.ARM_POS_PUSH_PROP, intake.WRIST_POS_INTAKE, 0))
-                        .splineToSplineHeading(new Pose2d(vDropPurple, splineTangent), splineTangent)
-                        .build()
-        );
-
-        /* example
-        Actions.runBlocking(
-                new ParallelAction(
-                        // Paral 1. turn on camera for april tag detect
-                        drive.actionBuilder(drive.pose)
-                                .splineTo(vDropPurple, splineTangent)
-                                .build(),
-
-                        // Paral 2.
-                        new CloseCamera(),
-
-                        // Paral 3.
-                        new SequentialAction(
-                                // Seq b. waiting alliance move out the way if at front side
-                                new SleepAction(1.0),
-
-                                new intakeUnitActions((int)NO_ACT, intake.WRIST_POS_INTAKE, 1000, 0)
-                        )
-                )
-        );
-         */
+        if ((2 == checkStatus) || (5 == checkStatus)) {
+            Actions.runBlocking(
+                    drive.actionBuilder(drive.pose)
+                            .afterTime(0.001, new CloseCamera()) // close camera
+                            .afterDisp(1, new intakeUnitActions(intake.ARM_POS_DROP_PURPLE, intake.WRIST_POS_INTAKE, 0))
+                            .splineToSplineHeading(new Pose2d(vDropPurple, splineTangent), splineTangent)
+                            .waitSeconds(0.5)  // wait for arm to be in place
+                            .build()
+            );
+        }
+        else {
+            Actions.runBlocking(
+                    drive.actionBuilder(drive.pose)
+                            .afterTime(0.001, new CloseCamera()) // close camera
+                            .afterDisp(1, new intakeUnitActions(intake.ARM_POS_DROP_PURPLE, intake.WRIST_POS_INTAKE, 0))
+                            //.strafeTo(new Vector2d(drive.pose.position.x - blueOrRed * Params.HALF_MAT, drive.pose.position.y))
+                            .splineToSplineHeading(new Pose2d(vDropPurple, splineTangent), splineTangent)
+                            .waitSeconds(0.5)  // wait for arm to be in place
+                            .build()
+            );
+        }
 
         logVector("robot drive: drop purple pose", drive.pose.position);
         logVector("robot drive: drop purple pose required", vDropPurple);
@@ -421,17 +441,37 @@ public class AutoRedFrontLeft extends LinearOpMode {
 
 
         // move back to drop yellow and white, lift arm after through gate
-        Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
-                        .afterDisp(1, new TurnOnCamera()) // turn on camera for April Tag checking
-                        .splineToLinearHeading(new Pose2d(blueOrRed * Params.HALF_MAT,  3 * Params.HALF_MAT, dropOffAngle), dropOffAngle)
-                        .afterTime(2, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, intake.WRIST_POS_DROP_YELLOW, 0))
-                        .splineToLinearHeading(new Pose2d(blueOrRed * Params.HALF_MAT,  -2 * Params.HALF_MAT, dropOffAngle), dropOffAngle)
-                        .splineToLinearHeading(new Pose2d(vCheckingAprilTagPose, dropOffAngle), dropOffAngle)
-                        .build()
-        );
-
-
+        if ((5 == checkStatus) || (2 == checkStatus)) {
+            Actions.runBlocking(
+                    drive.actionBuilder(drive.pose)
+                            .afterDisp(1, new TurnOnCamera()) // turn on camera for April Tag checking
+                            .strafeTo(vStartTurn1stDrop)
+                            .afterTime(0, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, intake.WRIST_POS_DROP_YELLOW, 0))
+                            .splineToLinearHeading(new Pose2d(vCheckingAprilTagPose, dropOffAngle), dropOffAngle)
+                            .build()
+            );
+        } else if ((1 == checkStatus) || (6 == checkStatus)) {
+            Actions.runBlocking(
+                    drive.actionBuilder(drive.pose)
+                            .afterDisp(1, new TurnOnCamera()) // turn on camera for April Tag checking
+                            .strafeTo(new Vector2d(vStartTurn2ndDrop.x, drive.pose.position.y - 2 * Params.HALF_MAT))
+                            .strafeTo(vStartTurn2ndDrop)
+                            .splineToLinearHeading(new Pose2d(vCheckingAprilTagPose, dropOffAngle), dropOffAngle)
+                            .afterTime(2, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, intake.WRIST_POS_DROP_YELLOW, 0))
+                            .build()
+            );
+        }
+        else {
+            Actions.runBlocking(
+                    drive.actionBuilder(drive.pose)
+                            .afterDisp(1, new TurnOnCamera()) // turn on camera for April Tag checking
+                            .splineToLinearHeading(new Pose2d(blueOrRed * Params.HALF_MAT, 3 * Params.HALF_MAT, dropOffAngle), dropOffAngle)
+                            .afterTime(2, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, intake.WRIST_POS_DROP_YELLOW, 0))
+                            .splineToLinearHeading(new Pose2d(blueOrRed * Params.HALF_MAT, -2 * Params.HALF_MAT, dropOffAngle), dropOffAngle)
+                            .splineToLinearHeading(new Pose2d(vCheckingAprilTagPose, dropOffAngle), dropOffAngle)
+                            .build()
+            );
+        }
         logVector("robot drive: drive.pose check april tag", drive.pose.position);
         logVector("robot drive: check april tag required", vCheckingAprilTagPose);
         logRobotHeading("robot drive: check april tag");
@@ -449,7 +489,7 @@ public class AutoRedFrontLeft extends LinearOpMode {
             logVector("robot drive: drop yellow pose required after april tag adjust", vDropYellow);
         }
         else {
-            vDropYellow = new Vector2d(vAprilTag.x + BUCKET_SHIFT, vAprilTag.y + 13); // 3 seem good
+            //vDropYellow = new Vector2d(vAprilTag.x + BUCKET_SHIFT, vAprilTag.y + 13); // 3 seem good
 
             Logging.log("Can not found required AprilTag to drop yellow pixel");
         }
@@ -476,40 +516,31 @@ public class AutoRedFrontLeft extends LinearOpMode {
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .afterTime(1, new pickupWhiteAct(intake.ARM_POS_INTAKE5))
-                        .splineToLinearHeading(new Pose2d(pickWhiteReady_x - blueOrRed * 0.95 * Params.HALF_MAT,  -2 * Params.HALF_MAT, pickupAngle), pickupAngle)
-                        .splineToLinearHeading(new Pose2d(pickWhiteReady_x - blueOrRed * 0.95 * Params.HALF_MAT, pickWhiteReady_y + 17, pickupAngle), pickupAngle)
+                        .splineToLinearHeading(new Pose2d(vStartTurn2ndDrop, pickupAngle), pickupAngle)
+                        .splineToLinearHeading(new Pose2d(startTurn2ndDrop_x - delta_x, pickWhite5.y + delta_y, pickupAngle), pickupAngle)
+
+                        // back to drop off 2nd round
+                        .waitSeconds(0.6)
+                        .strafeTo(vStartTurn2ndDrop)
+                        .splineToLinearHeading(new Pose2d(vCheckingAprilTag2nd, dropOffAngle), dropOffAngle)
+                        .afterTime(0.3, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, intake.WRIST_POS_DROP_YELLOW, 0))
                         .build()
         );
         Logging.log("Autonomous time - after second white pickup time: " + runtime);
 
-
-        // back to drop second white pixel
-        Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
-                        .strafeTo(new Vector2d(pickWhiteReady_x - blueOrRed * 0.95 * Params.HALF_MAT, pickWhiteReady_y))
-                        .afterTime(4, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, intake.WRIST_POS_DROP_YELLOW, 0))
-                        .splineToLinearHeading(new Pose2d(blueOrRed * Params.HALF_MAT * 1.5,  -2 * Params.HALF_MAT, dropOffAngle), dropOffAngle)
-                        .splineToLinearHeading(new Pose2d(vCheckingAprilTagPose, dropOffAngle), dropOffAngle)
-                        .build()
-        );
-
-
         Logging.log("Autonomous - Start April tag detect 2nd time");
-        aprilTagPose = tag.updatePoseAprilTag(desiredTagNum);
+        aprilTagPose = tag.updatePoseAprilTag(desiredTagNum2nd);
         logVector("robot drive: april tag location from camera", aprilTagPose.position);
-        logVector("robot drive: drop yellow pose required before adjust", vDropYellow);
+        logVector("robot drive: drop yellow pose required before adjust", vDropWhite);
 
         // if can not move based on April tag, move by road runner encode.
         if (tag.targetFound) {
             // adjust yellow drop-off position according to april tag location info from camera
-            vDropYellow = new Vector2d(drive.pose.position.x - aprilTagPose.position.x + BUCKET_SHIFT,
+            vDropWhite = new Vector2d(drive.pose.position.x - aprilTagPose.position.x + BUCKET_SHIFT,
                     drive.pose.position.y - aprilTagPose.position.y + Params.AUTO_DISTANCE_TO_TAG);
             logVector("robot drive: drop yellow pose required after april tag adjust", vDropYellow);
         }
         else {
-            // temp code
-             vDropYellow = new Vector2d(vAprilTag.x + BUCKET_SHIFT, vAprilTag.y + 13); // 3 seem good
-
             Logging.log("Can not found required AprilTag to drop yellow pixel");
         }
 
@@ -518,7 +549,7 @@ public class AutoRedFrontLeft extends LinearOpMode {
         // shift to AprilTag
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        .strafeTo(vDropYellow)
+                        .strafeTo(vDropWhite)
                         .build()
         );
         logVector("robot drive: drive.pose drop yellow", drive.pose.position);
@@ -527,10 +558,11 @@ public class AutoRedFrontLeft extends LinearOpMode {
         logVector("robot drive: april tag required", vAprilTag);
 
         // drop pixels
-        dropYellowAction();
+        dropWhiteAction();
 
         Logging.log("Autonomous time - after second white drop time: " + runtime);
 
+        intake.setArmCountPosition(intake.ARM_POS_READY_FOR_HANG + 200);
 
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
@@ -539,7 +571,6 @@ public class AutoRedFrontLeft extends LinearOpMode {
         );
         logVector("robot drive: drive.pose parking", drive.pose.position);
         logVector("robot drive: parking required", vParkPos);
-
     }
 
     private void dropPurpleAction() {
@@ -554,6 +585,14 @@ public class AutoRedFrontLeft extends LinearOpMode {
     private void dropYellowAction(){
         intake.setSwitchRightPosition(intake.SWITCH_RIGHT_RELEASE);
         sleep(500);
+        intake.setSwitchLeftPosition(intake.SWITCH_LEFT_RELEASE);
+        sleep(400);
+        intake.setArmCountPosition(intake.getArmPosition() - 500);
+        sleep(200);
+    }
+
+    private void dropWhiteAction(){
+        intake.setSwitchRightPosition(intake.SWITCH_RIGHT_RELEASE);
         intake.setSwitchLeftPosition(intake.SWITCH_LEFT_RELEASE);
         sleep(400);
         intake.setArmCountPosition(intake.getArmPosition() - 500);
