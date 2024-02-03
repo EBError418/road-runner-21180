@@ -275,7 +275,7 @@ public class intakeUnit
         setArmCountPosition(armPosition);
         wristServo.setPosition(WRIST_POS_DROP_YELLOW);
         switchServoClose();
-        fingerStop();
+        //fingerStop();
     }
     public void underTheBeam(){
         setArmCountPosition(ARM_POS_UNDER_BEAM);
