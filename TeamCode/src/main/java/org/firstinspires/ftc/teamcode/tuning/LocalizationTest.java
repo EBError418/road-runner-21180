@@ -38,7 +38,7 @@ public class LocalizationTest extends LinearOpMode {
                 telemetry.addData("right front pos", drive.rightFront.getCurrentPosition());
                 telemetry.addData("right back pos", drive.rightBack.getCurrentPosition());
 
-                if (drive.localizer.equals(ThreeDeadWheelLocalizer.class)) {
+                if (drive.localizer instanceof ThreeDeadWheelLocalizer) {
                     ThreeDeadWheelLocalizer dl = (ThreeDeadWheelLocalizer) drive.localizer;
                     telemetry.addData("par0 pos = ", dl.par0.getPositionAndVelocity().position);
                     telemetry.addData("par1 pos = ", dl.par1.getPositionAndVelocity().position);

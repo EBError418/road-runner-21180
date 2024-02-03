@@ -58,25 +58,25 @@ public final class MecanumDrive {
         public RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection =
                 RevHubOrientationOnRobot.LogoFacingDirection.UP;
         public RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
-                RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
 
         // drive model parameters
 
         // Gobilda odometry: 48mm diameter(1.89 inch), 2048 tick per revolution, inPerTick = 0.0029.
         public boolean useDeadWheel = true;
         public double inPerTick = useDeadWheel? 0.00294 : 0.02208155454144; // WHEEL_RADIUS(1.8898) * 2 * Math.PI / TICKS_PER_REV(537.6)
-        public double lateralInPerTick = useDeadWheel? 0.002621639136230116 : 0.019/0.9786;
-        public double trackWidthTicks = useDeadWheel? 4799.137772874604 : 650;
+        public double lateralInPerTick = useDeadWheel? 0.0026698972275674207 : 0.019/0.9786;
+        public double trackWidthTicks = useDeadWheel? 3654.072246196217 : 650;
 
         // feedforward parameters (in tick units)
-        public double kS = useDeadWheel? 0.24257680481252297 : 0.0;
-        public double kV = useDeadWheel? 0.0007154768810151011 : 0.0025;
+        public double kS = useDeadWheel? 0.2119659969575789 : 0.0;
+        public double kV = useDeadWheel? 0.0007190430845854507 : 0.0025;
         public double kA = useDeadWheel? 0.00012 : 0.0;
 
         // path profile parameters (in inches)
         public double maxWheelVel = 50;
-        public double minProfileAccel = -25;//-30;  // reduce acc to get more reliability
-        public double maxProfileAccel = 45;//50;
+        public double minProfileAccel = useDeadWheel? -40 : -25;  // reduce acc to get more reliability
+        public double maxProfileAccel = useDeadWheel? 50 : 45;//50;
 
         // turn profile parameters (in radians)
         public double maxAngVel = Math.PI / 2; // shared with path
