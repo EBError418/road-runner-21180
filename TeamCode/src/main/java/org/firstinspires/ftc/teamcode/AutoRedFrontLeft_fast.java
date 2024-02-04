@@ -294,7 +294,13 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
     }
 
     private void autoCore() {
-        Vector2d vParkPos = new Vector2d(blueOrRed * 3 * Params.HALF_MAT - 2 * leftOrRight * Params.HALF_MAT, -3.2 * Params.HALF_MAT);
+
+        double delta_x = 2.0; // compensate robot shifting to right when forward drive more than 60 inches
+        double delta_y = 1.0; // temp compensation
+        int armShiftCnt = -50;
+
+
+        Vector2d vParkPos = new Vector2d(blueOrRed * 3 * Params.HALF_MAT - 2 * leftOrRight * Params.HALF_MAT, -3.5 * Params.HALF_MAT);
         Vector2d vBackdrop = new Vector2d(blueOrRed * 3 * Params.HALF_MAT, -4 * Params.HALF_MAT);
 
         Vector2d vAprilTag = null;
@@ -306,30 +312,28 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         }
 
         Vector2d vCheckingAprilTagPose = new Vector2d(vAprilTag.x, vAprilTag.y + Params.HALF_MAT);
-        Vector2d vCheckingAprilTag2nd = new Vector2d(vAprilTag.x - (desiredTagWhite - desiredTagNum) * 6, vAprilTag.y + Params.HALF_MAT); // TODO
+        Vector2d vCheckingAprilTag2nd = new Vector2d(vAprilTag.x - (desiredTagWhite - desiredTagNum) * 6, vAprilTag.y + Params.HALF_MAT);
 
-        Vector2d vDropYellow = new Vector2d(vAprilTag.x + BUCKET_SHIFT, vAprilTag.y + 2.5); // 3 seem good
-        Vector2d vDropWhite = new Vector2d(vCheckingAprilTag2nd.x + BUCKET_SHIFT, vAprilTag.y + 2.5); // 3 seem good
-
+        Vector2d vDropYellow = new Vector2d(vAprilTag.x + BUCKET_SHIFT - delta_x, vAprilTag.y + 1);
+        Vector2d vDropWhite = new Vector2d(vCheckingAprilTag2nd.x + BUCKET_SHIFT, vAprilTag.y + 1 + 2 * delta_y);
 
         Vector2d vDropPurple = null;
         double xDelta = -7.0;
         double yDelta = 10.0;
         double splineTangent = startPose.heading.toDouble();
 
-        double pickWhiteReady_x = blueOrRed * 3.1 * Params.HALF_MAT +  BUCKET_SHIFT;
+        double pickWhiteReady_x = blueOrRed * 3.0 * Params.HALF_MAT + BUCKET_SHIFT;
         double pickWhiteReady_y = 3.5 * Params.HALF_MAT;
 
         double startTurn1stDrop_x = 3 * Params.HALF_MAT * blueOrRed;
 
-        double delta_x = 2.0; // compensate robot shifting to right when forward drive more than 60 inches
-        double delta_y = 1.0; // temp compensation
+
         double startTurn2ndDrop_x = pickWhiteReady_x - 2 * Params.HALF_MAT * blueOrRed; // under gate
 
         Vector2d vStartTurn1stDrop = new Vector2d(startTurn1stDrop_x, vCheckingAprilTagPose.y + Params.HALF_MAT);
-        Vector2d vStartTurn2ndDrop = new Vector2d(startTurn2ndDrop_x, vCheckingAprilTagPose.y + Params.HALF_MAT * 1.7); // 1.7 to avoid step on purple
+        Vector2d vStartTurn2ndDrop = new Vector2d(startTurn2ndDrop_x, vCheckingAprilTagPose.y + 0.5 *Params.HALF_MAT); // far enough to avoid step on purple
 
-        double dropOffAngle = -Math.PI/2 - 0.04 * blueOrRed; // 0.04 for turn orientation control
+        double dropOffAngle = -Math.PI/2 - 0.04;// * blueOrRed; // 0.04 for turn orientation control
         double pickupAngle = Math.PI/2;
 
         switch (checkStatus) {
@@ -430,6 +434,9 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
                         .afterDisp(3, new pickupWhiteAct(intake.ARM_POS_INTAKE5))
                         .splineToLinearHeading(pPickWhite1Ready, pickupAngle)
                         .strafeTo(pickWhite5)
+                        .waitSeconds(0.3)
+                        .afterTime(0, new intakeUnitActions(intake.ARM_POS_INTAKE5 + armShiftCnt, NO_ACT, 0))
+                        .waitSeconds(0.1)
                         .build()
         );
         Logging.log("Autonomous time - after pickup white time: " + runtime);
@@ -484,8 +491,6 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
             logVector("robot drive: drop yellow pose required after april tag adjust", vDropYellow);
         }
         else {
-            //vDropYellow = new Vector2d(vAprilTag.x + BUCKET_SHIFT, vAprilTag.y + 13); // 3 seem good
-
             Logging.log("Can not found required AprilTag to drop yellow pixel");
         }
 
@@ -494,6 +499,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         // shift to AprilTag
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
+                        .turn(-drive.pose.heading.toDouble() - Math.PI / 2) // fine turning heading
                         .strafeTo(vDropYellow)
                         .build()
         );
@@ -508,14 +514,19 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         Logging.log("Autonomous time - after drop off yellow time: " + runtime);
 
         // move to pickup second white pixel
+        double turnAngle = drive.pose.heading.toDouble() + Math.PI - blueOrRed * 0.03; // 0.03 is control orientation to avoid hitting board;
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .afterTime(1, new pickupWhiteAct(intake.ARM_POS_INTAKE5))
-                        .splineToLinearHeading(new Pose2d(vStartTurn2ndDrop, pickupAngle), pickupAngle)
-                        .splineToLinearHeading(new Pose2d(startTurn2ndDrop_x - delta_x, pickWhite5.y + delta_y, pickupAngle), pickupAngle)
+                        .splineToLinearHeading(new Pose2d(vStartTurn2ndDrop, turnAngle), turnAngle)
+                        .splineToLinearHeading(new Pose2d(startTurn2ndDrop_x + (blueOrRed - 1) * delta_x, pickWhite5.y + delta_y, pickupAngle), pickupAngle)
+                        .waitSeconds(0.4) // make sure the arm is lift after robot in place
+                        .afterTime(0, new intakeUnitActions(intake.ARM_POS_INTAKE5 + armShiftCnt, NO_ACT, 0))
+                        .waitSeconds(0.2)
+                        .strafeTo(new Vector2d(startTurn2ndDrop_x + (blueOrRed - 1) * delta_x - blueOrRed * 1.5 * BUCKET_SHIFT, pickWhite5.y + delta_y)) // move bucket a little bit
 
                         // back to drop off 2nd round
-                        .waitSeconds(0.6)
+                        .waitSeconds(0.3)
                         .strafeTo(vStartTurn2ndDrop)
                         .splineToLinearHeading(new Pose2d(vCheckingAprilTag2nd, dropOffAngle), dropOffAngle)
                         .afterTime(0.3, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, intake.WRIST_POS_DROP_YELLOW, 0))
@@ -575,13 +586,13 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
 
         // 2. open switch
         intake.setSwitchLeftPosition(intake.SWITCH_LEFT_RELEASE);
-        sleep(600);
+        sleep(500);
     }
     private void dropYellowAction(){
         intake.setSwitchRightPosition(intake.SWITCH_RIGHT_RELEASE);
-        sleep(500);
+        sleep(300);
         intake.setSwitchLeftPosition(intake.SWITCH_LEFT_RELEASE);
-        sleep(400);
+        sleep(300);
         intake.setArmCountPosition(intake.getArmPosition() - 500);
         sleep(200);
     }
@@ -589,7 +600,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
     private void dropWhiteAction(){
         // release both
         intake.switchServoOpen();
-        sleep(400);
+        sleep(300);
         intake.setArmCountPosition(intake.getArmPosition() - 500);
         sleep(200);
     }

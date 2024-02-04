@@ -60,9 +60,9 @@ public class intakeUnit
 
     private Servo switchRightServo = null;
     private Servo switchLeftServo = null;
-    final double SWITCH_RIGHT_CLOSE_POS = 0.24;
+    final double SWITCH_RIGHT_CLOSE_POS = 0.26;
     final double SWITCH_LEFT_CLOSE_POS = 0.21;
-    final double SWITCH_RIGHT_RELEASE = 0.32;
+    final double SWITCH_RIGHT_RELEASE = 0.35;
     final double SWITCH_LEFT_RELEASE = 0.05;
 
     public Servo wristServo = null;
@@ -75,22 +75,22 @@ public class intakeUnit
 
     // arm servo variables, not used in current prototype version.
     public DcMotor armMotor = null;
-    int ARM_POS_INTAKE = 3350;//3600; 3560 for finger down, 3600 for finger up
-    int ARM_MIN_COUNT_POS = ARM_POS_INTAKE - 3350; //0;
+    int ARM_POS_INTAKE = 3320;//3600; 3560 for finger down, 3600 for finger up
+    int ARM_MIN_COUNT_POS = ARM_POS_INTAKE - 3320; //0;
     int ARM_MAX_COUNT_POS = ARM_POS_INTAKE + 100; //3620;
-    int ARM_POS_AUTO = ARM_POS_INTAKE - 3300; //80;
-    int ARM_POS_HANG = ARM_POS_INTAKE - 3060; //500;
+    int ARM_POS_AUTO = ARM_POS_INTAKE - 3240; //80;
+    int ARM_POS_HANG = ARM_POS_INTAKE - 3000; //500;
     int ARM_POS_READY_FOR_HANG = ARM_POS_INTAKE - 1760; // 1800
     int ARM_POS_DROP = ARM_POS_INTAKE - 1000; //2550;
     int ARM_POS_CAMERA_READ = ARM_POS_INTAKE - 1060; //2500;
-    int ARM_POS_DROP_YELLOW = ARM_POS_INTAKE - 640; //2800;
+    int ARM_POS_DROP_YELLOW = ARM_POS_INTAKE - 600; //2800;
     int ARM_POS_UNDER_BEAM = ARM_POS_INTAKE - 360; //3200;
-    int ARM_POS_DROP_PURPLE = ARM_POS_INTAKE - 180; //3380;
+    int ARM_POS_DROP_PURPLE = ARM_POS_INTAKE - 170; //3380;
     int ARM_POS_PUSH_PROP = ARM_POS_INTAKE - 100;
     int ARM_POS_INTAKE2 = ARM_POS_INTAKE - 25;
     int ARM_POS_INTAKE3 = ARM_POS_INTAKE - 50;
     int ARM_POS_INTAKE4 = ARM_POS_INTAKE - 75;
-    int ARM_POS_INTAKE5 = ARM_POS_INTAKE - 130;
+    int ARM_POS_INTAKE5 = ARM_POS_INTAKE - 100;
 
 
     /**
@@ -198,7 +198,7 @@ public class intakeUnit
     public void setArmModeRunToPosition(int armPos) {
         setArmCountPosition(armPos);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        armMotor.setPower(0.95);
+        armMotor.setPower(0.9);
     }
     public void resetArmEncoder() {
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
@@ -329,20 +329,20 @@ public class intakeUnit
 
     public void resetArmPositions(int intakePos) {
         ARM_POS_INTAKE = intakePos;
-        ARM_MIN_COUNT_POS = ARM_POS_INTAKE - 3350; //0;
+        ARM_MIN_COUNT_POS = ARM_POS_INTAKE - 3320; //0;
         ARM_MAX_COUNT_POS = ARM_POS_INTAKE + 100; //3620; 
-        ARM_POS_AUTO = ARM_POS_INTAKE - 3300; //80;
-        ARM_POS_HANG = ARM_POS_INTAKE - 3060; //500;
+        ARM_POS_AUTO = ARM_POS_INTAKE - 3240; //80;
+        ARM_POS_HANG = ARM_POS_INTAKE - 3000; //500;
         ARM_POS_READY_FOR_HANG = ARM_POS_INTAKE - 1760; // 1800
         ARM_POS_DROP = ARM_POS_INTAKE - 1000; //2550;
         ARM_POS_CAMERA_READ = ARM_POS_INTAKE - 1060; //2500;
-        ARM_POS_DROP_YELLOW = ARM_POS_INTAKE - 640; //2800;
+        ARM_POS_DROP_YELLOW = ARM_POS_INTAKE - 600; //2800;
         ARM_POS_UNDER_BEAM = ARM_POS_INTAKE - 360; //3100;
-        ARM_POS_DROP_PURPLE = ARM_POS_INTAKE - 180; //3380;
+        ARM_POS_DROP_PURPLE = ARM_POS_INTAKE - 170; //3380;
         ARM_POS_PUSH_PROP = ARM_POS_INTAKE - 100;
         ARM_POS_INTAKE2 = ARM_POS_INTAKE - 25;
         ARM_POS_INTAKE3 = ARM_POS_INTAKE - 50;
         ARM_POS_INTAKE4 = ARM_POS_INTAKE - 75;
-        ARM_POS_INTAKE5 = ARM_POS_INTAKE - 130;
+        ARM_POS_INTAKE5 = ARM_POS_INTAKE - 120;
     }
 }
