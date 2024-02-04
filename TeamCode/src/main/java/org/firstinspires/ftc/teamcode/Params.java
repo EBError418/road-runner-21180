@@ -42,6 +42,7 @@ public class Params {
     static Pose2d startPose = new Pose2d(0,0,0);
     static Pose2d currentPose = new Pose2d(0,0,0);
 
+    static boolean deadWheelOn = true;
     static int blueOrRed = 1;
 
     //game field parameters
