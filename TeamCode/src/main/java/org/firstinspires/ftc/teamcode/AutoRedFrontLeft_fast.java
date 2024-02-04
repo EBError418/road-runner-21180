@@ -216,6 +216,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         drive = new MecanumDrive(hardwareMap, startPose);
         Params.startPose = startPose; // init storage pose.
         Params.blueOrRed = blueOrRed;
+        Params.deadWheelOn = MecanumDrive.PARAMS.useDeadWheel;
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
                 "Finger", "SwitchR", "SwitchL");
@@ -296,11 +297,10 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
     private void autoCore() {
 
         double delta_x = 2.0; // compensate robot shifting to right when forward drive more than 60 inches
-        double delta_y = 1.0; // temp compensation
+        double delta_y = Params.deadWheelOn? 0 : 1.0; // temp compensation
         int armShiftCnt = -50;
 
-
-        Vector2d vParkPos = new Vector2d(blueOrRed * 3 * Params.HALF_MAT - 2 * leftOrRight * Params.HALF_MAT, -3.5 * Params.HALF_MAT);
+        Vector2d vParkPos = new Vector2d(blueOrRed * 3 * Params.HALF_MAT - 2 * leftOrRight * Params.HALF_MAT, -4 * Params.HALF_MAT + Params.CHASSIS_LENGTH / 2.0 + 2);
         Vector2d vBackdrop = new Vector2d(blueOrRed * 3 * Params.HALF_MAT, -4 * Params.HALF_MAT);
 
         Vector2d vAprilTag = null;
@@ -314,8 +314,8 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         Vector2d vCheckingAprilTagPose = new Vector2d(vAprilTag.x, vAprilTag.y + Params.HALF_MAT);
         Vector2d vCheckingAprilTag2nd = new Vector2d(vAprilTag.x - (desiredTagWhite - desiredTagNum) * 6, vAprilTag.y + Params.HALF_MAT);
 
-        Vector2d vDropYellow = new Vector2d(vAprilTag.x + BUCKET_SHIFT - delta_x, vAprilTag.y + 1);
-        Vector2d vDropWhite = new Vector2d(vCheckingAprilTag2nd.x + BUCKET_SHIFT, vAprilTag.y + 1 + 2 * delta_y);
+        Vector2d vDropYellow = new Vector2d(vAprilTag.x + BUCKET_SHIFT - (Params.deadWheelOn? 0 : delta_x), vAprilTag.y + (Params.deadWheelOn? 4 :1));
+        Vector2d vDropWhite = new Vector2d(vCheckingAprilTag2nd.x + BUCKET_SHIFT, vAprilTag.y + (Params.deadWheelOn? 4 :(1 + 2 * delta_y)));
 
         Vector2d vDropPurple = null;
         double xDelta = -7.0;
@@ -425,7 +425,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         Logging.log("Autonomous time - after drop purple time: " + runtime);
 
         // temp code to move away from purple
-        Vector2d pickWhite5 = new Vector2d(pickWhiteReady_x, pickWhiteReady_y + 7);
+        Vector2d pickWhite5 = new Vector2d(pickWhiteReady_x, 4 * Params.HALF_MAT);
         Pose2d pPickWhite1Ready = new Pose2d(pickWhiteReady_x, pickWhiteReady_y, pickupAngle);
 
         // pickup first white pixel
@@ -506,8 +506,6 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         logVector("robot drive: drive.pose drop yellow", drive.pose.position);
         logVector("robot drive: check drop yellow required", vDropYellow);
 
-        logVector("robot drive: april tag required", vAprilTag);
-
         // drop pixel
         dropYellowAction(); // arm is at high position
 
@@ -532,22 +530,23 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
                         .afterTime(0.3, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, intake.WRIST_POS_DROP_YELLOW, 0))
                         .build()
         );
+
         Logging.log("Autonomous time - after second white pickup time: " + runtime);
 
         Logging.log("Autonomous - Start April tag detect 2nd time");
         aprilTagPose = tag.updatePoseAprilTag(desiredTagWhite);
         logVector("robot drive: april tag location from camera", aprilTagPose.position);
-        logVector("robot drive: drop yellow pose required before adjust", vDropWhite);
+        logVector("robot drive: drop white pose required before adjust", vDropWhite);
 
         // if can not move based on April tag, move by road runner encode.
         if (tag.targetFound) {
             // adjust yellow drop-off position according to april tag location info from camera
             vDropWhite = new Vector2d(drive.pose.position.x - aprilTagPose.position.x + BUCKET_SHIFT,
                     drive.pose.position.y - aprilTagPose.position.y + Params.AUTO_DISTANCE_TO_TAG);
-            logVector("robot drive: drop yellow pose required after april tag adjust", vDropYellow);
+            logVector("robot drive: drop white pose required after april tag adjust", vDropYellow);
         }
         else {
-            Logging.log("Can not found required AprilTag to drop yellow pixel");
+            Logging.log("Can not found required AprilTag to drop white pixel");
         }
 
         intake.readyToDropYellow(intake.ARM_POS_DROP_YELLOW);
@@ -559,9 +558,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
                         .build()
         );
         logVector("robot drive: drive.pose drop yellow", drive.pose.position);
-        logVector("robot drive: check drop yellow required", vDropYellow);
-
-        logVector("robot drive: april tag required", vAprilTag);
+        logVector("robot drive: check drop white required", vDropWhite);
 
         // drop pixels
         dropWhiteAction();
