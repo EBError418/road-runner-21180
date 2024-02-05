@@ -42,8 +42,13 @@ public class Params {
     static Pose2d startPose = new Pose2d(0,0,0);
     static Pose2d currentPose = new Pose2d(0,0,0);
 
+    static boolean fastMode = false;
     static boolean deadWheelOn = true;
     static int blueOrRed = 1;
+
+
+    static int armIntakeCount_InitFront = -50;
+    static int armIntakeCount_InitBack = 3320;
 
     //game field parameters
     static final double HALF_MAT = 12.0;

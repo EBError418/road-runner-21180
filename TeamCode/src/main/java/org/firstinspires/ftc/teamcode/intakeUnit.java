@@ -63,7 +63,7 @@ public class intakeUnit
     final double SWITCH_RIGHT_CLOSE_POS = 0.26;
     final double SWITCH_LEFT_CLOSE_POS = 0.21;
     final double SWITCH_RIGHT_RELEASE = 0.35;
-    final double SWITCH_LEFT_RELEASE = 0.05;
+    final double SWITCH_LEFT_RELEASE = 0.1;
 
     public Servo wristServo = null;
     final double WRIST_MIN_POS = 0.2;  // Minimum rotational position
@@ -87,10 +87,10 @@ public class intakeUnit
     int ARM_POS_UNDER_BEAM = ARM_POS_INTAKE - 360; //3200;
     int ARM_POS_DROP_PURPLE = ARM_POS_INTAKE - 170; //3380;
     int ARM_POS_PUSH_PROP = ARM_POS_INTAKE - 100;
-    int ARM_POS_INTAKE2 = ARM_POS_INTAKE - 25;
+    int ARM_POS_INTAKE2 = ARM_POS_INTAKE - 28;
     int ARM_POS_INTAKE3 = ARM_POS_INTAKE - 50;
-    int ARM_POS_INTAKE4 = ARM_POS_INTAKE - 75;
-    int ARM_POS_INTAKE5 = ARM_POS_INTAKE - 100;
+    int ARM_POS_INTAKE4 = ARM_POS_INTAKE - 88;
+    int ARM_POS_INTAKE5 = ARM_POS_INTAKE - 110;
 
 
     /**
@@ -340,9 +340,9 @@ public class intakeUnit
         ARM_POS_UNDER_BEAM = ARM_POS_INTAKE - 360; //3100;
         ARM_POS_DROP_PURPLE = ARM_POS_INTAKE - 170; //3380;
         ARM_POS_PUSH_PROP = ARM_POS_INTAKE - 100;
-        ARM_POS_INTAKE2 = ARM_POS_INTAKE - 25;
+        ARM_POS_INTAKE2 = ARM_POS_INTAKE - 28;
         ARM_POS_INTAKE3 = ARM_POS_INTAKE - 50;
-        ARM_POS_INTAKE4 = ARM_POS_INTAKE - 75;
-        ARM_POS_INTAKE5 = ARM_POS_INTAKE - 120;
+        ARM_POS_INTAKE4 = ARM_POS_INTAKE - 88;
+        ARM_POS_INTAKE5 = ARM_POS_INTAKE - 110;
     }
 }

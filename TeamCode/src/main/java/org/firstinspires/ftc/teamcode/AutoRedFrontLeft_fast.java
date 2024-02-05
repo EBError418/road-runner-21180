@@ -213,14 +213,19 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         }
 
         // init drive with road runner
-        drive = new MecanumDrive(hardwareMap, startPose);
         Params.startPose = startPose; // init storage pose.
         Params.blueOrRed = blueOrRed;
         Params.deadWheelOn = MecanumDrive.PARAMS.useDeadWheel;
+        Params.fastMode = true;
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
                 "Finger", "SwitchR", "SwitchL");
         intake.resetArmEncoder();
+
+        intake.resetArmPositions(Params.armIntakeCount_InitFront);
+
+        intake.setArmCountPosition(intake.ARM_POS_AUTO);
+        intake.switchServoOpen();
 
         runtime.reset();
         while ((ObjectDetection.PropSide.UNKNOWN == propLocation) &&
@@ -262,8 +267,6 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         }
         desiredTagWhite = (desiredTagNum < 3.5)? 2 : 5; // temp center for safe
 
-        tag = new AprilTagTest(drive, hardwareMap, desiredTagNum, webcamName);
-
         // bulk reading setting - auto refresh mode
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
@@ -273,6 +276,9 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         if (opModeIsActive()) {
+            drive = new MecanumDrive(hardwareMap, startPose);
+            tag = new AprilTagTest(drive, hardwareMap, desiredTagNum, webcamName);
+
             Logging.log("checkStatus = %d, desiredTagNum = %d", checkStatus, desiredTagNum);
             Logging.log("frontOrBack = %d, blueOrRed = %d", frontOrBack, blueOrRed);
 
@@ -296,9 +302,9 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
 
     private void autoCore() {
 
-        double delta_x = 2.0; // compensate robot shifting to right when forward drive more than 60 inches
+        double delta_x = 2.5; // compensate robot shifting to right when forward drive more than 60 inches
         double delta_y = Params.deadWheelOn? 0 : 1.0; // temp compensation
-        int armShiftCnt = -50;
+        int armShiftCnt = 80;
 
         Vector2d vParkPos = new Vector2d(blueOrRed * 3 * Params.HALF_MAT - 2 * leftOrRight * Params.HALF_MAT, -4 * Params.HALF_MAT + Params.CHASSIS_LENGTH / 2.0 + 2);
         Vector2d vBackdrop = new Vector2d(blueOrRed * 3 * Params.HALF_MAT, -4 * Params.HALF_MAT);
@@ -407,9 +413,9 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
                             .afterTime(0.001, new CloseCamera()) // close camera
-                            .afterDisp(1, new intakeUnitActions(intake.ARM_POS_DROP_PURPLE, intake.WRIST_POS_INTAKE, 0))
-                            .strafeTo(new Vector2d(drive.pose.position.x - blueOrRed * 4, drive.pose.position.y))
-                            .waitSeconds(0.5)  // wait for arm to be in place
+                            .afterTime(0.001, new intakeUnitActions(intake.ARM_POS_DROP_PURPLE, intake.WRIST_POS_INTAKE, 0))
+                            .strafeTo(new Vector2d(drive.pose.position.x - blueOrRed * 3, drive.pose.position.y))
+                            .waitSeconds(0.6)  // wait for arm to be in place
                             .splineToSplineHeading(new Pose2d(vDropPurple, splineTangent), splineTangent)
                             .build()
             );
@@ -429,17 +435,32 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         Pose2d pPickWhite1Ready = new Pose2d(pickWhiteReady_x, pickWhiteReady_y, pickupAngle);
 
         // pickup first white pixel
-        Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
-                        .afterDisp(3, new pickupWhiteAct(intake.ARM_POS_INTAKE5))
-                        .splineToLinearHeading(pPickWhite1Ready, pickupAngle)
-                        .strafeTo(pickWhite5)
-                        .waitSeconds(0.3)
-                        .afterTime(0, new intakeUnitActions(intake.ARM_POS_INTAKE5 + armShiftCnt, NO_ACT, 0))
-                        .waitSeconds(0.1)
-                        .build()
-        );
+        if ((2 == checkStatus) || (5 == checkStatus)) {
+            Actions.runBlocking(
+                    drive.actionBuilder(drive.pose)
+                            .afterDisp(3, new pickupWhiteAct(intake.ARM_POS_INTAKE5))
+                            .splineToLinearHeading(pPickWhite1Ready, pickupAngle)
+                            .strafeTo(pickWhite5)
+                            .waitSeconds(0.3)
+                            .afterTime(0, new intakeUnitActions(intake.ARM_POS_INTAKE5 + armShiftCnt, NO_ACT, 0))
+                            .waitSeconds(0.1)
+                            .build()
+            );
+        }
+        else {
+            Actions.runBlocking(
+                    drive.actionBuilder(drive.pose)
+                            .afterDisp(3, new pickupWhiteAct(intake.ARM_POS_INTAKE5))
+                            .splineToLinearHeading(pPickWhite1Ready, pickupAngle)
+                            .strafeTo(pickWhite5)
+                            .waitSeconds(0.3)
+                            .afterTime(0, new intakeUnitActions(intake.ARM_POS_INTAKE5 + armShiftCnt, NO_ACT, 0))
+                            .waitSeconds(0.1)
+                            .build()
+            );
+        }
         Logging.log("Autonomous time - after pickup white time: " + runtime);
+
 
 
         // move back to drop yellow and white, lift arm after through gate
@@ -521,7 +542,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
                         .waitSeconds(0.4) // make sure the arm is lift after robot in place
                         .afterTime(0, new intakeUnitActions(intake.ARM_POS_INTAKE5 + armShiftCnt, NO_ACT, 0))
                         .waitSeconds(0.2)
-                        .strafeTo(new Vector2d(startTurn2ndDrop_x + (blueOrRed - 1) * delta_x - blueOrRed * 1.5 * BUCKET_SHIFT, pickWhite5.y + delta_y)) // move bucket a little bit
+                        .strafeTo(new Vector2d(startTurn2ndDrop_x + (blueOrRed - 1) * delta_x - blueOrRed * 3 * BUCKET_SHIFT, pickWhite5.y - 1)) // move bucket a little bit
 
                         // back to drop off 2nd round
                         .waitSeconds(0.3)
@@ -565,11 +586,15 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
 
         Logging.log("Autonomous time - after second white drop time: " + runtime);
 
+
         // parking
         intake.setArmCountPosition(intake.ARM_POS_READY_FOR_HANG + 200);
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .strafeTo(vParkPos)
+                        //.splineTo(startPose.position, -Math.PI)
+                        //.strafeTo(new Vector2d(-5 * Params.HALF_MAT, 3 * Params.HALF_MAT))
+                        //.turn(- drive.pose.heading.toDouble())
                         .build()
         );
         logVector("robot drive: drive.pose parking", drive.pose.position);
