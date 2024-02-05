@@ -100,7 +100,6 @@ public class TeleopRR extends LinearOpMode {
                 "Finger", "SwitchR"/* right switch name */, "SwitchL" /* left switch */);
 
         intake.setArmModeRunToPosition(intake.getArmPosition());
-        intake.resetArmPositions(Params.fastMode? Params.armIntakeCount_InitFront : Params.armIntakeCount_InitBack);
 
         DroneServo = hardwareMap.get(Servo.class, "Drone");
         DroneServo.setPosition(Params.DRONE_START);

@@ -1,4 +1,4 @@
-/* Copyright (c) 2017 FIRST. All rights reserved.
+/* Copyright (c) 2023 FIRST. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without modification,
  * are permitted (subject to the limitations in the disclaimer below) provided that
@@ -25,54 +25,44 @@
  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ *
+ * PID controller and IMU codes are copied from
+ * https://stemrobotics.cs.pdx.edu/node/7268%3Froot=4196.html
  */
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
-import com.acmerobotics.roadrunner.Pose2d;
+@TeleOp(name="Arm Calibration", group="Concept")
+//@Disabled
+public class ArmPositionCalibration extends LinearOpMode {
 
-/**
- * This is NOT an opmode.
- *
- * This class defines the parameters related with game field elements.
- */
-public class Params {
-    // road runner
-    static Pose2d startPose = new Pose2d(0,0,0);
-    static Pose2d currentPose = new Pose2d(0,0,0);
+    // Declare OpMode members.
+    private final ElapsedTime runtime = new ElapsedTime();
+    private intakeUnit intake;
 
-    static boolean armCalibrated = false;
-    static boolean deadWheelOn = true;
-    static int blueOrRed = 1;
+    @Override
+    public void runOpMode() {
+        telemetry.addData("Status", "Initialized");
+        Logging.log("Status - Initialized");
 
+        intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
+                "Finger", "SwitchR", "SwitchL");
+        intake.resetArmEncoder();
+        Params.armCalibrated = true;
 
-    static int armIntakeCount_InitFront = -50;
+        waitForStart();
+        runtime.reset();
 
-    //game field parameters
-    static final double HALF_MAT = 12.0;
-
-    // robot size
-    static final double CHASSIS_HALF_WIDTH = 13.625 / 2.0;
-    static final double CHASSIS_LENGTH = 14;
-    static final double CHASSIS_HALF_LENGTH = CHASSIS_LENGTH / 2.0;
-    static final double CHASSIS_START_EXTRA = 3.25;
-
-    // moving distance variables
-    static final double AUTO_DISTANCE_TO_TAG = 8.5; //this is how close the camera should get to the target (inches)
-
-    static final double TELEOP_DISTANCE_TO_TAG = 7.0;
-
-    static final double BACKDROP_SIDEWAYS = 6.0; // 1 inch more to side tag
-
-    // chassis power factors
-    static final double POWER_LOW = 0.3;
-    static final double POWER_NORMAL = 0.80;
-    static final double POWER_HIGH = 1.0;
-
-    // drone servo parameters
-    static final double DRONE_START = 0.57;
-    static final double DRONE_LAUNCH = 0.18;
-
+        // run until the end of the match (driver presses STOP)
+        if (opModeIsActive()) {
+            telemetry.addData("Arm calibration: ---", "done !");
+            telemetry.update();
+            sleep(2000);
+        }
+    }
 }
-

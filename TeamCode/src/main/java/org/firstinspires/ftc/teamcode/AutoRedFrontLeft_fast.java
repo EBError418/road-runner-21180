@@ -216,15 +216,11 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         Params.startPose = startPose; // init storage pose.
         Params.blueOrRed = blueOrRed;
         Params.deadWheelOn = MecanumDrive.PARAMS.useDeadWheel;
-        Params.fastMode = true;
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
                 "Finger", "SwitchR", "SwitchL");
-        intake.resetArmEncoder();
+        intake.setArmModeRunToPosition(intake.getArmPosition());
 
-        intake.resetArmPositions(Params.armIntakeCount_InitFront);
-
-        intake.setArmCountPosition(intake.ARM_POS_AUTO);
         intake.switchServoOpen();
 
         runtime.reset();
@@ -241,6 +237,8 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
             telemetry.addData( ((blueOrRed >0)? "Blue - " : "Red - "),((frontOrBack >0)? "front" : "back"));
 
             telemetry.addData("Detected Prop location: ", propLocation);
+            telemetry.addData("Arm", "position = %d", intake.getArmPosition());
+
             telemetry.update();
         }
 
@@ -282,16 +280,23 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
             Logging.log("checkStatus = %d, desiredTagNum = %d", checkStatus, desiredTagNum);
             Logging.log("frontOrBack = %d, blueOrRed = %d", frontOrBack, blueOrRed);
 
-            intake.autonomousInit();
-            autonomousCore();
+            if (Params.armCalibrated) {
+                intake.autonomousInit();
+                autonomousCore();
 
-            Params.currentPose = drive.pose; // storage end pose of autonomous
-            intake.parkingPositions(); // Motors are at intake positions at the beginning of Tele-op
-            intake.fingerStop();
-            sleep(1000);
+                Params.currentPose = drive.pose; // storage end pose of autonomous
+                intake.parkingPositions(); // Motors are at intake positions at the beginning of Tele-op
+                intake.fingerStop();
+                sleep(1000);
 
-            camera.closeCameraDevice(); // cost too times at the beginning to close camera about 300 ms
-            Logging.log("Autonomous time - total Run Time: " + runtime);
+                camera.closeCameraDevice(); // cost too times at the beginning to close camera about 300 ms
+                Logging.log("Autonomous time - total Run Time: " + runtime);
+            }
+            else {
+                telemetry.addData("Arm calibration: ---", "need to be done before starting!");
+                telemetry.update();
+                sleep(5000);
+            }
         }
     }
 

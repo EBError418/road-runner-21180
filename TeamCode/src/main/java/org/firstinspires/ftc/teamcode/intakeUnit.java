@@ -75,7 +75,7 @@ public class intakeUnit
 
     // arm servo variables, not used in current prototype version.
     public DcMotor armMotor = null;
-    int ARM_POS_INTAKE = 3320;//3600; 3560 for finger down, 3600 for finger up
+    int ARM_POS_INTAKE = Params.armIntakeCount_InitFront;//3320;
     int ARM_MIN_COUNT_POS = ARM_POS_INTAKE - 3320; //0;
     int ARM_MAX_COUNT_POS = ARM_POS_INTAKE + 100; //3620;
     int ARM_POS_AUTO = ARM_POS_INTAKE - 3240; //80;
@@ -122,6 +122,8 @@ public class intakeUnit
 
         armMotor = hardwareMap.get(DcMotor.class, armMotorName);
         armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        resetArmPositions(Params.armIntakeCount_InitFront);
     }
 
     public void setSwitchRightPosition(double switchPos) {
@@ -253,7 +255,6 @@ public class intakeUnit
 
     public void autonomousInit() {
         setArmCountPosition(ARM_POS_AUTO);
-        // wristServo.setPosition(WRIST_POS_AUTO);
         switchServoClose();
         fingerIntake();
     }

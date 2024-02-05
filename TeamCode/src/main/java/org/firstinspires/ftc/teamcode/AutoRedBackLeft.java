@@ -223,7 +223,7 @@ public class AutoRedBackLeft extends LinearOpMode {
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
                 "Finger", "SwitchR", "SwitchL");
-        intake.resetArmEncoder();
+        intake.setArmModeRunToPosition(intake.getArmPosition());
 
         runtime.reset();
         while ((ObjectDetection.PropSide.UNKNOWN == propLocation) &&
@@ -239,6 +239,8 @@ public class AutoRedBackLeft extends LinearOpMode {
             telemetry.addData( ((blueOrRed >0)? "Blue - " : "Red - "),((frontOrBack >0)? "front" : "back"));
 
             telemetry.addData("Detected Prop location: ", propLocation);
+            telemetry.addData("Arm", "position = %d", intake.getArmPosition());
+
             telemetry.update();
         }
 
@@ -271,18 +273,27 @@ public class AutoRedBackLeft extends LinearOpMode {
             Logging.log("checkStatus = %d, desiredTagNum = %d", checkStatus, desiredTagNum);
             Logging.log("frontOrBack = %d, blueOrRed = %d", frontOrBack, blueOrRed);
 
-            intake.autonomousInit();
-            camera.closeCameraDevice(); // close camera for spike mark location checking
+            if (Params.armCalibrated) {
 
-            autonomousCore();
 
-            Params.currentPose = drive.pose; // storage end pose of autonomous
-            intake.parkingPositions(); // Motors are at intake positions at the beginning of Tele-op
-            intake.fingerStop();
-            sleep(1000);
+                intake.autonomousInit();
+                camera.closeCameraDevice(); // close camera for spike mark location checking
 
-            camera.closeCameraDevice(); // cost too times at the beginning to close camera about 300 ms
-            Logging.log("Autonomous time - total Run Time: " + runtime);
+                autonomousCore();
+
+                Params.currentPose = drive.pose; // storage end pose of autonomous
+                intake.parkingPositions(); // Motors are at intake positions at the beginning of Tele-op
+                intake.fingerStop();
+                sleep(1000);
+
+                camera.closeCameraDevice(); // cost too times at the beginning to close camera about 300 ms
+                Logging.log("Autonomous time - total Run Time: " + runtime);
+            }
+            else {
+                telemetry.addData("Arm calibration: ---", "need to be done before starting!");
+                telemetry.update();
+                sleep(5000);
+            }
         }
     }
 
