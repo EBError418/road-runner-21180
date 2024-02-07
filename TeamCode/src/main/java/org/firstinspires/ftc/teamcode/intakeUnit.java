@@ -70,27 +70,27 @@ public class intakeUnit
     final double WRIST_MAX_POS = 0.95; // Maximum rotational position
     final double WRIST_POS_DROP_PURPLE = 0.33;
     final double WRIST_POS_DROP_YELLOW = 0.40;
-    final double WRIST_POS_DROP = 0.45;
+    final double WRIST_POS_DROP = 0.44;
     final double WRIST_POS_INTAKE = 0.46;
 
     // arm servo variables, not used in current prototype version.
     public DcMotor armMotor = null;
-    int ARM_POS_INTAKE = Params.armIntakeCount_InitFront;//3320;
-    int ARM_MIN_COUNT_POS = ARM_POS_INTAKE - 3320; //0;
-    int ARM_MAX_COUNT_POS = ARM_POS_INTAKE + 100; //3620;
-    int ARM_POS_AUTO = ARM_POS_INTAKE - 3240; //80;
-    int ARM_POS_HANG = ARM_POS_INTAKE - 3000; //500;
-    int ARM_POS_READY_FOR_HANG = ARM_POS_INTAKE - 1760; // 1800
-    int ARM_POS_DROP = ARM_POS_INTAKE - 1000; //2550;
-    int ARM_POS_CAMERA_READ = ARM_POS_INTAKE - 1060; //2500;
-    int ARM_POS_DROP_YELLOW = ARM_POS_INTAKE - 600; //2800;
-    int ARM_POS_UNDER_BEAM = ARM_POS_INTAKE - 360; //3200;
-    int ARM_POS_DROP_PURPLE = ARM_POS_INTAKE - 170; //3380;
-    int ARM_POS_PUSH_PROP = ARM_POS_INTAKE - 100;
-    int ARM_POS_INTAKE2 = ARM_POS_INTAKE - 28;
-    int ARM_POS_INTAKE3 = ARM_POS_INTAKE - 50;
-    int ARM_POS_INTAKE4 = ARM_POS_INTAKE - 88;
-    int ARM_POS_INTAKE5 = ARM_POS_INTAKE - 110;
+    int ARM_POS_INTAKE = Params.armIntakeCount_InitFront;
+    int ARM_MIN_COUNT_POS;
+    int ARM_MAX_COUNT_POS;
+    int ARM_POS_AUTO;
+    int ARM_POS_HANG;
+    int ARM_POS_READY_FOR_HANG;
+    int ARM_POS_DROP;
+    int ARM_POS_CAMERA_READ;
+    int ARM_POS_DROP_YELLOW;
+    int ARM_POS_UNDER_BEAM;
+    int ARM_POS_DROP_PURPLE;
+    int ARM_POS_PUSH_PROP;
+    int ARM_POS_INTAKE2;
+    int ARM_POS_INTAKE3;
+    int ARM_POS_INTAKE4;
+    int ARM_POS_INTAKE5;
 
 
     /**
@@ -337,13 +337,13 @@ public class intakeUnit
         ARM_POS_READY_FOR_HANG = ARM_POS_INTAKE - 1760; // 1800
         ARM_POS_DROP = ARM_POS_INTAKE - 1000; //2550;
         ARM_POS_CAMERA_READ = ARM_POS_INTAKE - 1060; //2500;
-        ARM_POS_DROP_YELLOW = ARM_POS_INTAKE - 600; //2800;
+        ARM_POS_DROP_YELLOW = ARM_POS_INTAKE - 670; //2800;
         ARM_POS_UNDER_BEAM = ARM_POS_INTAKE - 360; //3100;
         ARM_POS_DROP_PURPLE = ARM_POS_INTAKE - 170; //3380;
         ARM_POS_PUSH_PROP = ARM_POS_INTAKE - 100;
         ARM_POS_INTAKE2 = ARM_POS_INTAKE - 28;
         ARM_POS_INTAKE3 = ARM_POS_INTAKE - 50;
-        ARM_POS_INTAKE4 = ARM_POS_INTAKE - 88;
-        ARM_POS_INTAKE5 = ARM_POS_INTAKE - 110;
+        ARM_POS_INTAKE4 = ARM_POS_INTAKE - 90;
+        ARM_POS_INTAKE5 = ARM_POS_INTAKE - 120;
     }
 }

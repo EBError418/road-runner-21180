@@ -50,7 +50,7 @@ public class Params {
     static int armIntakeCount_InitFront = -50;
 
     //game field parameters
-    static final double HALF_MAT = 12.0;
+    static final double HALF_MAT = 23.625/2.0;  // 60 cm
 
     // robot size
     static final double CHASSIS_HALF_WIDTH = 13.625 / 2.0;

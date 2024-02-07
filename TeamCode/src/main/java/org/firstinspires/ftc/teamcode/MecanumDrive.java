@@ -74,7 +74,7 @@ public final class MecanumDrive {
         public double kA = useDeadWheel? 0.00012 : 0.0;
 
         // path profile parameters (in inches)
-        public double maxWheelVel = 50;
+        public double maxWheelVel = useDeadWheel? 60 : 50;
         public double minProfileAccel = useDeadWheel? -30 : -25;  // reduce acc to get more reliability
         public double maxProfileAccel = useDeadWheel? 50 : 45;//50;
 
