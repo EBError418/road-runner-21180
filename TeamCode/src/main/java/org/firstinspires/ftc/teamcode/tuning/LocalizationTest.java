@@ -32,6 +32,35 @@ public class LocalizationTest extends LinearOpMode {
                         ),
                         -gamepad1.right_stick_x
                 ));
+
+                if (gamepad1.a) {
+                    Actions.runBlocking(
+                            drive.actionBuilder(drive.pose)
+                                    .turn(Math.PI / 2)
+                                    .build());
+                }
+
+                if (gamepad1.b) {
+                    Actions.runBlocking(
+                            drive.actionBuilder(drive.pose)
+                                    .turn(Math.PI)
+                                    .build());
+                }
+
+                if (gamepad1.x) {
+                    Actions.runBlocking(
+                            drive.actionBuilder(drive.pose)
+                                    .turn(-Math.PI / 2)
+                                    .build());
+                }
+
+                if (gamepad1.y) {
+                    Actions.runBlocking(
+                            drive.actionBuilder(drive.pose)
+                                    .turn(-Math.PI)
+                                    .build());
+                }
+
                 /*
                 sleep(1000);
 

@@ -61,14 +61,15 @@ public class intakeUnit
     private Servo switchRightServo = null;
     private Servo switchLeftServo = null;
     final double SWITCH_RIGHT_CLOSE_POS = 0.26;
-    final double SWITCH_LEFT_CLOSE_POS = 0.21;
+    final double SWITCH_LEFT_CLOSE_POS = 0.29;
     final double SWITCH_RIGHT_RELEASE = 0.35;
-    final double SWITCH_LEFT_RELEASE = 0.1;
+    final double SWITCH_LEFT_RELEASE = 0.15;
 
     public Servo wristServo = null;
     final double WRIST_MIN_POS = 0.2;  // Minimum rotational position
     final double WRIST_MAX_POS = 0.95; // Maximum rotational position
     final double WRIST_POS_DROP_PURPLE = 0.33;
+    final double WRIST_POS_DROP_WHITE = 0.41;
     final double WRIST_POS_DROP_YELLOW = 0.40;
     final double WRIST_POS_DROP = 0.44;
     final double WRIST_POS_INTAKE = 0.46;
@@ -83,6 +84,7 @@ public class intakeUnit
     int ARM_POS_READY_FOR_HANG;
     int ARM_POS_DROP;
     int ARM_POS_CAMERA_READ;
+    int ARM_POS_DROP_WHITE;
     int ARM_POS_DROP_YELLOW;
     int ARM_POS_UNDER_BEAM;
     int ARM_POS_DROP_PURPLE;
@@ -253,6 +255,13 @@ public class intakeUnit
         fingerStop();
     }
 
+    public void dropWhitePositions() {
+        setArmCountPosition(ARM_POS_DROP_WHITE);
+        wristServo.setPosition(WRIST_POS_DROP_WHITE);
+        switchServoClose();
+        fingerStop();
+    }
+
     public void autonomousInit() {
         setArmCountPosition(ARM_POS_AUTO);
         switchServoClose();
@@ -337,13 +346,14 @@ public class intakeUnit
         ARM_POS_READY_FOR_HANG = ARM_POS_INTAKE - 1760; // 1800
         ARM_POS_DROP = ARM_POS_INTAKE - 1000; //2550;
         ARM_POS_CAMERA_READ = ARM_POS_INTAKE - 1060; //2500;
-        ARM_POS_DROP_YELLOW = ARM_POS_INTAKE - 670; //2800;
-        ARM_POS_UNDER_BEAM = ARM_POS_INTAKE - 360; //3100;
+        ARM_POS_DROP_WHITE = ARM_POS_INTAKE - 750; //2800;
+        ARM_POS_DROP_YELLOW = ARM_POS_INTAKE - 650; //2800;
+        ARM_POS_UNDER_BEAM = ARM_POS_INTAKE - 260; //3100;
         ARM_POS_DROP_PURPLE = ARM_POS_INTAKE - 170; //3380;
         ARM_POS_PUSH_PROP = ARM_POS_INTAKE - 100;
         ARM_POS_INTAKE2 = ARM_POS_INTAKE - 30;
         ARM_POS_INTAKE3 = ARM_POS_INTAKE - 50;
         ARM_POS_INTAKE4 = ARM_POS_INTAKE - 90;
-        ARM_POS_INTAKE5 = ARM_POS_INTAKE - 125;
+        ARM_POS_INTAKE5 = ARM_POS_INTAKE - 120;
     }
 }

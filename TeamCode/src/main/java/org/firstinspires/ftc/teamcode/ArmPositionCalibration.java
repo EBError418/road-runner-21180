@@ -63,7 +63,8 @@ public class ArmPositionCalibration extends LinearOpMode {
             telemetry.addData("Arm calibration: ---", "done !");
             telemetry.update();
             intake.switchServoOpen();
-            sleep(500);
+            intake.setArmCountPosition(intake.ARM_POS_AUTO);
+            sleep(2000);
         }
     }
 }

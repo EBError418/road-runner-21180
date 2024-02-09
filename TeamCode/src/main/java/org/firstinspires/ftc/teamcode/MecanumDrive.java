@@ -66,7 +66,7 @@ public final class MecanumDrive {
         public boolean useDeadWheel = true;
         public double inPerTick = useDeadWheel? 0.00294 : 0.02208155454144; // WHEEL_RADIUS(1.8898) * 2 * Math.PI / TICKS_PER_REV(537.6)
         public double lateralInPerTick = useDeadWheel? 0.0026698972275674207 : 0.019/0.9786;
-        public double trackWidthTicks = useDeadWheel? 3676.9608023637293 : 650;
+        public double trackWidthTicks = useDeadWheel? 3680 : 650;
 
         // feedforward parameters (in tick units)
         public double kS = useDeadWheel? 0.2119659969575789 : 0.0;
@@ -74,13 +74,13 @@ public final class MecanumDrive {
         public double kA = useDeadWheel? 0.00012 : 0.0;
 
         // path profile parameters (in inches)
-        public double maxWheelVel = useDeadWheel? 60 : 50;
+        public double maxWheelVel = useDeadWheel? 65 : 50;
         public double minProfileAccel = useDeadWheel? -30 : -25;  // reduce acc to get more reliability
         public double maxProfileAccel = useDeadWheel? 50 : 45;//50;
 
         // turn profile parameters (in radians)
-        public double maxAngVel = Math.PI; // shared with path
-        public double maxAngAccel = Math.PI;
+        public double maxAngVel = Math.PI * 1.5; // shared with path
+        public double maxAngAccel = Math.PI * 1.5;
 
         // path controller gains
         public double axialGain = 9.0; // 0.0

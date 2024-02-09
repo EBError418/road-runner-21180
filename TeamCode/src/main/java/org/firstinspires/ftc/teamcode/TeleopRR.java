@@ -109,6 +109,7 @@ public class TeleopRR extends LinearOpMode {
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
+        intake.setWristPosition(intake.WRIST_POS_INTAKE);
 
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Mode", "waiting for start: %s", (Params.blueOrRed > 0) ? "Blue" : "Red");
