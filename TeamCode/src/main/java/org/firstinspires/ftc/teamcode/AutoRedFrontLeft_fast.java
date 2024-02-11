@@ -616,9 +616,9 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         double turnAngle = drive.pose.heading.toDouble() + Math.PI - blueOrRed * 0.03; // 0.03 is control orientation to avoid hitting board;
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        .strafeTo(vStartTurn2ndDrop) // strafe back to avoid hitting board
+                        .strafeToLinearHeading(vStartTurn2ndDrop, turnAngle) // strafe back to avoid hitting board
                         .afterTime(0.1, new pickupWhiteAct(intake.ARM_POS_INTAKE5))
-                        .turnTo(turnAngle)
+                        //.turnTo(turnAngle)
                         .turnTo(pickupAngle2) // fine tune heading before long distance moving
                         // pickup in right side bucket
                         .strafeTo(vPickup2)
