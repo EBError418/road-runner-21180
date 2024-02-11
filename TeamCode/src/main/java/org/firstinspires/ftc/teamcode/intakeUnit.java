@@ -68,7 +68,7 @@ public class intakeUnit
     public Servo wristServo = null;
     final double WRIST_MIN_POS = 0.2;  // Minimum rotational position
     final double WRIST_MAX_POS = 0.95; // Maximum rotational position
-    final double WRIST_POS_DROP_PURPLE = 0.33;
+    final double WRIST_POS_DROP_PURPLE = 0.35;
     final double WRIST_POS_DROP_WHITE = 0.41;
     final double WRIST_POS_DROP_YELLOW = 0.40;
     final double WRIST_POS_DROP = 0.44;
@@ -349,11 +349,11 @@ public class intakeUnit
         ARM_POS_DROP_WHITE = ARM_POS_INTAKE - 750; //2800;
         ARM_POS_DROP_YELLOW = ARM_POS_INTAKE - 650; //2800;
         ARM_POS_UNDER_BEAM = ARM_POS_INTAKE - 260; //3100;
-        ARM_POS_DROP_PURPLE = ARM_POS_INTAKE - 170; //3380;
+        ARM_POS_DROP_PURPLE = ARM_POS_INTAKE - 130; //3380;
         ARM_POS_PUSH_PROP = ARM_POS_INTAKE - 100;
         ARM_POS_INTAKE2 = ARM_POS_INTAKE - 30;
         ARM_POS_INTAKE3 = ARM_POS_INTAKE - 50;
         ARM_POS_INTAKE4 = ARM_POS_INTAKE - 90;
-        ARM_POS_INTAKE5 = ARM_POS_INTAKE - 120;
+        ARM_POS_INTAKE5 = ARM_POS_INTAKE - 125;
     }
 }
