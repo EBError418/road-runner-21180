@@ -65,13 +65,13 @@ public final class MecanumDrive {
         // Gobilda odometry: 48mm diameter(1.89 inch), 2048 tick per revolution, inPerTick = 0.0029.
         public boolean useDeadWheel = true;
         public double inPerTick = useDeadWheel? 0.00294 : 0.02208155454144; // WHEEL_RADIUS(1.8898) * 2 * Math.PI / TICKS_PER_REV(537.6)
-        public double lateralInPerTick = useDeadWheel? 0.0026698972275674207 : 0.019/0.9786;
-        public double trackWidthTicks = useDeadWheel? 3680 : 650;
+        public double lateralInPerTick = useDeadWheel? 0.002622 : 0.019/0.9786;
+        public double trackWidthTicks = useDeadWheel? 3542.133 : 650;
 
         // feedforward parameters (in tick units)
-        public double kS = useDeadWheel? 0.2119659969575789 : 0.0;
-        public double kV = useDeadWheel? 0.0007190430845854507 : 0.0025;
-        public double kA = useDeadWheel? 0.00012 : 0.0;
+        public double kS = useDeadWheel? 0.239 : 0.0;
+        public double kV = useDeadWheel? 0.00064 : 0.0025;
+        public double kA = useDeadWheel? 0.00013 : 0.0;
 
         // path profile parameters (in inches)
         public double maxWheelVel = useDeadWheel? 65 : 50;
@@ -79,8 +79,8 @@ public final class MecanumDrive {
         public double maxProfileAccel = useDeadWheel? 50 : 45;//50;
 
         // turn profile parameters (in radians)
-        public double maxAngVel = Math.PI * 1.5; // shared with path
-        public double maxAngAccel = Math.PI * 1.5;
+        public double maxAngVel = Math.PI; // shared with path
+        public double maxAngAccel = Math.PI;
 
         // path controller gains
         public double axialGain = 9.0; // 0.0
