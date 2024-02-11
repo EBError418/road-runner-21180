@@ -316,8 +316,8 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
 
         double dropYellow_delta_x = blueOrRed * ((2 == checkStatus || 5 == checkStatus)? 0 : ((3 == checkStatus || 4 == checkStatus)? -4.5 : -6));
         double dropYellow_delta_y = 0.0;
-        double dropWhite_delta_y = 2.5;
-        double pickup1_delta_x = blueOrRed * ((2 == checkStatus || 5 == checkStatus)? 0 : ((3 == checkStatus || 4 == checkStatus)? 3.0 : 1.0));
+        double dropWhite_delta_y = 1.5;
+        double pickup1_delta_x = blueOrRed * ((2 == checkStatus || 5 == checkStatus)? 0.5 : ((3 == checkStatus || 4 == checkStatus)? 3.0 : 1.0));
         double pickup2_delta_x = blueOrRed * ((2 == checkStatus || 5 == checkStatus)? -3.0 : ((3 == checkStatus || 4 == checkStatus)? -1 : -4.0));
         double pickup2_delta_y = (2 == checkStatus || 5 == checkStatus)? 0.5 : 2.0; // temp compensation
 
@@ -338,8 +338,18 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
 
         switch (checkStatus) {
             case 5:
-            case 2:
+                /*
                 xDelta = 9.0;
+                yDelta = 6;
+                splineTangent = startPose.heading.toDouble() + blueOrRed * Math.PI / 15;
+                pickupAngle1 = Math.PI / 2.25;
+                pickWhiteReady_x -= 2;
+                pickup1_alpha_x = -3.5;
+                pickup1_alpha_y = 11;
+                break;
+                 */
+            case 2:
+                xDelta = 8.5; // avoid stamp on purple for case 5
                 yDelta = 6;
                 splineTangent = startPose.heading.toDouble() + blueOrRed * Math.PI / 15;
                 break;
@@ -471,8 +481,8 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
                             .splineToLinearHeading(pPickWhite1Ready, pickupAngle1)
                             .strafeTo(pickWhite5)
                             .waitSeconds(0.3)
-                            .afterTime(0, new intakeUnitActions(intake.ARM_POS_INTAKE5 + armShiftCnt, NO_ACT, NO_ACT))
-                            .waitSeconds(0.3)
+                            //.afterTime(0, new intakeUnitActions(intake.ARM_POS_INTAKE5 + armShiftCnt, NO_ACT, NO_ACT))
+                            //.waitSeconds(0.3)
                             .build()
             );
         }
@@ -549,7 +559,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
 
         intake.readyToDropYellow(intake.ARM_POS_DROP_YELLOW);
         if ((5 == checkStatus) || (2 == checkStatus)) {
-            sleep(800); // wait arm down to the position
+            sleep(300); // wait arm down to the position
         }
 
         // shift to AprilTag
@@ -634,7 +644,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
             sleep(200);
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
-                            .strafeTo(vDropWhite)
+                            .strafeTo(new Vector2d(vDropWhite.x, drive.pose.position.y - 2.0))
                             .build()
             );
         }
