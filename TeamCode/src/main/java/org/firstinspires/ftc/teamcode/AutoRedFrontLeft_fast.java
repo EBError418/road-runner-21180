@@ -317,7 +317,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
 
         double pickup1_delta_x = blueOrRed * 1.5;
         double pickup2_delta_x = 4;
-        double pickup2_delta_y = 0.5; // temp compensation
+        double pickup2_delta_y = 1.0; // temp compensation
         double dropYellow_delta_x = 0.0;
         double dropYellow_delta_y = -1.5;
         double dropWhite_delta_y = 0.5;
@@ -383,8 +383,8 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
                 pickup1_alpha_y = 4;
 
                 pickup1_delta_x = -2.5;
-                pickup2_delta_x = -3;
-                pickup2_delta_y = 0;
+                pickup2_delta_x = -4;
+                pickup2_delta_y = 0.5;
                 dropYellow_delta_x = 3;
 
                 pickWhiteReady_x = blueOrRed * 2.0 * Params.HALF_MAT + BUCKET_SHIFT;;
@@ -404,7 +404,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
                 yDelta = 2;
                 purpleAngle = startPose.heading.toDouble() + blueOrRed * Math.PI / 3.5;
 
-                pickup1_delta_x = -1.0;
+                pickup1_delta_x = -1.5;
                 pickup2_delta_x = -1.0;
                 pickup2_delta_y = 1.0;
                 dropYellow_delta_x = 3;
@@ -662,6 +662,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
 
         // move to drop white
         if ((1 == checkStatus) || (4 == checkStatus)) {
+            intake.setSwitchRightPosition(intake.SWITCH_RIGHT_CLOSE_POS);
             intake.dropWhitePositions();
             sleep(200);
             Actions.runBlocking(
@@ -672,6 +673,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         }
         intake.setSwitchLeftPosition(intake.SWITCH_LEFT_RELEASE);
         sleep(200);
+        intake.setSwitchRightPosition(intake.SWITCH_RIGHT_CLOSE_POS);
         intake.setArmCountPosition(intake.getArmPosition() - 500);
         sleep(200);
     }
