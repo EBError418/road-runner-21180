@@ -320,7 +320,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         double pickup2_delta_y = 1.0; // temp compensation
         double dropYellow_delta_x = 0.0;
         double dropYellow_delta_y = -1.5;
-        double dropWhite_delta_y = 1.5;
+        double dropWhite_delta_y = -0.5;
 
         double xDelta = 0.0;
         double yDelta = 0.0;
@@ -363,7 +363,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
                 purpleAngle = Math.PI / 2.0 - Math.PI / 3.3;
 
                 pickup1_delta_x = 0;
-                pickup2_delta_x = 6;
+                pickup2_delta_x = 7;
                 pickup2_delta_y = 1.0;
                 dropYellow_delta_x = -1.5;
 
