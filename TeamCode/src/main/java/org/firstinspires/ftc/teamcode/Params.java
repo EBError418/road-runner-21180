@@ -47,7 +47,7 @@ public class Params {
     static int blueOrRed = 1;
 
 
-    static int armIntakeCount_InitFront = -30;
+    static int armIntakeCount_InitFront = -20;
 
     //game field parameters
     static final double HALF_MAT = 23.625/2.0;  // 60 cm

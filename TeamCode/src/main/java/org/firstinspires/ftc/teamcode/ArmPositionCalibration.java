@@ -35,6 +35,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name="Arm Calibration", group="Concept")
@@ -60,11 +61,29 @@ public class ArmPositionCalibration extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         if (opModeIsActive()) {
-            telemetry.addData("Arm calibration: ---", "done !");
-            telemetry.update();
+
             intake.switchServoOpen();
             intake.setArmCountPosition(intake.ARM_POS_AUTO);
             sleep(2000);
+            telemetry.addData("Arm calibration: ---", "done !");
+            telemetry.update();
+            /*
+                    intake.setWristPosition(intake.WRIST_POS_INTAKE);
+            intake.setArmCountPosition(intake.ARM_POS_UNDER_BEAM); // lift arm
+            sleep(1000);
+            intake.armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            intake.armMotor.setPower(0.05); // slowly down arm to ground
+            sleep(200);
+            intake.armMotor.setPower(0);
+            intake.armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+            sleep(3000);  // floating time
+            intake.resetArmEncoder(); // reset arm encoder
+            sleep(100);
+            intake.setArmCountPosition(intake.ARM_POS_AUTO); // get ready for autonomous
+            sleep(1500);
+            telemetry.addData("Arm calibration: ---", "done !");
+            telemetry.update();
+             */
         }
     }
 }

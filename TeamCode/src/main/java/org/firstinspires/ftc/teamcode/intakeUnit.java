@@ -70,7 +70,7 @@ public class intakeUnit
     final double WRIST_MAX_POS = 0.95; // Maximum rotational position
     final double WRIST_POS_DROP_PURPLE = 0.35;
     final double WRIST_POS_DROP_WHITE = 0.41;
-    final double WRIST_POS_DROP_YELLOW = 0.40;
+    final double WRIST_POS_DROP_YELLOW = 0.375;
     final double WRIST_POS_DROP = 0.44;
     final double WRIST_POS_INTAKE = 0.46;
 
@@ -347,7 +347,7 @@ public class intakeUnit
         ARM_POS_DROP = ARM_POS_INTAKE - 1000; //2550;
         ARM_POS_CAMERA_READ = ARM_POS_INTAKE - 1060; //2500;
         ARM_POS_DROP_WHITE = ARM_POS_INTAKE - 750; //2800;
-        ARM_POS_DROP_YELLOW = ARM_POS_INTAKE - 650; //2800;
+        ARM_POS_DROP_YELLOW = ARM_POS_INTAKE - 630; //2800;
         ARM_POS_UNDER_BEAM = ARM_POS_INTAKE - 260; //3100;
         ARM_POS_DROP_PURPLE = ARM_POS_INTAKE - 130; //3380;
         ARM_POS_PUSH_PROP = ARM_POS_INTAKE - 100;

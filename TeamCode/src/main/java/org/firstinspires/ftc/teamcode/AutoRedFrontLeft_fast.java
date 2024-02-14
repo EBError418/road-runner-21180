@@ -320,7 +320,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         double pickup2_delta_y = 0.5; // temp compensation
         double dropYellow_delta_x = 0.0;
         double dropYellow_delta_y = -1.5;
-        double dropWhite_delta_y = 1.5;
+        double dropWhite_delta_y = 0.5;
 
         double xDelta = 0.0;
         double yDelta = 0.0;
@@ -339,35 +339,33 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
 
         switch (checkStatus) {
             case 5:
-                xDelta = -9.5; // avoid stamp on purple for case 5
-                yDelta = 7;
+                xDelta = -8.5; // avoid stamp on purple for case 5
+                yDelta = 8;
                 purpleAngle = startPose.heading.toDouble() + blueOrRed * Math.PI / 15;
 
                 pickup1_delta_x = -1.5;
-                pickup2_delta_x = 1.0;
-                pickup2_delta_y = 1.0;
+                pickup2_delta_x = -1.0;
                 dropYellow_delta_x = -1;
                 break;
 
             case 2:
                 xDelta = 8.5; // avoid stamp on purple for case 5
-                yDelta = 7;
+                yDelta = 8;
                 purpleAngle = startPose.heading.toDouble() + blueOrRed * Math.PI / 15;
 
                 pickup1_delta_x = 0.5;
-                pickup2_delta_x = 4;
-                pickup2_delta_y = 0.5;
-                dropYellow_delta_x = 0;
+                pickup2_delta_x = 5;
+                dropYellow_delta_x = 2;
                 break;
             case 3:
-                xDelta = -16.5;
+                xDelta = -16;
                 yDelta = 0;
-                purpleAngle = Math.PI / 2.0 - Math.PI / 3.4;
+                purpleAngle = Math.PI / 2.0 - Math.PI / 3.3;
 
                 pickup1_delta_x = 0;
-                pickup2_delta_x = 2;
+                pickup2_delta_x = 6;
                 pickup2_delta_y = 1.0;
-                dropYellow_delta_x = 0;
+                dropYellow_delta_x = -1.5;
 
                 pickup1_alpha_x = 3;
                 pickup1_alpha_y = -2;
@@ -387,7 +385,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
                 pickup1_delta_x = -2.5;
                 pickup2_delta_x = -3;
                 pickup2_delta_y = 0;
-                dropYellow_delta_x = 2;
+                dropYellow_delta_x = 3;
 
                 pickWhiteReady_x = blueOrRed * 2.0 * Params.HALF_MAT + BUCKET_SHIFT;;
                 break;
@@ -407,9 +405,9 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
                 purpleAngle = startPose.heading.toDouble() + blueOrRed * Math.PI / 3.5;
 
                 pickup1_delta_x = -1.0;
-                pickup2_delta_x = 1;
+                pickup2_delta_x = -1.0;
                 pickup2_delta_y = 1.0;
-                dropYellow_delta_x = 2;
+                dropYellow_delta_x = 3;
                 break;
         }
         pickWhiteReady_x = pickWhiteReady_x + pickup1_delta_x;
@@ -454,7 +452,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         // move to drop purple, hitting the ball
         double wristPos = ((2 == checkStatus) || (5 == checkStatus))? intake.WRIST_POS_INTAKE  : intake.WRIST_POS_DROP_PURPLE;
         double armPos = ((2 == checkStatus) || (5 == checkStatus))? intake.ARM_POS_PUSH_PROP : intake.ARM_POS_DROP_PURPLE;
-        double waitSec = (1 == checkStatus)? 0 : 0.7;
+        double waitSec = (1 == checkStatus)? 0 : ((2 == checkStatus)? 1.0 : 0.7);
         if ((4 == checkStatus) || (3 == checkStatus)){
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
@@ -489,6 +487,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         }
         dropPurpleAction();
         intake.underTheBeam(); // avoid to hitting rigging bin
+        sleep(200);
 
         Logging.log("Autonomous time - after drop purple time: " + runtime);
 
@@ -597,7 +596,8 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         logVector("Before fine turn required", vStartTurn2ndDrop);
         // move to pickup second white pixel
         double turnAngle = drive.pose.heading.toDouble() + Math.PI - blueOrRed * 0.03; // 0.03 is control orientation to avoid hitting board;
-        waitSec = ((2 == checkStatus) || (5 == checkStatus))? 1.0 : 0.5;
+        waitSec = ((4 == checkStatus))? 1.0 : 0.5;
+        waitSec = ((2 == checkStatus) || (5 == checkStatus) )? 1.7 :  waitSec;
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .strafeToLinearHeading(vStartTurn2ndDrop, turnAngle) // strafe back to avoid hitting board
