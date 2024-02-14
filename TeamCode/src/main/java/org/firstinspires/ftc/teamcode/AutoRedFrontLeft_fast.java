@@ -320,7 +320,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         double pickup2_delta_y = 1.0; // temp compensation
         double dropYellow_delta_x = 0.0;
         double dropYellow_delta_y = -1.5;
-        double dropWhite_delta_y = 0.5;
+        double dropWhite_delta_y = 1.5;
 
         double xDelta = 0.0;
         double yDelta = 0.0;
