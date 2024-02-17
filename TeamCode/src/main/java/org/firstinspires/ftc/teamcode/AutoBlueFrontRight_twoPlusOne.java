@@ -3,7 +3,7 @@ import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
 @Autonomous(name="03 Blue Front Right + 1 white", group="Concept")
 //@Disabled
-public class AutoBlueFrontRight_twoPlusOne extends AutoRedFrontLeft_fast {
+public class AutoBlueFrontRight_twoPlusOne extends AutoRedFrontLeft_twoPlusOne {
     @Override
     public void setRobotLocation() {
         startLoc = 3;

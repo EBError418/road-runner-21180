@@ -360,7 +360,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
             case 3:
                 xDelta = -16;
                 yDelta = 0;
-                purpleAngle = Math.PI / 2.0 - Math.PI / 3.3;
+                purpleAngle = Math.PI / 2.0 - Math.PI / 3.1;
 
                 pickup1_delta_x = 0;
                 pickup2_delta_x = 7;
@@ -526,7 +526,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
                             .afterTime(0.01, new TurnOnCamera()) // turn on camera for April Tag checking
-                            .afterTime(0.2, new intakeUnitActions(intake.ARM_POS_INTAKE5, NO_ACT, intake.FINGER_OUTTAKE_POS))
+                            .afterTime(0.2, new intakeUnitActions(intake.ARM_POS_INTAKE5, intake.WRIST_POS_DROP_YELLOW, intake.FINGER_OUTTAKE_POS))
                             .strafeTo(vCheckingAprilTagPose)
                             .afterTime(0, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, intake.WRIST_POS_DROP_YELLOW, intake.FINGER_INTAKE_POS))
                             .turnTo(dropOffAngle)
