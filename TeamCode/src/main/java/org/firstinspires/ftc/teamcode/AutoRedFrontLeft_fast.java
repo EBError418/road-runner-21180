@@ -546,6 +546,8 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
                             .build()
             );
         }
+        Logging.log("Autonomous time - checking camera time: " + runtime);
+
         logVector("robot drive: drive.pose check april tag", drive.pose.position);
         logVector("robot drive: check april tag required", vCheckingAprilTagPose);
         logRobotHeading("robot drive: check april tag before fine correction");
@@ -596,8 +598,8 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         logVector("Before fine turn required", vStartTurn2ndDrop);
         // move to pickup second white pixel
         double turnAngle = drive.pose.heading.toDouble() + Math.PI - blueOrRed * 0.03; // 0.03 is control orientation to avoid hitting board;
-        waitSec = ((4 == checkStatus))? 1.0 : 0.5;
-        waitSec = ((2 == checkStatus) || (5 == checkStatus) )? 1.7 :  waitSec;
+        waitSec = ((4 == checkStatus))? 0.7 : 0.5;
+        waitSec = ((2 == checkStatus) || (5 == checkStatus) )? 1.0 :  waitSec;
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .strafeToLinearHeading(vStartTurn2ndDrop, turnAngle) // strafe back to avoid hitting board
@@ -620,8 +622,11 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
                         // back to drop off 2nd round
                         .afterTime(0.05, new intakeUnitActions(intake.ARM_POS_UNDER_BEAM, intake.WRIST_POS_DROP_PURPLE, NO_ACT))
                         .strafeTo(vStartTurn2ndDrop)
-                        .strafeToLinearHeading(vDropWhite, dropOffAngle)
-                        .afterTime(0.3, new intakeUnitActions(intake.ARM_POS_DROP_WHITE, intake.WRIST_POS_DROP_WHITE, NO_ACT))
+
+                        //.strafeToLinearHeading(vDropWhite, dropOffAngle)
+                        .strafeToLinearHeading(vCheckingAprilTag2nd, dropOffAngle)
+
+                        .afterTime(0.3, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, intake.WRIST_POS_DROP_WHITE, NO_ACT))
                         .afterTime(0, new recordDrivePosition("drop white2"))
                         .build()
         );
@@ -630,6 +635,43 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
 
         logRobotHeading("robot drive: drop off white");
         Logging.log("Autonomous time - after second white pickup time: " + runtime);
+
+        // fine correct angle before checking April Tag
+        Actions.runBlocking(
+                drive.actionBuilder(drive.pose)
+                        .turnTo(dropOffAngle)
+                        .build()
+        );
+        logRobotHeading("robot drive: check april tag after fine correction");
+
+        Logging.log("Autonomous - Start April tag detect");
+        aprilTagPose = tag.updatePoseAprilTag(desiredTagWhite);
+        logVector("robot drive: april tag location from camera", aprilTagPose.position);
+        logVector("robot drive: drop yellow pose required before adjust", vDropWhite);
+
+        // if can not move based on April tag, move by road runner encode.
+        if (tag.targetFound) {
+            // adjust yellow drop-off position according to april tag location info from camera
+            vDropWhite = new Vector2d(drive.pose.position.x - aprilTagPose.position.x + BUCKET_SHIFT,
+                    drive.pose.position.y - aprilTagPose.position.y + Params.AUTO_DISTANCE_TO_TAG - 2.0 /* for white*/);
+            logVector("robot drive: drop yellow pose required after april tag adjust", vDropWhite);
+        }
+        else {
+            Logging.log("Can not found required AprilTag to drop yellow pixel");
+        }
+
+        intake.readyToDropYellow(intake.ARM_POS_DROP_WHITE);
+
+        // shift to AprilTag
+        Actions.runBlocking(
+                drive.actionBuilder(drive.pose)
+                        .strafeTo(vDropWhite)
+                        .build()
+        );
+        logVector("robot drive: drive.pose drop yellow", drive.pose.position);
+        logVector("robot drive: drop yellow required", vDropYellow);
+        logRobotHeading("robot drive: drop yellow heading -");
+
 
         // drop pixels
         dropWhiteAction();

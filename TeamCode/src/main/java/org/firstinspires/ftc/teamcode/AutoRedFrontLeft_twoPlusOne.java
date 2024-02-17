@@ -49,6 +49,7 @@ public class AutoRedFrontLeft_twoPlusOne extends LinearOpMode {
 
     private int checkStatus = 1;
     // USE LATER: boolean debug_flag = true;
+    private double waitAllianceTime = 8;
 
     // Declare OpMode members.
     private final ElapsedTime runtime = new ElapsedTime();
@@ -474,7 +475,7 @@ public class AutoRedFrontLeft_twoPlusOne extends LinearOpMode {
                     drive.actionBuilder(drive.pose)
                             .afterTime(1, new TurnOnCamera()) // turn on camera for April Tag checking
                             .afterTime(0.5, new intakeUnitActions(intake.ARM_POS_INTAKE5, NO_ACT, intake.FINGER_OUTTAKE_POS))
-                            .waitSeconds(3)
+                            .waitSeconds(waitAllianceTime)
                             .strafeTo(vCheckingAprilTagPose)
                             .afterTime(0, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, intake.WRIST_POS_DROP_YELLOW, intake.FINGER_INTAKE_POS))
                             .turnTo(dropOffAngle)
@@ -488,6 +489,7 @@ public class AutoRedFrontLeft_twoPlusOne extends LinearOpMode {
                             .afterTime(0.2, new intakeUnitActions(intake.ARM_POS_INTAKE5, intake.WRIST_POS_DROP_YELLOW, intake.FINGER_OUTTAKE_POS))
                             .strafeToLinearHeading(new Vector2d(vStartTurn2ndDrop.x, 3 * Params.HALF_MAT), pickupAngle2)
                             .afterTime(0, new intakeUnitActions(NO_ACT, NO_ACT, intake.FINGER_INTAKE_POS))
+                            .waitSeconds(waitAllianceTime)
                             .strafeToLinearHeading(vStartTurn2ndDrop, pickupAngle2)
                             .afterTime(2, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, intake.WRIST_POS_DROP_YELLOW, intake.FINGER_INTAKE_POS))
                             .strafeToLinearHeading(vCheckingAprilTagPose, dropOffAngle)
