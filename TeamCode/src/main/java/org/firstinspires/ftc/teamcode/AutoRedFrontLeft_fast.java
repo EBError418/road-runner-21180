@@ -525,7 +525,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         logVector("robot drive: after pickup1 - pickWhite5", pickWhite5);
         logRobotHeading("robot drive: after pickup1 heading -");
 
-        if (pickup2ndWhite) {
+        if (!pickup2ndWhite) {
             sleep((int)(waitAllianceTime * 1000));
         }
 

@@ -70,7 +70,7 @@ public final class MecanumDrive {
 
         // feedforward parameters (in tick units)
         public double kS = useDeadWheel? 0.239 : 0.0;
-        public double kV = useDeadWheel? 0.00064 : 0.0025;
+        public double kV = useDeadWheel? 0.00068 : 0.0025;
         public double kA = useDeadWheel? 0.00013 : 0.0;
 
         // path profile parameters (in inches)
@@ -201,6 +201,13 @@ public final class MecanumDrive {
     public MecanumDrive(HardwareMap hardwareMap, Pose2d pose) {
         this.pose = pose;
 
+        /*  only uncomment for tuning to lift arm
+        intakeUnit intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
+                "Finger", "SwitchR", "SwitchL");
+        intake.resetArmEncoder();
+        intake.setArmModeRunToPosition(intake.ARM_POS_INTAKE);
+        intake.setArmCountPosition(intake.ARM_POS_DROP_WHITE);
+        */
         LynxFirmware.throwIfModulesAreOutdated(hardwareMap);
 
         for (LynxModule module : hardwareMap.getAll(LynxModule.class)) {

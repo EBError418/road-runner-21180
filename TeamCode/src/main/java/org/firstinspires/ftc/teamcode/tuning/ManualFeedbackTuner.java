@@ -27,17 +27,17 @@ public final class ManualFeedbackTuner extends LinearOpMode {
                 }
             }
             waitForStart();
-            drive.pose = new Pose2d(0, 0, 0);
+            //drive.pose = new Pose2d(0, 0, 0);
             while (opModeIsActive()) {
                 sleep(1000);
 
                 Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
+                        drive.actionBuilder(new Pose2d(0, 0, 0))
                             .lineToX(DISTANCE * (gamepad1.a? (-1) : 1))
                             .waitSeconds(1)
                             .lineToX(0)
                             .build());
-                drive.updatePoseEstimate();
+                //drive.updatePoseEstimate();
             }
         } else if (TuningOpModes.DRIVE_CLASS.equals(TankDrive.class)) {
             TankDrive drive = new TankDrive(hardwareMap, new Pose2d(0, 0, 0));
