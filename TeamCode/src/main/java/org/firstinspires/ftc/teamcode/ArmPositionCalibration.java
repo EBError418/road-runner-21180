@@ -53,7 +53,6 @@ public class ArmPositionCalibration extends LinearOpMode {
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
                 "Finger", "SwitchR", "SwitchL");
-        intake.resetArmEncoder();
         Params.armCalibrated = true;
 
         waitForStart();
@@ -61,6 +60,8 @@ public class ArmPositionCalibration extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         if (opModeIsActive()) {
+
+            intake.resetArmEncoder();
 
             intake.switchServoOpen();
             intake.setArmCountPosition(intake.ARM_POS_AUTO);

@@ -81,6 +81,10 @@ import java.util.Vector;
 public class AutoRedFrontLeft_fast extends LinearOpMode {
 
     private final double NO_ACT = 100000;
+
+    private double waitAllianceTime = 9.0;
+
+    public boolean pickup2ndWhite = true;
     /** 1 for Red Front, 2 for Red back, 3 for Blue Front, and 4 for Blue back
      */
     public int startLoc = 1;
@@ -521,14 +525,19 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         logVector("robot drive: after pickup1 - pickWhite5", pickWhite5);
         logRobotHeading("robot drive: after pickup1 heading -");
 
+        if (pickup2ndWhite) {
+            sleep((int)(waitAllianceTime * 1000));
+        }
+
         // move back to drop yellow and white, lift arm after through gate
         if ((5 == checkStatus) || (2 == checkStatus)) {
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
                             .afterTime(0.01, new TurnOnCamera()) // turn on camera for April Tag checking
-                            .afterTime(0.2, new intakeUnitActions(intake.ARM_POS_INTAKE5, intake.WRIST_POS_DROP_YELLOW, intake.FINGER_OUTTAKE_POS))
+                            .afterTime(0.1, new intakeUnitActions(NO_ACT, intake.WRIST_POS_DROP_YELLOW, NO_ACT))
+                            .afterTime(0.4, new intakeUnitActions(intake.ARM_POS_INTAKE5, NO_ACT, intake.FINGER_OUTTAKE_POS))
                             .strafeTo(vCheckingAprilTagPose)
-                            .afterTime(0, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, intake.WRIST_POS_DROP_YELLOW, intake.FINGER_INTAKE_POS))
+                            .afterTime(0, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, NO_ACT, intake.FINGER_INTAKE_POS))
                             .turnTo(dropOffAngle)
                             .build()
             );
@@ -537,11 +546,12 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
                             .afterTime(0.01, new TurnOnCamera()) // turn on camera for April Tag checking
-                            .afterTime(0.2, new intakeUnitActions(intake.ARM_POS_INTAKE5, intake.WRIST_POS_DROP_YELLOW, intake.FINGER_OUTTAKE_POS))
+                            .afterTime(0.1, new intakeUnitActions(NO_ACT, intake.WRIST_POS_DROP_YELLOW, NO_ACT))
+                            .afterTime(0.4, new intakeUnitActions(intake.ARM_POS_INTAKE5, NO_ACT, intake.FINGER_OUTTAKE_POS))
                             .strafeToLinearHeading(new Vector2d(vStartTurn2ndDrop.x, 3 * Params.HALF_MAT), pickupAngle2)
                             .afterTime(0, new intakeUnitActions(NO_ACT, NO_ACT, intake.FINGER_INTAKE_POS))
                             .strafeToLinearHeading(vStartTurn2ndDrop, pickupAngle2)
-                            .afterTime(2, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, intake.WRIST_POS_DROP_YELLOW, intake.FINGER_INTAKE_POS))
+                            .afterTime(0.5, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, NO_ACT, intake.FINGER_INTAKE_POS))
                             .strafeToLinearHeading(vCheckingAprilTagPose, dropOffAngle)
                             .build()
             );
@@ -597,85 +607,86 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
 
         logVector("Before fine turn required", vStartTurn2ndDrop);
         // move to pickup second white pixel
-        double turnAngle = drive.pose.heading.toDouble() + Math.PI - blueOrRed * 0.03; // 0.03 is control orientation to avoid hitting board;
-        waitSec = ((4 == checkStatus))? 0.7 : 0.5;
-        waitSec = ((2 == checkStatus) || (5 == checkStatus) )? 1.0 :  waitSec;
-        Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(vStartTurn2ndDrop, turnAngle) // strafe back to avoid hitting board
-                        .afterTime(0.1, new pickupWhiteAct(intake.ARM_POS_INTAKE5))
-                        .afterTime(0, new recordDrivePosition("Before fine turn"))
-                        .turnTo(pickupAngle2) // fine tune heading before long distance moving
-                        .afterTime(0, new recordDrivePosition("After fine turn"))
+        if (pickup2ndWhite) {
+            double turnAngle = drive.pose.heading.toDouble() + Math.PI - blueOrRed * 0.03; // 0.03 is control orientation to avoid hitting board;
+            waitSec = ((4 == checkStatus)) ? 0.7 : 0.5;
+            waitSec = ((2 == checkStatus) || (5 == checkStatus)) ? 1.0 : waitSec;
+            Actions.runBlocking(
+                    drive.actionBuilder(drive.pose)
+                            .strafeToLinearHeading(vStartTurn2ndDrop, turnAngle) // strafe back to avoid hitting board
+                            .afterTime(0.1, new pickupWhiteAct(intake.ARM_POS_INTAKE5))
+                            .afterTime(0, new recordDrivePosition("Before fine turn"))
+                            .turnTo(pickupAngle2) // fine tune heading before long distance moving
+                            .afterTime(0, new recordDrivePosition("After fine turn"))
 
-                        // pickup in right side bucket
-                        .strafeTo(vPickup2)
-                        .afterTime(0, new recordDrivePosition("when pickup white2"))
-                        .waitSeconds(0.3) // make sure the arm is lift after robot in place
+                            // pickup in right side bucket
+                            .strafeTo(vPickup2)
+                            .afterTime(0, new recordDrivePosition("when pickup white2"))
+                            .waitSeconds(0.3) // make sure the arm is lift after robot in place
 
-                        // low arm
-                        .afterTime(0, new intakeUnitActions(intake.ARM_POS_INTAKE5 + armShiftCnt, NO_ACT, NO_ACT))
-                        .turnTo(pickupAngle2) // correct heading before backing to drop
-                        .afterTime(0, new recordDrivePosition("after correct heading before backing to drop white2"))
-                        .waitSeconds(waitSec)
+                            // low arm
+                            .afterTime(0, new intakeUnitActions(intake.ARM_POS_INTAKE5 + armShiftCnt, NO_ACT, NO_ACT))
+                            .turnTo(pickupAngle2) // correct heading before backing to drop
+                            .afterTime(0, new recordDrivePosition("after correct heading before backing to drop white2"))
+                            .waitSeconds(waitSec)
 
-                        // back to drop off 2nd round
-                        .afterTime(0.05, new intakeUnitActions(intake.ARM_POS_UNDER_BEAM, intake.WRIST_POS_DROP_PURPLE, NO_ACT))
-                        .strafeTo(vStartTurn2ndDrop)
+                            // back to drop off 2nd round
+                            .afterTime(0.05, new intakeUnitActions(intake.ARM_POS_UNDER_BEAM, intake.WRIST_POS_DROP_PURPLE, NO_ACT))
+                            .strafeTo(vStartTurn2ndDrop)
 
-                        //.strafeToLinearHeading(vDropWhite, dropOffAngle)
-                        .strafeToLinearHeading(vCheckingAprilTag2nd, dropOffAngle)
+                            //.strafeToLinearHeading(vDropWhite, dropOffAngle)
+                            .strafeToLinearHeading(vCheckingAprilTag2nd, dropOffAngle)
 
-                        .afterTime(0.3, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, intake.WRIST_POS_DROP_WHITE, NO_ACT))
-                        .afterTime(0, new recordDrivePosition("drop white2"))
-                        .build()
-        );
-        logVector("robot drive: pickup white2 required", vPickup2);
-        logVector("robot drive: drop white2 required", vDropWhite);
+                            .afterTime(0.3, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, intake.WRIST_POS_DROP_WHITE, NO_ACT))
+                            .afterTime(0, new recordDrivePosition("drop white2"))
+                            .build()
+            );
+            logVector("robot drive: pickup white2 required", vPickup2);
+            logVector("robot drive: drop white2 required", vDropWhite);
 
-        logRobotHeading("robot drive: drop off white");
-        Logging.log("Autonomous time - after second white pickup time: " + runtime);
+            logRobotHeading("robot drive: drop off white");
+            Logging.log("Autonomous time - after second white pickup time: " + runtime);
 
-        // fine correct angle before checking April Tag
-        Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
-                        .turnTo(dropOffAngle)
-                        .build()
-        );
-        logRobotHeading("robot drive: check april tag after fine correction");
+            // fine correct angle before checking April Tag
+            Actions.runBlocking(
+                    drive.actionBuilder(drive.pose)
+                            .turnTo(dropOffAngle)
+                            .build()
+            );
+            logRobotHeading("robot drive: check april tag after fine correction");
 
-        Logging.log("Autonomous - Start April tag detect");
-        aprilTagPose = tag.updatePoseAprilTag(desiredTagWhite);
-        logVector("robot drive: april tag location from camera", aprilTagPose.position);
-        logVector("robot drive: drop yellow pose required before adjust", vDropWhite);
+            Logging.log("Autonomous - Start April tag detect");
+            aprilTagPose = tag.updatePoseAprilTag(desiredTagWhite);
+            logVector("robot drive: april tag location from camera", aprilTagPose.position);
+            logVector("robot drive: drop yellow pose required before adjust", vDropWhite);
 
-        // if can not move based on April tag, move by road runner encode.
-        if (tag.targetFound) {
-            // adjust yellow drop-off position according to april tag location info from camera
-            vDropWhite = new Vector2d(drive.pose.position.x - aprilTagPose.position.x + BUCKET_SHIFT,
-                    drive.pose.position.y - aprilTagPose.position.y + Params.AUTO_DISTANCE_TO_TAG - 2.0 /* for white*/);
-            logVector("robot drive: drop yellow pose required after april tag adjust", vDropWhite);
+            // if can not move based on April tag, move by road runner encode.
+            if (tag.targetFound) {
+                // adjust yellow drop-off position according to april tag location info from camera
+                vDropWhite = new Vector2d(drive.pose.position.x - aprilTagPose.position.x + BUCKET_SHIFT,
+                        drive.pose.position.y - aprilTagPose.position.y + Params.AUTO_DISTANCE_TO_TAG - 2.0 /* for white*/);
+                logVector("robot drive: drop yellow pose required after april tag adjust", vDropWhite);
+            } else {
+                Logging.log("Can not found required AprilTag to drop yellow pixel");
+            }
+
+            intake.readyToDropYellow(intake.ARM_POS_DROP_WHITE);
+
+            // shift to AprilTag
+            Actions.runBlocking(
+                    drive.actionBuilder(drive.pose)
+                            .strafeTo(vDropWhite)
+                            .build()
+            );
+            logVector("robot drive: drive.pose drop yellow", drive.pose.position);
+            logVector("robot drive: drop yellow required", vDropYellow);
+            logRobotHeading("robot drive: drop yellow heading -");
+
+
+            // drop pixels
+            dropWhiteAction();
+            Logging.log("Autonomous time - after second white drop time: " + runtime);
         }
-        else {
-            Logging.log("Can not found required AprilTag to drop yellow pixel");
-        }
-
-        intake.readyToDropYellow(intake.ARM_POS_DROP_WHITE);
-
-        // shift to AprilTag
-        Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
-                        .strafeTo(vDropWhite)
-                        .build()
-        );
-        logVector("robot drive: drive.pose drop yellow", drive.pose.position);
-        logVector("robot drive: drop yellow required", vDropYellow);
-        logRobotHeading("robot drive: drop yellow heading -");
-
-
-        // drop pixels
-        dropWhiteAction();
-        Logging.log("Autonomous time - after second white drop time: " + runtime);
 
         // parking
         intake.setArmCountPosition(intake.ARM_POS_READY_FOR_HANG + 200);
