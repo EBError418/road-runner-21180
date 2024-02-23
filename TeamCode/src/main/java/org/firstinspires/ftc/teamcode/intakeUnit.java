@@ -61,18 +61,19 @@ public class intakeUnit
     private Servo switchRightServo = null;
     private Servo switchLeftServo = null;
     final double SWITCH_RIGHT_CLOSE_POS = 0.26;
-    final double SWITCH_LEFT_CLOSE_POS = 0.29;
-    final double SWITCH_RIGHT_RELEASE = 0.35;
-    final double SWITCH_LEFT_RELEASE = 0.15;
+    final double SWITCH_RIGHT_RELEASE = 0.38;
+
+    final double SWITCH_LEFT_CLOSE_POS = 0.27;
+    final double SWITCH_LEFT_RELEASE = 0.02;
 
     public Servo wristServo = null;
     final double WRIST_MIN_POS = 0.2;  // Minimum rotational position
     final double WRIST_MAX_POS = 0.95; // Maximum rotational position
     final double WRIST_POS_DROP_PURPLE = 0.35;
-    final double WRIST_POS_DROP_WHITE = 0.41;
+    final double WRIST_POS_DROP_WHITE = 0.42;
     final double WRIST_POS_DROP_YELLOW = 0.38;
-    final double WRIST_POS_DROP = 0.44;
-    final double WRIST_POS_INTAKE = 0.46;
+    final double WRIST_POS_DROP = 0.47;
+    final double WRIST_POS_INTAKE = 0.47;
 
     // arm servo variables, not used in current prototype version.
     public DcMotor armMotor = null;
