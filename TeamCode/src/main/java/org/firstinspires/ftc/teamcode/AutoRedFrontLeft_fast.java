@@ -108,6 +108,11 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
     private int desiredTagWhite = 0; // blue: 1,2,3; red: 4,5,6
 
     private int checkStatus = 1;
+
+    double dropOffAngle = -Math.PI/2 - 0.04;// * blueOrRed; // 0.04 for turn orientation control
+    double pickupAngle2 = Math.PI/2;
+    double pickupAngle1 = Math.PI/2;
+
     // USE LATER: boolean debug_flag = true;
 
     // Declare OpMode members.
@@ -330,7 +335,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
 
         double pickup1_delta_x = blueOrRed * 1.5;
         double pickup2_delta_x = 4;
-        double pickup2_delta_y = 0.5; // temp compensation
+        double pickup2_delta_y = 0.25;
         double dropYellow_delta_x = 0.0;
         double dropYellow_delta_y = -1.5;
         double dropWhite_delta_y = -0.5;
@@ -343,9 +348,6 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         double pickWhiteReady_y = 3.5 * Params.HALF_MAT - 5.0;
 
         double startTurn2ndDrop_x = blueOrRed * Params.HALF_MAT; // under gate
-        double dropOffAngle = -Math.PI/2 - 0.04;// * blueOrRed; // 0.04 for turn orientation control
-        double pickupAngle2 = Math.PI/2;
-        double pickupAngle1 = Math.PI/2;
 
         double pickup1_alpha_x = 0;
         double pickup1_alpha_y = 0;
@@ -377,7 +379,6 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
 
                 pickup1_delta_x = -0.5;
                 pickup2_delta_x = 4.5;
-                pickup2_delta_y = 1.0;
                 dropYellow_delta_x = -2;
 
                 pickup1_alpha_x = 3;
@@ -408,7 +409,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
 
                 pickup1_delta_x = 1.0;
                 pickup2_delta_x = 4;
-                pickup2_delta_y = 1.0;
+                pickup2_delta_y = 0.5;
                 dropYellow_delta_x = -2.5;
                 break;
             case 6:
@@ -423,7 +424,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         }
         pickWhiteReady_x = pickWhiteReady_x + pickup1_delta_x;
 
-        int armShiftWhite1 = 15;
+        int armShiftWhite1 = 20;
         int armShiftCnt = 30;
 
         Vector2d vParkPos = new Vector2d(blueOrRed * 3 * Params.HALF_MAT - 2 * leftOrRight * Params.HALF_MAT, -4 * Params.HALF_MAT + 2);
@@ -635,7 +636,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         // move to pickup second white pixel
         if (pickup2ndWhite) {
             double turnAngle = drive.pose.heading.toDouble() + Math.PI - blueOrRed * 0.03; // 0.03 is control orientation to avoid hitting board;
-            waitSec = (1 == checkStatus)? 0.4 : 0.9;
+            waitSec = (1 == checkStatus)? 0.4 : 1.0;
 
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
@@ -648,7 +649,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
                             // pickup in right side bucket
                             .strafeTo(vPickup2)
                             .afterTime(0, new recordDrivePosition("when pickup white2"))
-                            .waitSeconds(0.4) // make sure the arm is lift after robot in place
+                            .waitSeconds(0.3) // make sure the arm is lift after robot in place
 
                             // low arm
                             .afterTime(0, new intakeUnitActions(intake.ARM_POS_INTAKE5 + armShiftCnt, NO_ACT, NO_ACT))
@@ -702,6 +703,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
                             .strafeTo(vDropWhite)
+                            .turnTo(dropOffAngle)
                             .build()
             );
             logVector("robot drive: drive.pose drop white", drive.pose.position);
@@ -746,12 +748,12 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
                             .strafeTo(new Vector2d(vDropWhite.x, drive.pose.position.y - 2.0))
+                            .turnTo(dropOffAngle)
                             .build()
             );
         }
         intake.setSwitchLeftPosition(intake.SWITCH_LEFT_RELEASE);
         sleep(200);
-        intake.setSwitchRightPosition(intake.SWITCH_RIGHT_CLOSE_POS);
         intake.setArmCountPosition(intake.getArmPosition() - 500);
         sleep(200);
     }
@@ -787,17 +789,6 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             camera.closeCameraDevice();
             return false;
-        }
-    }
-
-    private void updateProfileAccel(boolean slowMode) {
-        if (slowMode) {
-            MecanumDrive.PARAMS.minProfileAccel = -15;
-            MecanumDrive.PARAMS.maxProfileAccel = 20;
-        }
-        else {
-            MecanumDrive.PARAMS.minProfileAccel = -25;
-            MecanumDrive.PARAMS.maxProfileAccel = 45;
         }
     }
 
