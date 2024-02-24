@@ -59,7 +59,7 @@ public class GamePadButtons {
     public boolean armReset;
     public boolean wristUp;
     public boolean wristDown;
-
+    public boolean setPos; //set the arm and wrist to a certain position to move wrongly placed pixels
     public boolean fingerOuttake;
     public boolean fingerIntake;
     public boolean fingerStop;
@@ -140,6 +140,7 @@ public class GamePadButtons {
         //wrists
         wristUp = gamepad2.left_stick_y < 0;
         wristDown = gamepad2.left_stick_y > 0;
+        setPos = gamepad1.left_trigger > 0;
 
         //fingers
         fingerIntake =  gamepad2.dpad_down;

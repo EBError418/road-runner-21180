@@ -454,6 +454,8 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         Vector2d pickWhite5 = new Vector2d(pickWhiteReady_x + pickup1_alpha_x, pickWhiteReady_y + 11 + pickup1_alpha_y);
         Vector2d vPickup2 = new Vector2d(startTurn2ndDrop_x + pickup2_delta_x, pickWhite5.y + pickup2_delta_y);
 
+        Vector2d vOneWaitPosition = new Vector2d(vCheckingAprilTagPose.x, pickWhite5.y - Params.HALF_MAT);
+
         Logging.log("check status = %d, xDelta = %.2f, yDelta = %.2f ", checkStatus, xDelta, yDelta);
         logVector("Back drop pose", vBackdrop);
         logVector("April tag", vAprilTag);
@@ -535,23 +537,36 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         logVector("robot drive: after pickup1 - pickWhite5", pickWhite5);
         logRobotHeading("robot drive: after pickup1 heading -");
 
-        if (!pickup2ndWhite) {
-            sleep((int)(waitAllianceTime * 1000));
-        }
-
         // move back to drop yellow and white, lift arm after through gate
         if ((5 == checkStatus) || (2 == checkStatus)) {
-            Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
-                            .afterTime(0.01, new TurnOnCamera()) // turn on camera for April Tag checking
-                            .afterTime(0.1, new intakeUnitActions(intake.ARM_POS_UNDER_BEAM, intake.WRIST_POS_DROP_YELLOW, NO_ACT))
-                            .afterTime(0.4, new intakeUnitActions(NO_ACT, NO_ACT, intake.FINGER_OUTTAKE_POS))
-                            .afterTime(1.5, new intakeUnitActions(NO_ACT, NO_ACT, intake.FINGER_INTAKE_POS))
-                            .strafeTo(vCheckingAprilTagPose)
-                            .afterTime(0, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, NO_ACT, NO_ACT))
-                            .turnTo(dropOffAngle)
-                            .build()
-            );
+            if (pickup2ndWhite) {
+                Actions.runBlocking(
+                        drive.actionBuilder(drive.pose)
+                                .afterTime(0.01, new TurnOnCamera()) // turn on camera for April Tag checking
+                                .afterTime(0.1, new intakeUnitActions(intake.ARM_POS_UNDER_BEAM, intake.WRIST_POS_DROP_YELLOW, NO_ACT))
+                                .afterTime(0.4, new intakeUnitActions(NO_ACT, NO_ACT, intake.FINGER_OUTTAKE_POS))
+                                .afterTime(1.5, new intakeUnitActions(NO_ACT, NO_ACT, intake.FINGER_INTAKE_POS))
+                                .strafeTo(vCheckingAprilTagPose)
+                                .afterTime(0, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, NO_ACT, NO_ACT))
+                                .turnTo(dropOffAngle)
+                                .build()
+                );
+            }
+            else {
+                Actions.runBlocking(
+                        drive.actionBuilder(drive.pose)
+                                .afterTime(0.01, new TurnOnCamera()) // turn on camera for April Tag checking
+                                .afterTime(0.1, new intakeUnitActions(intake.ARM_POS_UNDER_BEAM, intake.WRIST_POS_DROP_YELLOW, NO_ACT))
+                                .afterTime(0.4, new intakeUnitActions(NO_ACT, NO_ACT, intake.FINGER_OUTTAKE_POS))
+                                .afterTime(1.5, new intakeUnitActions(NO_ACT, NO_ACT, intake.FINGER_INTAKE_POS))
+                                .strafeTo(vOneWaitPosition)
+                                .waitSeconds(waitAllianceTime)
+                                .strafeTo(vCheckingAprilTagPose)
+                                .afterTime(0, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, NO_ACT, NO_ACT))
+                                .turnTo(dropOffAngle)
+                                .build()
+                );
+            }
         }
         else {
             Actions.runBlocking(
@@ -561,6 +576,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
                             .afterTime(0.4, new intakeUnitActions(NO_ACT, NO_ACT, intake.FINGER_OUTTAKE_POS))
                             .afterTime(1.5, new intakeUnitActions(NO_ACT, NO_ACT, intake.FINGER_INTAKE_POS))
                             .strafeToLinearHeading(new Vector2d(vStartTurn2ndDrop.x, 3 * Params.HALF_MAT), pickupAngle2)
+                            .waitSeconds((pickup2ndWhite)? 0.001 : waitAllianceTime)
                             .strafeToLinearHeading(vStartTurn2ndDrop, pickupAngle2)
                             .strafeToLinearHeading(vCheckingAprilTagPose, dropOffAngle)
                             .afterTime(0, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, NO_ACT, NO_ACT))

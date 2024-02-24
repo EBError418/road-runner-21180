@@ -266,6 +266,10 @@ public class TeleopRR extends LinearOpMode {
                 intake.resetArmPositions(intake.getArmPosition());
             }
 
+            if (gpButtons.setPos) {
+                intake.movingPixelPosition();
+            }
+
             mecanum.updatePoseEstimate();
             Params.currentPose = mecanum.pose;
             if (debugFlag) {
