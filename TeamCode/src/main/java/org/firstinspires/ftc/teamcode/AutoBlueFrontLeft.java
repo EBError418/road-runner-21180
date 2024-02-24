@@ -3,9 +3,10 @@
 * */
 package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 @Autonomous(name="Blue Front Left", group="Concept")
-//@Disabled
+@Disabled
 public class AutoBlueFrontLeft extends AutoRedFrontLeft {
     @Override
     public void setRobotLocation() {

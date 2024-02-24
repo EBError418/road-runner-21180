@@ -71,7 +71,7 @@ public class intakeUnit
     final double WRIST_MAX_POS = 0.95; // Maximum rotational position
     final double WRIST_POS_DROP_PURPLE = 0.35;
     final double WRIST_POS_DROP_WHITE = 0.42;
-    final double WRIST_POS_DROP_YELLOW = 0.38;
+    final double WRIST_POS_DROP_YELLOW = 0.37;
     final double WRIST_POS_DROP = 0.47;
     final double WRIST_POS_INTAKE = 0.47;
 
@@ -87,6 +87,7 @@ public class intakeUnit
     int ARM_POS_CAMERA_READ;
     int ARM_POS_DROP_WHITE;
     int ARM_POS_DROP_YELLOW;
+    int ARM_POS_DROP_YELLOW_BACK;
     int ARM_POS_UNDER_BEAM;
     int ARM_POS_DROP_PURPLE;
     int ARM_POS_PUSH_PROP;
@@ -293,11 +294,6 @@ public class intakeUnit
         wristServo.setPosition(WRIST_POS_DROP_PURPLE);
     }
 
-    public void liftArmToDropPurple(){
-        setArmCountPosition(ARM_POS_DROP_YELLOW);
-        wristServo.setPosition(WRIST_POS_DROP_PURPLE);
-    }
-
     public void underTheBeamIntake(){
         setArmCountPosition(ARM_POS_UNDER_BEAM);
         wristServo.setPosition(WRIST_POS_INTAKE);
@@ -349,6 +345,7 @@ public class intakeUnit
         ARM_POS_CAMERA_READ = ARM_POS_INTAKE - 1060; //2500;
         ARM_POS_DROP_WHITE = ARM_POS_INTAKE - 750; //2800;
         ARM_POS_DROP_YELLOW = ARM_POS_INTAKE - 630; //2800;
+        ARM_POS_DROP_YELLOW_BACK = ARM_POS_INTAKE - 500;
         ARM_POS_UNDER_BEAM = ARM_POS_INTAKE - 260; //3100;
         ARM_POS_DROP_PURPLE = ARM_POS_INTAKE - 130; //3380;
         ARM_POS_PUSH_PROP = ARM_POS_INTAKE - 100;

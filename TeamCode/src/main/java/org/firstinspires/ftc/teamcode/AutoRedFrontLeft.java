@@ -45,6 +45,7 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -79,7 +80,7 @@ import java.util.List;
  */
 
 @Autonomous(name="Red Front Left", group="Concept")
-//@Disabled
+@Disabled
 public class AutoRedFrontLeft extends LinearOpMode {
 
     /** 1 for Red Front, 2 for Red back, 3 for Blue Front, and 4 for Blue back
@@ -330,19 +331,19 @@ public class AutoRedFrontLeft extends LinearOpMode {
             case 2:
             case -2:
                 // pass the test
-                xDelta = 9.0;
+                xDelta = 8;
                 yDelta = 0;
                 break;
             case -1:
             case 4:
                 // pass the test
                 xDelta = 12.0;
-                yDelta = blueOrRed * -10.0;
+                yDelta = blueOrRed * -9.0;
                 break;
             case -3:
             case -4:
-                xDelta = -6; // 0;
-                yDelta = -9;
+                xDelta = -2; // 0;
+                yDelta = -7;
                 startArmFlip = new Vector2d(blueOrRed * (3 * Params.HALF_MAT + xDelta), startPose.position.y - 15);
                 break;
             case 1:
@@ -356,7 +357,7 @@ public class AutoRedFrontLeft extends LinearOpMode {
             case -6:
                 // pass the test
                 xDelta = 12.0;
-                yDelta = blueOrRed * 14.0;
+                yDelta = blueOrRed * 11.5;
                 break;
         }
         vDropPurple = new Vector2d(blueOrRed * (3 * Params.HALF_MAT + xDelta), startPose.position.y + yDelta);
@@ -545,7 +546,8 @@ public class AutoRedFrontLeft extends LinearOpMode {
             Logging.log("Can not found required AprilTag to drop yellow pixel");
         }
 
-        intake.readyToDropYellow(intake.ARM_POS_DROP_YELLOW);
+        // lower arm for back station
+        intake.readyToDropYellow((frontOrBack > 0)? intake.ARM_POS_DROP_YELLOW : intake.ARM_POS_DROP_YELLOW_BACK);
 
         // shift to AprilTag
         Actions.runBlocking(

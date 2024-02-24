@@ -363,8 +363,8 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
                 break;
             case 3:
                 xDelta = -16;
-                yDelta = 0;
-                purpleAngle = Math.PI / 2.0 - Math.PI / 3.1;
+                yDelta = 2;
+                purpleAngle = Math.PI / 2.0 - Math.PI / 2.9;
 
                 pickup1_delta_x = -0.5;
                 pickup2_delta_x = 4;
@@ -380,8 +380,8 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
                 break;
             case 4:
                 xDelta = 16.5;
-                yDelta = -0.5;
-                purpleAngle = Math.PI / 2.0 - blueOrRed * Math.PI / 3.8;
+                yDelta = 1.5;
+                purpleAngle = Math.PI / 2.0 - blueOrRed * Math.PI / 3.5;
 
                 pickWhiteReady_y = 3.5 * Params.HALF_MAT - 9;
                 pickup1_alpha_y = 4;

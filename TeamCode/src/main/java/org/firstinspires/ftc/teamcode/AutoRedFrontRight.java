@@ -5,9 +5,10 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 @Autonomous(name="Red Front Right", group="Concept")
-//@Disabled
+@Disabled
 public class AutoRedFrontRight extends AutoRedFrontLeft {
     @Override
     public void setRobotLocation() {
