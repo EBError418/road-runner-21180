@@ -36,6 +36,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 @TeleOp(name="Arm Calibration", group="Concept")
@@ -45,11 +46,15 @@ public class ArmPositionCalibration extends LinearOpMode {
     // Declare OpMode members.
     private final ElapsedTime runtime = new ElapsedTime();
     private intakeUnit intake;
+    private Servo DroneServo;
 
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
         Logging.log("Status - Initialized");
+
+        DroneServo = hardwareMap.get(Servo.class, "Drone");
+        DroneServo.setPosition(Params.DRONE_START);
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
                 "Finger", "SwitchR", "SwitchL");
