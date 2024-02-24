@@ -71,8 +71,8 @@ public class intakeUnit
     final double WRIST_MAX_POS = 0.95; // Maximum rotational position
     final double WRIST_POS_DROP_PURPLE = 0.35;
     final double WRIST_POS_DROP_WHITE = 0.42;
-    final double WRIST_POS_DROP_YELLOW = 0.37;
-    final double WRIST_POS_DROP = 0.47;
+    final double WRIST_POS_DROP_YELLOW = 0.365;
+    final double WRIST_POS_DROP = 0.48;
     final double WRIST_POS_INTAKE = 0.47;
 
     // arm servo variables, not used in current prototype version.
@@ -287,8 +287,14 @@ public class intakeUnit
         setArmCountPosition(armPosition);
         wristServo.setPosition(WRIST_POS_DROP_YELLOW);
         switchServoClose();
-        //fingerStop();
     }
+
+    public void readyToDropWhite(int armPosition){
+        setArmCountPosition(armPosition);
+        wristServo.setPosition(WRIST_POS_DROP_WHITE);
+        switchServoClose();
+    }
+
     public void underTheBeam(){
         setArmCountPosition(ARM_POS_UNDER_BEAM);
         wristServo.setPosition(WRIST_POS_DROP_PURPLE);
