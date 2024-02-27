@@ -90,9 +90,15 @@ public class GamePadButtons {
         //game pad 1 buttons
 
         //driving
+        /*
         robotDrive = gamepad1.left_stick_y;
         robotStrafe = gamepad1.left_stick_x;
         robotTurn = gamepad1.right_stick_x;
+         */
+
+        robotDrive = gamepad1.left_stick_y * gamepad1.left_stick_y * gamepad1.left_stick_y;
+        robotStrafe = gamepad1.left_stick_x * gamepad1.left_stick_x * gamepad1.left_stick_x;
+        robotTurn = gamepad1.right_stick_x * gamepad1.right_stick_x * gamepad1.right_stick_x;
 
         //speed controls
         speedCtrl = gamepad1.back || gamepad2.back;

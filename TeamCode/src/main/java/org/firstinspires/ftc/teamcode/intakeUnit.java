@@ -70,11 +70,10 @@ public class intakeUnit
     final double WRIST_MIN_POS = 0.2;  // Minimum rotational position
     final double WRIST_MAX_POS = 0.95; // Maximum rotational position
     final double WRIST_POS_DROP_PURPLE = 0.35;
-    final double WRIST_POS_DROP_WHITE = 0.42;
-    final double WRIST_POS_DROP_YELLOW = 0.38;
+    final double WRIST_POS_DROP_YELLOW = 0.42;
+    final double WRIST_POS_DROP_WHITE = 0.44;
     final double WRIST_POS_DROP = 0.48;
-    final double WRIST_POS_INTAKE = 0.47;
-
+    final double WRIST_POS_INTAKE = 0.48;
     final double WRIST_POS_REACH_FORWARD = 0.5;
 
     // arm servo variables, not used in current prototype version.

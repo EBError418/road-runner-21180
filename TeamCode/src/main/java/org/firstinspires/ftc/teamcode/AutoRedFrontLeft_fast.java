@@ -408,7 +408,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
                 purpleAngle = startPose.heading.toDouble() + blueOrRed * Math.PI / 3.5;
 
                 pickup1_delta_x = 1.0;
-                pickup2_delta_x = 4;
+                pickup2_delta_x = 4.5;
                 pickup2_delta_y = 0.5;
                 dropYellow_delta_x = -2.5;
                 break;
@@ -437,7 +437,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
             vAprilTag = new Vector2d(vBackdrop.x + (5 - desiredTagNum) * Params.BACKDROP_SIDEWAYS, vBackdrop.y);
         }
 
-        double adjustInchY = ((1 == checkStatus) || (6 == checkStatus))? -2 : 0; // avoid stamp on purple
+        double adjustInchY = ((1 == checkStatus) || (6 == checkStatus))? -3 : 0; // avoid stamp on purple
         Vector2d vCheckingAprilTagPose = new Vector2d(vAprilTag.x, vAprilTag.y + Params.HALF_MAT + adjustInchY);
         Vector2d vCheckingAprilTag2nd = new Vector2d(vAprilTag.x - (desiredTagWhite - desiredTagNum) * 6, vAprilTag.y + Params.HALF_MAT + adjustInchY);
 
@@ -553,7 +553,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
                                 .build()
                 );
             }
-            else {
+            else { // 2 + 1 for case 5 and 2
                 Actions.runBlocking(
                         drive.actionBuilder(drive.pose)
                                 .afterTime(0.01, new TurnOnCamera()) // turn on camera for April Tag checking

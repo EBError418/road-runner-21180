@@ -109,7 +109,13 @@ public class TeleopRR extends LinearOpMode {
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
-        intake.setWristPosition(intake.WRIST_POS_INTAKE);
+
+        if (intake.getArmPosition() > intake.ARM_POS_DROP_PURPLE) {
+            intake.setWristPosition(intake.WRIST_POS_INTAKE);
+        }
+        else {
+            intake.setWristPosition(intake.WRIST_POS_DROP_WHITE);
+        }
 
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Mode", "waiting for start: %s", (Params.blueOrRed > 0) ? "Blue" : "Red");
@@ -274,7 +280,7 @@ public class TeleopRR extends LinearOpMode {
             Params.currentPose = mecanum.pose;
             if (debugFlag) {
                 // claw arm servo log
-                telemetry.addData("Wrist", "position %.2f", intake.getWristPosition());
+                telemetry.addData("Wrist", "position %.3f", intake.getWristPosition());
 
                 telemetry.addData("Arm", "position = %d", intake.getArmPosition());
 
@@ -284,9 +290,9 @@ public class TeleopRR extends LinearOpMode {
 
                 telemetry.addData("switch Left", "position %.3f", intake.getSwitchLeftPosition());
 
-                telemetry.addData("Drone", "position %.2f", DroneServo.getPosition());
+                telemetry.addData("Drone", "position %.3f", DroneServo.getPosition());
 
-                telemetry.addData("heading", " %.2f", Math.toDegrees(mecanum.pose.heading.log()));
+                telemetry.addData("heading", " %.3f", Math.toDegrees(mecanum.pose.heading.log()));
 
                 telemetry.addData("location", " %s", mecanum.pose.position.toString());
 
