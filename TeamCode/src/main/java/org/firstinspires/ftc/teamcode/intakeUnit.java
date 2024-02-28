@@ -72,7 +72,7 @@ public class intakeUnit
     final double WRIST_POS_DROP_PURPLE = 0.35;
     final double WRIST_POS_DROP_YELLOW = 0.42;
     final double WRIST_POS_DROP_WHITE = 0.44;
-    final double WRIST_POS_DROP = 0.48;
+    final double WRIST_POS_DROP = 0.47;
     final double WRIST_POS_INTAKE = 0.48;
     final double WRIST_POS_REACH_FORWARD = 0.5;
 

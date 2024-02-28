@@ -636,7 +636,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         // move to pickup second white pixel
         if (pickup2ndWhite) {
             double turnAngle = drive.pose.heading.toDouble() + Math.PI - blueOrRed * 0.03; // 0.03 is control orientation to avoid hitting board;
-            waitSec = (1 == checkStatus)? 0.4 : 1.0;
+            waitSec = (1 == checkStatus)? 0.3 : 1.0;
 
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
@@ -649,7 +649,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
                             // pickup in right side bucket
                             .strafeTo(vPickup2)
                             .afterTime(0, new recordDrivePosition("when pickup white2"))
-                            .waitSeconds(0.3) // make sure the arm is lift after robot in place
+                            .waitSeconds(0.6) // make sure the arm is lift after robot in place
 
                             // low arm
                             .afterTime(0, new intakeUnitActions(intake.ARM_POS_INTAKE5 + armShiftCnt, NO_ACT, NO_ACT))
