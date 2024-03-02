@@ -276,6 +276,14 @@ public class TeleopRR extends LinearOpMode {
                 intake.movingPixelPosition();
             }
 
+            if (gpButtons.testDropYellow) {
+                intake.readyToDropYellow(intake.ARM_POS_DROP_YELLOW);
+            }
+
+            if (gpButtons.testDropWhite) {
+                intake.dropWhitePositions();
+            }
+
             mecanum.updatePoseEstimate();
             Params.currentPose = mecanum.pose;
             if (debugFlag) {

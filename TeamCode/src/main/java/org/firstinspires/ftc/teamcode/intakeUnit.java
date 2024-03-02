@@ -60,20 +60,24 @@ public class intakeUnit
 
     private Servo switchRightServo = null;
     private Servo switchLeftServo = null;
-    final double SWITCH_RIGHT_CLOSE_POS = 0.26;
-    final double SWITCH_RIGHT_RELEASE = 0.38;
+    final double SWITCH_RIGHT_CLOSE_POS = 0.27;
+    final double SWITCH_RIGHT_RELEASE = 0.36;
 
-    final double SWITCH_LEFT_CLOSE_POS = 0.27;
-    final double SWITCH_LEFT_RELEASE = 0.02;
+    final double SWITCH_LEFT_CLOSE_POS = 0.21;
+    final double SWITCH_LEFT_RELEASE = 0.03;
 
     public Servo wristServo = null;
     final double WRIST_MIN_POS = 0.2;  // Minimum rotational position
     final double WRIST_MAX_POS = 0.95; // Maximum rotational position
+    final double WRIST_POS_DROP_TURN = 0.30;
     final double WRIST_POS_DROP_PURPLE = 0.35;
-    final double WRIST_POS_DROP_YELLOW = 0.42;
-    final double WRIST_POS_DROP_WHITE = 0.44;
-    final double WRIST_POS_DROP = 0.47;
-    final double WRIST_POS_INTAKE = 0.48;
+    final double WRIST_POS_DROP_YELLOW_BACK = 0.36;
+
+    final double WRIST_POS_DROP_YELLOW = 0.39;
+    final double WRIST_POS_DROP_WHITE = 0.42;
+    final double WRIST_POS_DROP = 0.46;
+    final double WRIST_POS_INTAKE5 = 0.455;
+    final double WRIST_POS_INTAKE = 0.475;
     final double WRIST_POS_REACH_FORWARD = 0.5;
 
     // arm servo variables, not used in current prototype version.
@@ -97,6 +101,7 @@ public class intakeUnit
     int ARM_POS_INTAKE3;
     int ARM_POS_INTAKE4;
     int ARM_POS_INTAKE5;
+    int ARM_POS_INTAKE_WHITE2;
 
 
     /**
@@ -245,6 +250,13 @@ public class intakeUnit
         fingerIntake();
     }
 
+    public void intakeWhite2Positions() {
+        setArmCountPosition(ARM_POS_INTAKE_WHITE2);
+        wristServo.setPosition(WRIST_POS_INTAKE5);
+        switchServoClose();
+        fingerIntake();
+    }
+
     public void parkingPositions() {
         setArmCountPosition(ARM_POS_INTAKE);
         wristServo.setPosition(WRIST_POS_INTAKE);
@@ -357,7 +369,7 @@ public class intakeUnit
         ARM_POS_DROP = ARM_POS_INTAKE - 1000; //2550;
         ARM_POS_CAMERA_READ = ARM_POS_INTAKE - 1060; //2500;
         ARM_POS_DROP_WHITE = ARM_POS_INTAKE - 750; //2800;
-        ARM_POS_DROP_YELLOW = ARM_POS_INTAKE - 630; //2800;
+        ARM_POS_DROP_YELLOW = ARM_POS_INTAKE - 635; //2800;
         ARM_POS_MOVING_PIXEL_ON_BOARD = ARM_POS_INTAKE - 520;
         ARM_POS_DROP_YELLOW_BACK = ARM_POS_INTAKE - 500;
         ARM_POS_UNDER_BEAM = ARM_POS_INTAKE - 260; //3100;
@@ -366,6 +378,7 @@ public class intakeUnit
         ARM_POS_INTAKE2 = ARM_POS_INTAKE - 29;
         ARM_POS_INTAKE3 = ARM_POS_INTAKE - 58;
         ARM_POS_INTAKE4 = ARM_POS_INTAKE - 87;
-        ARM_POS_INTAKE5 = ARM_POS_INTAKE - 116;
+        ARM_POS_INTAKE_WHITE2 = ARM_POS_INTAKE - 116;
+        ARM_POS_INTAKE5 = ARM_POS_INTAKE - 126;
     }
 }

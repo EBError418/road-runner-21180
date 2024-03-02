@@ -42,6 +42,7 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -76,18 +77,15 @@ import java.util.Vector;
  *          "Webcam 1"
  */
 
-@Autonomous(name="00 Red Front Left + 2 white", group="Concept")
+@Autonomous(name="Red Back Right - 10 sec", group="Concept")
 //@Disabled
-public class AutoRedFrontLeft_fast extends LinearOpMode {
+public class AutoRedBackRight_fast extends LinearOpMode {
 
     private final double NO_ACT = 100000;
-
-    private double waitAllianceTime = 9.0;
 
     double BUCKET_SHIFT = 2.0;
 
     double whiteDropShift;
-    public boolean pickup2ndWhite = true;
     /** 1 for Red Front, 2 for Red back, 3 for Blue Front, and 4 for Blue back
      */
     public int startLoc = 1;
@@ -110,7 +108,6 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
     private int checkStatus = 1;
 
     double dropOffAngle = -Math.PI/2 - 0.04;// * blueOrRed; // 0.04 for turn orientation control
-    double pickupAngle2 = Math.PI/2;
     double pickupAngle1 = Math.PI/2;
 
     // USE LATER: boolean debug_flag = true;
@@ -139,8 +136,8 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
      * 1 for Red Front, 2 for Red back, 3 for Blue Front, and 4 for Blue back
      */
     public void setRobotLocation() {
-        startLoc = 1;
-        leftOrRight = -1;
+        startLoc = 2;
+        leftOrRight = 1;
     }
 
     /**
@@ -353,33 +350,33 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         double pickup1_alpha_y = 0;
 
         switch (checkStatus) {
-            case 5:
-                xDelta = -7.5; // avoid stamp on purple for case 5
-                yDelta = 8;
-                purpleAngle = startPose.heading.toDouble() + blueOrRed * Math.PI / 10;
+            case -5:
+                xDelta = -7; // avoid stamp on purple for case 5
+                yDelta = -8;
+                purpleAngle = startPose.heading.toDouble() + Math.PI / 10;
 
                 pickup1_delta_x = -1;
                 pickup2_delta_x = -1.0;
                 dropYellow_delta_x = -0.5 ;
                 break;
 
-            case 2:
-                xDelta = 8.5; // avoid stamp on purple for case 5
-                yDelta = 8;
-                purpleAngle = startPose.heading.toDouble() + blueOrRed * Math.PI / 15;
+            case -2:
+                xDelta = 8.0; // avoid stamp on purple for case 5
+                yDelta = -7;
+                purpleAngle = startPose.heading.toDouble() - Math.PI / 15;
 
                 pickup1_delta_x = 0.5;
                 pickup2_delta_x = 3.5;
-                dropYellow_delta_x = 2;
+                dropYellow_delta_x = 1;
                 break;
-            case 3:
-                xDelta = -16;
-                yDelta = 2;
-                purpleAngle = Math.PI / 2.0 - Math.PI / 2.9;
+            case -1:
+                xDelta = 12;
+                yDelta = -17.5;
+                purpleAngle = startPose.heading.toDouble() - Math.PI / 6;
 
                 pickup1_delta_x = -0.5;
                 pickup2_delta_x = 4.5;
-                dropYellow_delta_x = -2;
+                dropYellow_delta_x = 0;
 
                 pickup1_alpha_x = 3;
                 pickup1_alpha_y = -2;
@@ -388,44 +385,41 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
                 pickWhiteReady_y = 3.5 * Params.HALF_MAT - 2;
                 pickupAngle1 = Math.toRadians(70);
                 break;
-            case 4:
-                xDelta = 16.5;
-                yDelta = 1.5;
-                purpleAngle = Math.PI / 2.0 - blueOrRed * Math.PI / 3.4;
+            case -6:
+                xDelta = -12;
+                yDelta = -17.5;
+                purpleAngle = startPose.heading.toDouble() - blueOrRed * Math.PI / 8;
 
                 pickWhiteReady_y = 3.5 * Params.HALF_MAT - 6;
                 pickup1_alpha_y = 1;
 
-                pickup1_delta_x = -3.5;
-                pickup2_delta_x = -6;
-                dropYellow_delta_x = 3.5;
+                pickup1_delta_x = -3;
+                pickup2_delta_x = -4;
+                dropYellow_delta_x = 1;
 
                 pickWhiteReady_x = blueOrRed * 2.0 * Params.HALF_MAT + BUCKET_SHIFT;;
                 break;
-            case 1:
-                xDelta = 8;
-                yDelta = 4;
-                purpleAngle = startPose.heading.toDouble() + blueOrRed * Math.PI / 3.5;
+            case -3:
+                xDelta = 9;
+                yDelta = -2;
+                purpleAngle = startPose.heading.toDouble() - Math.PI / 3.5;
 
                 pickup1_delta_x = 1.0;
                 pickup2_delta_x = 4.5;
                 pickup2_delta_y = 0.5;
-                dropYellow_delta_x = -2.5;
+                dropYellow_delta_x = 1;
                 break;
-            case 6:
-                xDelta = -9.5;
-                yDelta = 2;
-                purpleAngle = startPose.heading.toDouble() + blueOrRed * Math.PI / 3.5;
+            case -4:
+                xDelta = -7;
+                yDelta = -3.5;
+                purpleAngle = startPose.heading.toDouble() + Math.PI / 3.5;
 
                 pickup1_delta_x = -1;
                 pickup2_delta_x = -1.5;
-                dropYellow_delta_x = 3;
+                dropYellow_delta_x = 0;
                 break;
         }
         pickWhiteReady_x = pickWhiteReady_x + pickup1_delta_x;
-
-        int armShiftWhite1 = 20;
-        int armShiftCnt = 30;
 
         Vector2d vParkPos = new Vector2d(blueOrRed * 3 * Params.HALF_MAT - 2 * leftOrRight * Params.HALF_MAT, -4 * Params.HALF_MAT + 2);
         Vector2d vBackdrop = new Vector2d(blueOrRed * 3 * Params.HALF_MAT + dropYellow_delta_x, -4 * Params.HALF_MAT);
@@ -466,30 +460,21 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         Logging.log("Autonomous time - robot start moving time: " + runtime);
 
         // move to drop purple, hitting the ball
-        double wristPos = ((2 == checkStatus) || (5 == checkStatus))? intake.WRIST_POS_INTAKE5  : intake.WRIST_POS_DROP_PURPLE;
+        double wristPos = ((2 == checkStatus) || (5 == checkStatus))? intake.WRIST_POS_INTAKE  : intake.WRIST_POS_DROP_PURPLE;
         double armPos = ((2 == checkStatus) || (5 == checkStatus))? intake.ARM_POS_PUSH_PROP : intake.ARM_POS_DROP_PURPLE;
         double waitSec = (1 == checkStatus)? 0 : 0.7;
         waitSec = (6 == checkStatus)? 0.3 : waitSec;
-        if ((4 == checkStatus) || (3 == checkStatus)){
-            Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
-                            .afterTime(0.001, new CloseCamera()) // close camera
-                            .afterTime(0.1, new intakeUnitActions(armPos, wristPos, NO_ACT))
-                            .strafeToLinearHeading(vDropPurple, purpleAngle)
-                            .build()
-            );
-        }
-        else {
-            Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
+
+        Actions.runBlocking(
+                drive.actionBuilder(drive.pose)
                             .afterTime(0.001, new CloseCamera()) // close camera
                             .afterTime(0.1, new intakeUnitActions(armPos, wristPos, NO_ACT))
                             .strafeTo(vDropPurple)
                             .waitSeconds(waitSec)  // wait for arm to be in place
                             .turnTo(purpleAngle)
                             .build()
-            );
-        }
+        );
+
 
         logVector("robot drive: drop purple pose", drive.pose.position);
         logVector("robot drive: drop purple pose required", vDropPurple);
@@ -508,82 +493,17 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
 
         Logging.log("Autonomous time - after drop purple time: " + runtime);
 
-        // pickup first white pixel
-        if ((4 == checkStatus) || (3 == checkStatus)){
-            Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
-                            .afterTime(0.1,new pickupWhiteAct(intake.ARM_POS_INTAKE5))
-                            .strafeToLinearHeading(pPickWhite1Ready.position, pPickWhite1Ready.heading)
-                            .strafeTo(pickWhite5)
-                            .waitSeconds(0.1)
-                            .afterTime(0, new intakeUnitActions(intake.ARM_POS_INTAKE5 + armShiftWhite1, NO_ACT, NO_ACT))
-                            .waitSeconds(0.4)
-                            .build()
-            );
-        }
-        else {
-            Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
-                            .afterTime(0.5,new pickupWhiteAct(intake.ARM_POS_INTAKE5)) // 1.5 to avoid hitting bin for case 6th
-                            .strafeToLinearHeading(pPickWhite1Ready.position, pPickWhite1Ready.heading)
-                            .strafeTo(pickWhite5)
-                            .waitSeconds(0.1)
-                            .afterTime(0, new intakeUnitActions(intake.ARM_POS_INTAKE5 + armShiftWhite1, NO_ACT, NO_ACT))
-                            .waitSeconds(0.4)
-                            .build()
-            );
-        }
-        Logging.log("Autonomous time - after pickup white time: " + runtime);
-        logVector("robot drive: after pickup1", drive.pose.position);
-        logVector("robot drive: after pickup1 - pickWhite5", pickWhite5);
-        logRobotHeading("robot drive: after pickup1 heading -");
-
         // move back to drop yellow and white, lift arm after through gate
-        if ((5 == checkStatus) || (2 == checkStatus)) {
-            if (pickup2ndWhite) {
+
                 Actions.runBlocking(
                         drive.actionBuilder(drive.pose)
                                 .afterTime(0.01, new TurnOnCamera()) // turn on camera for April Tag checking
-                                .afterTime(0.1, new intakeUnitActions(intake.ARM_POS_UNDER_BEAM, intake.WRIST_POS_DROP_YELLOW, NO_ACT))
-                                .afterTime(0.4, new intakeUnitActions(NO_ACT, NO_ACT, intake.FINGER_OUTTAKE_POS))
-                                .afterTime(1.5, new intakeUnitActions(NO_ACT, NO_ACT, intake.FINGER_INTAKE_POS))
-                                .strafeTo(vCheckingAprilTagPose)
+                                //.strafeTo(vCheckingAprilTagPose)
+                                .strafeToLinearHeading(vCheckingAprilTagPose, dropOffAngle)
                                 .afterTime(0, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, NO_ACT, NO_ACT))
-                                .turnTo(dropOffAngle)
                                 .build()
                 );
-            }
-            else { // 2 + 1 for case 5 and 2
-                Actions.runBlocking(
-                        drive.actionBuilder(drive.pose)
-                                .afterTime(0.01, new TurnOnCamera()) // turn on camera for April Tag checking
-                                .afterTime(0.1, new intakeUnitActions(intake.ARM_POS_UNDER_BEAM, intake.WRIST_POS_DROP_YELLOW, NO_ACT))
-                                .afterTime(0.4, new intakeUnitActions(NO_ACT, NO_ACT, intake.FINGER_OUTTAKE_POS))
-                                .afterTime(1.5, new intakeUnitActions(NO_ACT, NO_ACT, intake.FINGER_INTAKE_POS))
-                                .strafeTo(vOneWaitPosition)
-                                .waitSeconds(waitAllianceTime)
-                                .strafeTo(vCheckingAprilTagPose)
-                                .afterTime(0, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, NO_ACT, NO_ACT))
-                                .turnTo(dropOffAngle)
-                                .build()
-                );
-            }
-        }
-        else {
-            Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
-                            .afterTime(0.01, new TurnOnCamera()) // turn on camera for April Tag checking
-                            .afterTime(0.1, new intakeUnitActions(intake.ARM_POS_UNDER_BEAM, intake.WRIST_POS_DROP_YELLOW, NO_ACT))
-                            .afterTime(0.4, new intakeUnitActions(NO_ACT, NO_ACT, intake.FINGER_OUTTAKE_POS))
-                            .afterTime(1.5, new intakeUnitActions(NO_ACT, NO_ACT, intake.FINGER_INTAKE_POS))
-                            .strafeToLinearHeading(new Vector2d(vStartTurn2ndDrop.x, 3 * Params.HALF_MAT), pickupAngle2)
-                            .waitSeconds((pickup2ndWhite)? 0.001 : waitAllianceTime)
-                            .strafeToLinearHeading(vStartTurn2ndDrop, pickupAngle2)
-                            .strafeToLinearHeading(vCheckingAprilTagPose, dropOffAngle)
-                            .afterTime(0, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, NO_ACT, NO_ACT))
-                            .build()
-            );
-        }
+
         Logging.log("Autonomous time - checking camera time: " + runtime);
         logVector("robot drive: drive.pose check april tag", drive.pose.position);
         logVector("robot drive: check april tag required", vCheckingAprilTagPose);
@@ -613,10 +533,11 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
             Logging.log("Can not found required AprilTag to drop yellow pixel");
         }
 
-        intake.readyToDropYellow(intake.ARM_POS_DROP_YELLOW);
+        intake.readyToDropYellow(intake.ARM_POS_DROP_YELLOW_BACK);
         if ((5 == checkStatus) || (2 == checkStatus)) {
             sleep(100); // wait arm down to the position
         }
+        intake.setWristPosition(intake.WRIST_POS_DROP_YELLOW_BACK);
 
         // shift to AprilTag
         Actions.runBlocking(
@@ -633,90 +554,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         Logging.log("Autonomous time - after drop off yellow time: " + runtime);
 
         logVector("Before fine turn required", vStartTurn2ndDrop);
-        // move to pickup second white pixel
-        if (pickup2ndWhite) {
-            double turnAngle = drive.pose.heading.toDouble() + Math.PI - blueOrRed * 0.03; // 0.03 is control orientation to avoid hitting board;
-            double wait1Sec = (1 == checkStatus)? 0.5 : 1.0;
-            double wait2Sec = (1 == checkStatus)? 0.3 : 0.6;
 
-
-            Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
-                            .strafeToLinearHeading(vStartTurn2ndDrop, turnAngle) // strafe back to avoid hitting board
-                            .afterTime(0.1, new pickupWhite2Act())
-                            .afterTime(0, new recordDrivePosition("Before fine turn"))
-                            .turnTo(pickupAngle2) // fine tune heading before long distance moving
-                            .afterTime(0, new recordDrivePosition("After fine turn"))
-
-                            // pickup in right side bucket
-                            .strafeTo(vPickup2)
-                            .afterTime(0, new recordDrivePosition("when pickup white2"))
-                            .waitSeconds(wait1Sec) // make sure the arm is lift after robot in place
-
-                            // low arm
-                            .afterTime(0, new intakeUnitActions(intake.ARM_POS_INTAKE5 + armShiftCnt, intake.WRIST_POS_INTAKE, NO_ACT))
-                            .turnTo(pickupAngle2) // correct heading before backing to drop
-                            .afterTime(0, new recordDrivePosition("after correct heading before backing to drop white2"))
-                            .waitSeconds(wait2Sec)
-
-                            // back to drop off 2nd round
-                            .afterTime(0.1, new intakeUnitActions(intake.ARM_POS_UNDER_BEAM, intake.WRIST_POS_DROP_PURPLE, NO_ACT))
-                            .strafeTo(vStartTurn2ndDrop)
-                            .afterTime(0.3, new intakeUnitActions(NO_ACT, intake.WRIST_POS_DROP_TURN, NO_ACT))
-
-                            //.splineToLinearHeading(new Pose2d(vCheckingAprilTag2nd, dropOffAngle), dropOffAngle)
-                            .strafeToLinearHeading(vCheckingAprilTag2nd, dropOffAngle)
-
-                            .afterTime(0.3, new intakeUnitActions(intake.ARM_POS_CAMERA_READ, NO_ACT, NO_ACT))
-                            .afterTime(0, new recordDrivePosition("drop white2"))
-                            .build()
-            );
-            logVector("robot drive: pickup white2 required", vPickup2);
-            logVector("robot drive: drop white2 required", vDropWhite);
-
-            logRobotHeading("robot drive: drop off white");
-            Logging.log("Autonomous time - after second white pickup time: " + runtime);
-
-            // fine correct angle before checking April Tag
-            Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
-                            .turnTo(dropOffAngle)
-                            .build()
-            );
-            logRobotHeading("robot drive: check april tag after fine correction");
-
-            Logging.log("Autonomous - Start April tag detect");
-            aprilTagPose = tag.updatePoseAprilTag(desiredTagWhite);
-            logVector("robot drive: april tag location from camera", aprilTagPose.position);
-            logVector("robot drive: drop white pose required before adjust", vDropWhite);
-
-            // if can not move based on April tag, move by road runner encode.
-            if (tag.targetFound) {
-                // adjust yellow drop-off position according to april tag location info from camera
-                vDropWhite = new Vector2d(drive.pose.position.x - aprilTagPose.position.x + whiteDropShift,
-                        drive.pose.position.y - aprilTagPose.position.y + Params.AUTO_DISTANCE_TO_TAG - 2.0 /* for white*/);
-                logVector("robot drive: drop yellow pose required after april tag adjust", vDropWhite);
-            } else {
-                Logging.log("Can not found required AprilTag to drop yellow pixel");
-            }
-
-            intake.readyToDropWhite(intake.ARM_POS_DROP_WHITE);
-
-            // shift to AprilTag
-            Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
-                            .strafeTo(vDropWhite)
-                            .turnTo(dropOffAngle)
-                            .build()
-            );
-            logVector("robot drive: drive.pose drop white", drive.pose.position);
-            logVector("robot drive: drop white required", vDropWhite);
-            logRobotHeading("robot drive: drop white heading -");
-
-            // drop pixels
-            dropWhiteAction();
-            Logging.log("Autonomous time - after second white drop time: " + runtime);
-        }
 
         // parking
         intake.setArmCountPosition(intake.ARM_POS_READY_FOR_HANG + 200);
@@ -763,11 +601,8 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
 
     private void dropWhiteAction(){
         // release both
-        intake.fingerStop();
         intake.switchServoOpen();
-        sleep((1 == checkStatus)? 100 : 400); // save a little time for case 1
-        intake.fingerIntake();
-        sleep((1 == checkStatus)? 300 : 800);
+        sleep((1 == checkStatus)? 400 : 1200); // save a little time for case 1
         intake.setArmCountPosition(intake.ARM_POS_READY_FOR_HANG);
         sleep(200);
     }
@@ -846,14 +681,6 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.intakePositions(armPos);
-            return false;
-        }
-    }
-
-    private class pickupWhite2Act implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            intake.intakeWhite2Positions();
             return false;
         }
     }

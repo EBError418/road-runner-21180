@@ -83,8 +83,9 @@ public class GamePadButtons {
     public boolean moveToCenterTag;
     public boolean moveToRightTag;
     public boolean moveToFront;
-
     public boolean goThroughGate;
+    public boolean testDropYellow;
+    public boolean testDropWhite;
 
     public void checkGamepadButtons(@NonNull Gamepad gamepad1, @NonNull Gamepad gamepad2) {
         //game pad 1 buttons
@@ -121,6 +122,10 @@ public class GamePadButtons {
         // preset ARM positions for drop
         readyToDrop = gamepad1.right_bumper;
         lowDropPos = (gamepad1.right_trigger > 0);
+
+        // for test only
+        testDropWhite = (gamepad2.back && gamepad2.a);
+        testDropYellow = (gamepad2.back && gamepad2.b);
 
         // game pad 2
 
