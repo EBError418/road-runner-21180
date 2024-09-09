@@ -42,11 +42,10 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Version;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -54,7 +53,6 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.List;
-import java.util.Vector;
 
 /**
  * Hardware config:
@@ -76,8 +74,8 @@ import java.util.Vector;
  *          "Webcam 1"
  */
 
-@Autonomous(name="00 Red Front Left + 2 white", group="Concept")
-//@Disabled
+@Autonomous(name="Red Front Left + 2 white", group="Concept")
+@Disabled
 public class AutoRedFrontLeft_fast extends LinearOpMode {
 
     private final double NO_ACT = 100000;
@@ -229,10 +227,10 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         Params.deadWheelOn = MecanumDrive.PARAMS.useDeadWheel;
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
-                "Finger", "SwitchR", "SwitchL");
+                "Finger");
         intake.setArmModeRunToPosition(intake.getArmPosition());
 
-        intake.switchServoOpen();
+        intake.fingerServoOpen();
 
         runtime.reset();
         while ((ObjectDetection.PropSide.UNKNOWN == propLocation) &&
@@ -328,7 +326,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
 
     private void autonomousCore() {
         autoCore();
-        intake.armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        //intake.armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
 
     private void autoCore() {
@@ -498,7 +496,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
 
         // drop off the purple pixel by arm and wrist actions
         if ((2 == checkStatus) || (5 == checkStatus)) {
-            intake.setArmCountPosition(intake.ARM_POS_DROP_PURPLE);
+            intake.setArmPosition(intake.ARM_POS_DROP_PURPLE);
             intake.setWristPosition(intake.WRIST_POS_DROP_PURPLE);
             sleep(200);
         }
@@ -719,7 +717,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         }
 
         // parking
-        intake.setArmCountPosition(intake.ARM_POS_READY_FOR_HANG + 200);
+        intake.setArmPosition(intake.ARM_POS_READY_FOR_HANG + 200);
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .strafeTo(vParkPos)
@@ -736,17 +734,17 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
 
         // 2. open switch
         intake.setWristPosition(intake.WRIST_POS_DROP_PURPLE);
-        intake.setSwitchLeftPosition(intake.SWITCH_LEFT_RELEASE);
+        intake.setWristServoPosition(intake.WRIST_SNAP_POSITION);
         sleep(500);
     }
     private void dropYellowAction(){
-        intake.setSwitchRightPosition(intake.SWITCH_RIGHT_RELEASE);
+        intake.setArmServoPosition(intake.ARM_FORE_POSITION);
         sleep(300);
 
         // move to drop white
         if ((1 == checkStatus) || (4 == checkStatus)) {
-            intake.setSwitchRightPosition(intake.SWITCH_RIGHT_CLOSE_POS);
-            intake.dropWhitePositions();
+            intake.setArmServoPosition(intake.SWITCH_RIGHT_CLOSE_POS);
+            //intake.dropWhitePositions();
             sleep(100);
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
@@ -755,20 +753,20 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
                             .build()
             );
         }
-        intake.setSwitchLeftPosition(intake.SWITCH_LEFT_RELEASE);
+        intake.setWristServoPosition(intake.WRIST_SNAP_POSITION);
         sleep(200);
-        intake.setArmCountPosition(intake.getArmPosition() - 500);
+        intake.setArmPosition(intake.getArmPosition() - 500);
         sleep(200);
     }
 
     private void dropWhiteAction(){
         // release both
         intake.fingerStop();
-        intake.switchServoOpen();
+        intake.fingerServoOpen();
         sleep((1 == checkStatus)? 100 : 400); // save a little time for case 1
         intake.fingerIntake();
         sleep((1 == checkStatus)? 300 : 800);
-        intake.setArmCountPosition(intake.ARM_POS_READY_FOR_HANG);
+        intake.setArmPosition(intake.ARM_POS_READY_FOR_HANG);
         sleep(200);
     }
 
@@ -813,7 +811,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
             if (armPos < NO_ACT) {
-                intake.setArmCountPosition(armPos);
+                intake.setArmPosition(armPos);
             }
 
             if (wristPos < NO_ACT) {
@@ -845,7 +843,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            intake.intakePositions(armPos);
+            //intake.intakePositions(armPos);
             return false;
         }
     }
@@ -853,7 +851,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
     private class pickupWhite2Act implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            intake.intakeWhite2Positions();
+            //intake.intakeWhite2Positions();
             return false;
         }
     }

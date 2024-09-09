@@ -56,21 +56,21 @@ public final class MecanumDrive {
         // TODO: fill in these values based on
         //   see https://ftc-docs.firstinspires.org/en/latest/programming_resources/imu/imu.html?highlight=imu#physical-hub-mounting
         public RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection =
-                RevHubOrientationOnRobot.LogoFacingDirection.UP;
+                RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
         public RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
-                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
+                RevHubOrientationOnRobot.UsbFacingDirection.UP;
 
         // drive model parameters
 
         // Gobilda odometry: 48mm diameter(1.89 inch), 2048 tick per revolution, inPerTick = 0.0029.
-        public boolean useDeadWheel = true;
+        public boolean useDeadWheel = false;
         public double inPerTick = useDeadWheel? 0.00294 : 0.02208155454144; // WHEEL_RADIUS(1.8898) * 2 * Math.PI / TICKS_PER_REV(537.6)
         public double lateralInPerTick = useDeadWheel? 0.002622 : 0.019/0.9786;
-        public double trackWidthTicks = useDeadWheel? 3542.133 : 650;
+        public double trackWidthTicks = useDeadWheel? 3542.133 : 1033.694878742297;
 
         // feedforward parameters (in tick units)
-        public double kS = useDeadWheel? 0.239 : 0.0;
-        public double kV = useDeadWheel? 0.00068 : 0.0025;
+        public double kS = useDeadWheel? 0.239 : 0.3626963142056274;
+        public double kV = useDeadWheel? 0.00068 : 0.004996510332010479;
         public double kA = useDeadWheel? 0.00013 : 0.0;
 
         // path profile parameters (in inches)

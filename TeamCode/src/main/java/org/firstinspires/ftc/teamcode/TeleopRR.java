@@ -25,9 +25,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
-import com.acmerobotics.roadrunner.Rotation2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -36,8 +34,6 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 import java.util.List;
 
@@ -73,6 +69,8 @@ public class TeleopRR extends LinearOpMode {
     //claw and arm unit
     private intakeUnit intake;
 
+    private SlidersWith2Motors slider;
+
     private Servo DroneServo;
 
     // debug flags, turn it off for formal version to save time of logging
@@ -92,17 +90,16 @@ public class TeleopRR extends LinearOpMode {
         mecanum = new MecanumDrive(hardwareMap, Params.currentPose);
         mecanum.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        tag = new AprilTagTest(mecanum, hardwareMap, 0, "Webcam 1");
+        //tag = new AprilTagTest(mecanum, hardwareMap, 0, "Webcam 1");
 
-        tag.initAprilTag();
+        //tag.initAprilTag();
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
-                "Finger", "SwitchR"/* right switch name */, "SwitchL" /* left switch */);
+                "Finger");
+
+        slider = new SlidersWith2Motors();
 
         intake.setArmModeRunToPosition(intake.getArmPosition());
-
-        DroneServo = hardwareMap.get(Servo.class, "Drone");
-        DroneServo.setPosition(Params.DRONE_START);
 
         // bulk reading setting - auto refresh mode
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
@@ -110,12 +107,7 @@ public class TeleopRR extends LinearOpMode {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
 
-        if (intake.getArmPosition() > intake.ARM_POS_DROP_PURPLE) {
-            intake.setWristPosition(intake.WRIST_POS_INTAKE);
-        }
-        else {
-            intake.setWristPosition(intake.WRIST_POS_DROP_WHITE);
-        }
+
 
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Mode", "waiting for start: %s", (Params.blueOrRed > 0) ? "Blue" : "Red");
@@ -146,6 +138,12 @@ public class TeleopRR extends LinearOpMode {
                     -gpButtons.robotTurn * maxDrivePower
             ));
 
+            slider.init(hardwareMap, "sliderRight", "sliderLeft");
+
+            slider.setCountPosition(slider.getPosition());
+            slider.runToPosition();
+
+            /*
             // Set position only when button is hit.
             if (gpButtons.wristDown) {
                 intake.wristDown();
@@ -207,11 +205,11 @@ public class TeleopRR extends LinearOpMode {
                 intake.intakePositions(intake.ARM_POS_INTAKE5);
             }
             if (gpButtons.switchOpen) {
-                intake.switchServoOpen();
+                intake.fingerServoOpen();
             }
 
             if (gpButtons.dropAndBack) {
-                intake.switchServoOpen();
+                intake.fingerServoOpen();
                 moveBack(Params.HALF_MAT * 1.5);
             }
 
@@ -284,33 +282,79 @@ public class TeleopRR extends LinearOpMode {
                 intake.dropWhitePositions();
             }
 
+             */
+            if (gpButtons.sliderUp){
+                //slider.setInchPosition(slider.getInchPosition() + 0.001);
+                slider.manualControlPos((gpButtons.sliderUpDowm));
+            }
+
+            if (gpButtons.sliderDown){
+                //slider.setInchPosition(slider.getInchPosition() - 0.001);
+                slider.manualControlPos(gpButtons.sliderUpDowm);
+            }
+
+            if (gpButtons.armBackwards) {
+                intake.setArmPosition(intake.getArmPosition() + 0.005);
+                intake.setWristPosition(intake.getWristPosition() + 0.005);
+            }
+
+            if (gpButtons.armForwards) {
+                intake.setArmPosition(intake.getArmPosition() - 0.005);
+                intake.setWristPosition(intake.getWristPosition() - 0.005);
+            }
+
+            if (gpButtons.wristUp) {
+                intake.setWristPosition(intake.getWristPosition() + 0.005);
+            }
+
+            if (gpButtons.wristDown) {
+                intake.setWristPosition(intake.getWristPosition() - 0.005);
+            }
+
+            if (gpButtons.fingerClose) {
+                intake.setFingerPosition(intake.getFingerPosition() - 0.01);
+            }
+
+            if (gpButtons.fingerOpen) {
+                intake.setFingerPosition(intake.getFingerPosition() + 0.01);
+            }
+
             mecanum.updatePoseEstimate();
             Params.currentPose = mecanum.pose;
             if (debugFlag) {
                 // claw arm servo log
-                telemetry.addData("Wrist", "position %.3f", intake.getWristPosition());
-
-                telemetry.addData("Arm", "position = %d", intake.getArmPosition());
-
                 telemetry.addData("Finger", "position %.3f", intake.getFingerPosition());
 
-                telemetry.addData("switch Right", "position %.3f", intake.getSwitchRightPosition());
+                telemetry.addData("Wrist", "position %.3f", intake.getWristPosition());
 
-                telemetry.addData("switch Left", "position %.3f", intake.getSwitchLeftPosition());
+                telemetry.addData("Slider", "position = %.3f", slider.getInchPosition());
 
-                telemetry.addData("Drone", "position %.3f", DroneServo.getPosition());
+                telemetry.addData("Arm", "position = %.3f", intake.getArmPosition());
+
+
+                //telemetry.addData("Finger", "position %.3f", intake.getFingerPosition());
+
+                //telemetry.addData("switch Right", "position %.3f", intake.getSwitchRightPosition());
+
+                //telemetry.addData("switch Left", "position %.3f", intake.getSwitchLeftPosition());
+
+                telemetry.addData(" ", " ");
+
+
 
                 telemetry.addData("heading", " %.3f", Math.toDegrees(mecanum.pose.heading.log()));
 
                 telemetry.addData("location", " %s", mecanum.pose.position.toString());
 
-                telemetry.addData("motor velocity = ", " %.3f", mecanum.leftFront.getVelocity());
+                //telemetry.addData("motor velocity = ", " %.3f", mecanum.leftFront.getVelocity());
 
                 telemetry.update(); // update message at the end of while loop
+
             }
+
         }
 
-        intake.armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        //intake.armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         // The motor stop on their own but power is still applied. Turn off motor.
     }
 
@@ -319,6 +363,7 @@ public class TeleopRR extends LinearOpMode {
         Logging.log("%s: %s", sTag, vectorName);
     }
 
+    /*
     private void moveByAprilTag_new(int tagNum) {
         intake.dropPositions();
         sleep(300); // make sure arm is out of camera sight
@@ -352,6 +397,8 @@ public class TeleopRR extends LinearOpMode {
             mecanum.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         }
     }
+
+
     private void lineWithAprilTag(int tagNum) {
         intake.dropPositions();
         sleep(300); // make sure arm is out of camera sight
@@ -362,11 +409,11 @@ public class TeleopRR extends LinearOpMode {
                         .lineToY(mecanum.pose.position.y + 1.5 * Params.HALF_MAT)
                         .build()
         );
-         */
 
-        logVector("initial moving done. position:",mecanum.pose.position);
+
+
         //sleep(850);
-        Pose2d aprilTagPose = tag.updatePoseAprilTag_new(tagNum);
+
         // if can not move based on April tag, moved by road runner.
         if (tag.targetFound) {
             mecanum.updatePoseEstimate();
@@ -379,7 +426,7 @@ public class TeleopRR extends LinearOpMode {
             Vector2d desiredMove = new Vector2d(mecanum.pose.position.x - aprilTagPose.position.x,
                     mecanum.pose.position.y + 6.5 * Params.HALF_MAT);
             logVector("robot drive: before move to pose", mecanum.pose.position);
-            intake.armMotor.setPower(0.5);
+            //intake.armMotor.setPower(0.5);
             intake.underTheBeam();
             Actions.runBlocking(
                     mecanum.actionBuilder(mecanum.pose)
@@ -390,12 +437,13 @@ public class TeleopRR extends LinearOpMode {
             );
             logVector("robot drive: move to tag pose required", desiredMove);
             logRobotHeading("after moving to april tag");
-            intake.armMotor.setPower(1);
+            //intake.armMotor.setPower(1);
             mecanum.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         } else {
             Logging.log("new command: april tag not detected");
         }
     }
+    */
 
     private void logRobotHeading(String sTag) {
         Logging.log("%s drive.pose: %.2f", sTag, Math.toDegrees(mecanum.pose.heading.log()));

@@ -60,7 +60,7 @@ public class SlidersWith2Motors
     public DcMotor LeftSliderMotor = null;
     final double SLIDER_MOTOR_POWER = 0.98; // save some powers
     final double COUNTS_PER_INCH = 82.9; // for 435RPM; 31.3 for 1150RPM; 120 for 312RPM
-    final double manualUpdatePos = COUNTS_PER_INCH / 1.1;
+    final double manualUpdatePos = COUNTS_PER_INCH / 0.75;
 
     // slider position variables
     final int FOUR_STAGE_SLIDER_MAX_POS = 2600;
@@ -80,8 +80,8 @@ public class SlidersWith2Motors
         LeftSliderMotor = hardwareMap.get(DcMotor.class, leftMotorName);
 
         /* slider motor control */
-        RightSliderMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        LeftSliderMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        LeftSliderMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        RightSliderMotor.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
     /**

@@ -5,14 +5,12 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
-@Autonomous(name="Red Back Right", group="Concept")
-@Disabled
-public class AutoRedBackRight extends AutoLeft {
+@Autonomous(name="Right side parking", group="Concept")
+//@Disabled
+public class AutoRight_emergency extends AutoLeft_emergency {
     @Override
     public void setRobotLocation() {
         startLoc = 2;
-        leftOrRight = 1;
     }
 }
