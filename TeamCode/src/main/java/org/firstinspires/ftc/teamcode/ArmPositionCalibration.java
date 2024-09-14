@@ -64,7 +64,7 @@ public class ArmPositionCalibration extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         if (opModeIsActive()) {
 
-            intake.resetArmEncoder();
+            //intake.resetArmEncoder();
 
             intake.fingerServoOpen();
             intake.setArmPosition(intake.ARM_POS_AUTO);

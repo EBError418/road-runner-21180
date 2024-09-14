@@ -29,6 +29,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
@@ -50,7 +52,7 @@ public class intakeUnit
     HardwareMap hardwareMap =  null;
 
     // arm servo motor variables
-    private Servo armServo = null;
+    private DcMotor armMotor = null;
 
 
     final double FINGER_INTAKE_POS = 0;
@@ -74,8 +76,6 @@ public class intakeUnit
     final double WRIST_POS_DROP_YELLOW_BACK = 0.36;
 
     final double WRIST_POS_DROP_YELLOW = 0.39;
-    final double WRIST_POS_DROP_WHITE = 0.42;
-    final double WRIST_POS_DROP = 0.46;
     final double WRIST_POS_INTAKE5 = 0.455;
     final double WRIST_POS_INTAKE = 0.475;
     final double WRIST_POS_REACH_FORWARD = 0.5;
@@ -84,25 +84,25 @@ public class intakeUnit
     //public DcMotor sliderOneMotor = null;
     //public DcMotor sliderTwoMotor = null;
     int ARM_POS_INTAKE = Params.armIntakeCount_InitFront;
-    int ARM_MIN_COUNT_POS;
-    int ARM_MAX_COUNT_POS;
     int ARM_POS_AUTO;
-    int ARM_POS_HANG;
     int ARM_POS_READY_FOR_HANG;
-    int ARM_POS_DROP;
     int ARM_POS_CAMERA_READ;
-    int ARM_POS_DROP_WHITE;
-    int ARM_POS_DROP_YELLOW;
-    int ARM_POS_DROP_YELLOW_BACK;
     int ARM_POS_UNDER_BEAM;
     int ARM_POS_MOVING_PIXEL_ON_BOARD;
     int ARM_POS_DROP_PURPLE;
     int ARM_POS_PUSH_PROP;
-    int ARM_POS_INTAKE2;
-    int ARM_POS_INTAKE3;
-    int ARM_POS_INTAKE4;
     int ARM_POS_INTAKE5;
-    int ARM_POS_INTAKE_WHITE2;
+
+    //new stuff
+    int ARM_POS_GRAB_SAMPLE;
+    final double WRIST_POS_GRAB_SAMPLE = 0.657;
+    final double FINGER_CLOSE = 0.5;
+    final double FINGER_OPEN = 0.8;
+    int ARM_MIN_COUNT_POS;
+    int ARM_MAX_COUNT_POS;
+    int ARM_POS_BEFORE_HANG;
+    int ARM_POS_AFTER_HANG;
+    int ARM_POS_HIGH_CHAMBER;
 
 
     /**
@@ -131,7 +131,12 @@ public class intakeUnit
         wristServo.setDirection(Servo.Direction.FORWARD);
         sleep(200);
 
-        armServo = hardwareMap.get(Servo.class, armServoName);
+        armMotor = hardwareMap.get(DcMotor.class, armServoName);
+        armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        setArmModeRunToPosition(0);
+
+        resetArmPositions(Params.armIntakeCount_InitFront);
 
         /*
         sliderOneMotor = hardwareMap.get(DcMotor.class, sliderOneMotorName);
@@ -145,9 +150,9 @@ public class intakeUnit
         //resetArmPositions(Params.armIntakeCount_InitFront);
     }
 
-    public void setArmServoPosition(double armPos) {
-        armPos = Range.clip(armPos, SWITCH_RIGHT_CLOSE_POS, ARM_FORE_POSITION);
-        armServo.setPosition(armPos);
+    public void setArmServoPosition(int armPos) {
+        armPos = Range.clip(armPos, 0, 5000);
+        armMotor.setTargetPosition(armPos);
     }
 
     public void setWristServoPosition(double wristPos){
@@ -177,6 +182,7 @@ public class intakeUnit
 
      */
 
+    /*
     public void armServoForward() {
         setArmServoPosition(ARM_FORE_POSITION);
     }
@@ -185,10 +191,15 @@ public class intakeUnit
         setWristServoPosition(WRIST_SNAP_POSITION);
     }
 
+     */
+
+    /*
     public void switchServoClose() {
         setArmServoPosition(SWITCH_RIGHT_CLOSE_POS);
         setWristServoPosition(SWITCH_LEFT_CLOSE_POS);
     }
+
+     */
 
     /**
      * set the target position of wrist servo motor
@@ -232,14 +243,18 @@ public class intakeUnit
      * @param armPos the target position value for arm servo motor
      */
     public void setArmPosition(double armPos) {
-        armServo.setPosition(armPos);
+        armMotor.setTargetPosition((int)(armPos));
     }
 
-    public void setArmModeRunToPosition(double armPos) {
+
+    public void setArmModeRunToPosition(int armPos) {
         setArmPosition(armPos);
-        //sliderOneMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        //sliderOneMotor.setPower(0.9);
+        armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        armMotor.setPower(0.9);
     }
+
+
+    /*
     public void resetArmEncoder() {
         //sliderOneMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setArmModeRunToPosition(0);
@@ -331,7 +346,7 @@ public class intakeUnit
         switchServoClose();
     }
     */
-
+    /*
     public void readyToDropYellow(int armPosition){
         setArmPosition(armPosition);
         wristServo.setPosition(WRIST_POS_DROP_YELLOW);
@@ -343,6 +358,8 @@ public class intakeUnit
         wristServo.setPosition(WRIST_POS_DROP_WHITE);
         switchServoClose();
     }
+
+     */
 
     public void underTheBeam(){
         setArmPosition(ARM_POS_UNDER_BEAM);
@@ -362,8 +379,8 @@ public class intakeUnit
      * Get the arm servo motor current position value
      * @return the current arm servo motor position value
      */
-    public double getArmPosition() {
-        return armServo.getPosition();
+    public int getArmPosition() {
+        return armMotor.getCurrentPosition();
     }
 
     /**
@@ -403,23 +420,20 @@ public class intakeUnit
     public void resetArmPositions(int intakePos) {
         ARM_POS_INTAKE = intakePos;
         ARM_MIN_COUNT_POS = ARM_POS_INTAKE - 3320; //0;
-        ARM_MAX_COUNT_POS = ARM_POS_INTAKE + 100; //3620; 
+        ARM_MAX_COUNT_POS = ARM_POS_INTAKE + 100; //3620;
         ARM_POS_AUTO = ARM_POS_INTAKE - 3240; //80;
-        ARM_POS_HANG = ARM_POS_INTAKE - 3000; //500;
         ARM_POS_READY_FOR_HANG = ARM_POS_INTAKE - 1760; // 1800
-        ARM_POS_DROP = ARM_POS_INTAKE - 1000; //2550;
         ARM_POS_CAMERA_READ = ARM_POS_INTAKE - 1060; //2500;
-        ARM_POS_DROP_WHITE = ARM_POS_INTAKE - 750; //2800;
-        ARM_POS_DROP_YELLOW = ARM_POS_INTAKE - 635; //2800;
         ARM_POS_MOVING_PIXEL_ON_BOARD = ARM_POS_INTAKE - 520;
-        ARM_POS_DROP_YELLOW_BACK = ARM_POS_INTAKE - 500;
         ARM_POS_UNDER_BEAM = ARM_POS_INTAKE - 260; //3100;
         ARM_POS_DROP_PURPLE = ARM_POS_INTAKE - 130; //3380;
         ARM_POS_PUSH_PROP = ARM_POS_INTAKE - 100;
-        ARM_POS_INTAKE2 = ARM_POS_INTAKE - 29;
-        ARM_POS_INTAKE3 = ARM_POS_INTAKE - 58;
-        ARM_POS_INTAKE4 = ARM_POS_INTAKE - 87;
-        ARM_POS_INTAKE_WHITE2 = ARM_POS_INTAKE - 116;
         ARM_POS_INTAKE5 = ARM_POS_INTAKE - 126;
+
+        //NEW STUFF
+        ARM_POS_GRAB_SAMPLE = 2995;
+        ARM_POS_BEFORE_HANG = 973;
+        ARM_POS_AFTER_HANG = 135;
+        ARM_POS_HIGH_CHAMBER = 1749;
     }
 }

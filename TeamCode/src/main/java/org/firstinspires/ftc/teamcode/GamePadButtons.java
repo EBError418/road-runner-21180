@@ -57,8 +57,8 @@ public class GamePadButtons {
     public boolean speedCtrl;
     public boolean sliderUp;
 
-    public float sliderUpDowm;
-    public boolean sliderDown;
+    //public float sliderUpDowm;
+    //public boolean sliderDown;
     public boolean armForwards;
     public boolean armBackwards;
     public boolean fingerOpen;
@@ -89,21 +89,21 @@ public class GamePadButtons {
         //moveToFront = gamepad1.a;
 
         //finger
-        fingerClose = gamepad2.dpad_left;
-        fingerOpen = gamepad2.dpad_right;
+        fingerClose = gamepad2.dpad_up;
+        fingerOpen = gamepad2.dpad_down;
 
         //wrists
-        wristUp = gamepad2.a;
-        wristDown = gamepad2.b;
+        wristUp = gamepad2.right_stick_y < 0;
+        wristDown = gamepad2.right_stick_y > 0;
 
         //arm
         armForwards = gamepad2.left_stick_y > 0;
         armBackwards = gamepad2.left_stick_y < 0;
 
         //slider
-        sliderUp = gamepad2.right_stick_y > 0;
-        sliderDown = gamepad2.right_stick_y < 0;
+        //sliderUp = gamepad2.right_stick_y > 0;
+        //sliderDown = gamepad2.right_stick_y < 0;
 
-        sliderUpDowm  = gamepad2.right_stick_y;
+        //sliderUpDowm  = gamepad2.right_stick_y;
     }
 }

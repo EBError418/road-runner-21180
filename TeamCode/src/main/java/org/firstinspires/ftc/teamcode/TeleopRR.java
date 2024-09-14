@@ -69,7 +69,7 @@ public class TeleopRR extends LinearOpMode {
     //claw and arm unit
     private intakeUnit intake;
 
-    private SlidersWith2Motors slider;
+    //private SlidersWith2Motors slider;
 
     private Servo DroneServo;
 
@@ -97,9 +97,9 @@ public class TeleopRR extends LinearOpMode {
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
                 "Finger");
 
-        slider = new SlidersWith2Motors();
+        //slider = new SlidersWith2Motors();
 
-        intake.setArmModeRunToPosition(intake.getArmPosition());
+        //intake.setArmModeRunToPosition(intake.getArmPosition());
 
         // bulk reading setting - auto refresh mode
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
@@ -138,10 +138,10 @@ public class TeleopRR extends LinearOpMode {
                     -gpButtons.robotTurn * maxDrivePower
             ));
 
-            slider.init(hardwareMap, "sliderRight", "sliderLeft");
+            //slider.init(hardwareMap, "sliderRight", "sliderLeft");
 
-            slider.setCountPosition(slider.getPosition());
-            slider.runToPosition();
+            //slider.setCountPosition(slider.getPosition());
+            //slider.runToPosition();
 
             /*
             // Set position only when button is hit.
@@ -283,6 +283,7 @@ public class TeleopRR extends LinearOpMode {
             }
 
              */
+            /*
             if (gpButtons.sliderUp){
                 //slider.setInchPosition(slider.getInchPosition() + 0.001);
                 slider.manualControlPos((gpButtons.sliderUpDowm));
@@ -293,30 +294,32 @@ public class TeleopRR extends LinearOpMode {
                 slider.manualControlPos(gpButtons.sliderUpDowm);
             }
 
+             */
+
             if (gpButtons.armBackwards) {
-                intake.setArmPosition(intake.getArmPosition() + 0.005);
-                intake.setWristPosition(intake.getWristPosition() + 0.005);
+                intake.setArmPosition(intake.getArmPosition() + 50);
+
             }
 
             if (gpButtons.armForwards) {
-                intake.setArmPosition(intake.getArmPosition() - 0.005);
-                intake.setWristPosition(intake.getWristPosition() - 0.005);
+                intake.setArmPosition(intake.getArmPosition() - 50);
+
             }
 
             if (gpButtons.wristUp) {
-                intake.setWristPosition(intake.getWristPosition() + 0.005);
+                intake.setWristPosition(intake.getWristPosition() + 0.002);
             }
 
             if (gpButtons.wristDown) {
-                intake.setWristPosition(intake.getWristPosition() - 0.005);
+                intake.setWristPosition(intake.getWristPosition() - 0.002);
             }
 
             if (gpButtons.fingerClose) {
-                intake.setFingerPosition(intake.getFingerPosition() - 0.01);
+                intake.setFingerPosition(intake.FINGER_CLOSE);
             }
 
             if (gpButtons.fingerOpen) {
-                intake.setFingerPosition(intake.getFingerPosition() + 0.01);
+                intake.setFingerPosition(intake.FINGER_OPEN);
             }
 
             mecanum.updatePoseEstimate();
@@ -327,9 +330,7 @@ public class TeleopRR extends LinearOpMode {
 
                 telemetry.addData("Wrist", "position %.3f", intake.getWristPosition());
 
-                telemetry.addData("Slider", "position = %.3f", slider.getInchPosition());
-
-                telemetry.addData("Arm", "position = %.3f", intake.getArmPosition());
+                telemetry.addData("Arm", "position = %.3f", (double)(intake.getArmPosition()));
 
 
                 //telemetry.addData("Finger", "position %.3f", intake.getFingerPosition());

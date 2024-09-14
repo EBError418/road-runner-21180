@@ -224,7 +224,7 @@ public class AutoRedBackRight_fast extends LinearOpMode {
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
                 "Finger");
-        intake.setArmModeRunToPosition(intake.getArmPosition());
+        //intake.setArmModeRunToPosition(intake.getArmPosition());
 
         intake.fingerServoOpen();
 
@@ -530,7 +530,7 @@ public class AutoRedBackRight_fast extends LinearOpMode {
             Logging.log("Can not found required AprilTag to drop yellow pixel");
         }
 
-        intake.readyToDropYellow(intake.ARM_POS_DROP_YELLOW_BACK);
+       // intake.readyToDropYellow(intake.ARM_POS_DROP_YELLOW_BACK);
         if ((5 == checkStatus) || (2 == checkStatus)) {
             sleep(100); // wait arm down to the position
         }

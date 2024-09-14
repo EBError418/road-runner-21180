@@ -228,7 +228,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
                 "Finger");
-        intake.setArmModeRunToPosition(intake.getArmPosition());
+        //intake.setArmModeRunToPosition(intake.getArmPosition());
 
         intake.fingerServoOpen();
 
@@ -611,7 +611,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
             Logging.log("Can not found required AprilTag to drop yellow pixel");
         }
 
-        intake.readyToDropYellow(intake.ARM_POS_DROP_YELLOW);
+        //intake.readyToDropYellow(intake.ARM_POS_DROP_YELLOW);
         if ((5 == checkStatus) || (2 == checkStatus)) {
             sleep(100); // wait arm down to the position
         }
@@ -698,7 +698,7 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
                 Logging.log("Can not found required AprilTag to drop yellow pixel");
             }
 
-            intake.readyToDropWhite(intake.ARM_POS_DROP_WHITE);
+            //intake.readyToDropWhite(intake.ARM_POS_DROP_WHITE);
 
             // shift to AprilTag
             Actions.runBlocking(
@@ -738,12 +738,12 @@ public class AutoRedFrontLeft_fast extends LinearOpMode {
         sleep(500);
     }
     private void dropYellowAction(){
-        intake.setArmServoPosition(intake.ARM_FORE_POSITION);
+        //intake.setArmServoPosition(intake.ARM_FORE_POSITION);
         sleep(300);
 
         // move to drop white
         if ((1 == checkStatus) || (4 == checkStatus)) {
-            intake.setArmServoPosition(intake.SWITCH_RIGHT_CLOSE_POS);
+            //intake.setArmServoPosition(intake.SWITCH_RIGHT_CLOSE_POS);
             //intake.dropWhitePositions();
             sleep(100);
             Actions.runBlocking(
