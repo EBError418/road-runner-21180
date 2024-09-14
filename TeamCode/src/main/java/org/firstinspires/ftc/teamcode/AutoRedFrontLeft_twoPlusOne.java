@@ -9,6 +9,7 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
@@ -24,7 +25,7 @@ import java.util.List;
 import java.util.Vector;
 
 @Autonomous(name="03 Red Front Left + 1 white", group="Concept")
-//@Disabled
+@Disabled
 public class AutoRedFrontLeft_twoPlusOne extends AutoRedFrontLeft_fast {
 
     @Override

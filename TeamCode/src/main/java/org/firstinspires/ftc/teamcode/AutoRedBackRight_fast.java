@@ -44,10 +44,8 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Version;
 
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.openftc.easyopencv.OpenCvCamera;
@@ -55,7 +53,6 @@ import org.openftc.easyopencv.OpenCvCameraFactory;
 import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.List;
-import java.util.Vector;
 
 /**
  * Hardware config:
@@ -78,7 +75,7 @@ import java.util.Vector;
  */
 
 @Autonomous(name="Red Back Right - 10 sec", group="Concept")
-//@Disabled
+@Disabled
 public class AutoRedBackRight_fast extends LinearOpMode {
 
     private final double NO_ACT = 100000;
@@ -226,10 +223,10 @@ public class AutoRedBackRight_fast extends LinearOpMode {
         Params.deadWheelOn = MecanumDrive.PARAMS.useDeadWheel;
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
-                "Finger", "SwitchR", "SwitchL");
+                "Finger");
         intake.setArmModeRunToPosition(intake.getArmPosition());
 
-        intake.switchServoOpen();
+        intake.fingerServoOpen();
 
         runtime.reset();
         while ((ObjectDetection.PropSide.UNKNOWN == propLocation) &&
@@ -325,7 +322,7 @@ public class AutoRedBackRight_fast extends LinearOpMode {
 
     private void autonomousCore() {
         autoCore();
-        intake.armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        //intake.armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
 
     private void autoCore() {
@@ -483,7 +480,7 @@ public class AutoRedBackRight_fast extends LinearOpMode {
 
         // drop off the purple pixel by arm and wrist actions
         if ((2 == checkStatus) || (5 == checkStatus)) {
-            intake.setArmCountPosition(intake.ARM_POS_DROP_PURPLE);
+            intake.setArmPosition(intake.ARM_POS_DROP_PURPLE);
             intake.setWristPosition(intake.WRIST_POS_DROP_PURPLE);
             sleep(200);
         }
@@ -550,14 +547,14 @@ public class AutoRedBackRight_fast extends LinearOpMode {
         logRobotHeading("robot drive: drop yellow heading -");
 
         // drop pixel
-        dropYellowAction(); // arm is at high position
+        //dropYellowAction(); // arm is at high position
         Logging.log("Autonomous time - after drop off yellow time: " + runtime);
 
         logVector("Before fine turn required", vStartTurn2ndDrop);
 
 
         // parking
-        intake.setArmCountPosition(intake.ARM_POS_READY_FOR_HANG + 200);
+        intake.setArmPosition(intake.ARM_POS_READY_FOR_HANG + 200);
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .strafeTo(vParkPos)
@@ -574,16 +571,18 @@ public class AutoRedBackRight_fast extends LinearOpMode {
 
         // 2. open switch
         intake.setWristPosition(intake.WRIST_POS_DROP_PURPLE);
-        intake.setSwitchLeftPosition(intake.SWITCH_LEFT_RELEASE);
+        intake.setWristServoPosition(intake.WRIST_SNAP_POSITION);
         sleep(500);
     }
+
+    /*
     private void dropYellowAction(){
-        intake.setSwitchRightPosition(intake.SWITCH_RIGHT_RELEASE);
+        intake.setArmServoPosition(intake.SWITCH_RIGHT_RELEASE);
         sleep(300);
 
         // move to drop white
         if ((1 == checkStatus) || (4 == checkStatus)) {
-            intake.setSwitchRightPosition(intake.SWITCH_RIGHT_CLOSE_POS);
+            intake.setArmServoPosition(intake.SWITCH_RIGHT_CLOSE_POS);
             intake.dropWhitePositions();
             sleep(100);
             Actions.runBlocking(
@@ -593,17 +592,19 @@ public class AutoRedBackRight_fast extends LinearOpMode {
                             .build()
             );
         }
-        intake.setSwitchLeftPosition(intake.SWITCH_LEFT_RELEASE);
+        intake.setWristServoPosition(intake.SWITCH_LEFT_RELEASE);
         sleep(200);
         intake.setArmCountPosition(intake.getArmPosition() - 500);
         sleep(200);
     }
 
+     */
+
     private void dropWhiteAction(){
         // release both
-        intake.switchServoOpen();
+        intake.fingerServoOpen();
         sleep((1 == checkStatus)? 400 : 1200); // save a little time for case 1
-        intake.setArmCountPosition(intake.ARM_POS_READY_FOR_HANG);
+        intake.setArmPosition(intake.ARM_POS_READY_FOR_HANG);
         sleep(200);
     }
 
@@ -648,7 +649,7 @@ public class AutoRedBackRight_fast extends LinearOpMode {
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
 
             if (armPos < NO_ACT) {
-                intake.setArmCountPosition(armPos);
+                intake.setArmPosition(armPos);
             }
 
             if (wristPos < NO_ACT) {
@@ -680,7 +681,7 @@ public class AutoRedBackRight_fast extends LinearOpMode {
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            intake.intakePositions(armPos);
+            //intake.intakePositions(armPos);
             return false;
         }
     }

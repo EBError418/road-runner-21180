@@ -35,7 +35,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -56,8 +55,7 @@ public class ArmPositionCalibration extends LinearOpMode {
         DroneServo = hardwareMap.get(Servo.class, "Drone");
         DroneServo.setPosition(Params.DRONE_START);
 
-        intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
-                "Finger", "SwitchR", "SwitchL");
+        intake = new intakeUnit(hardwareMap, "Arm", "Wrist", "Finger");
         Params.armCalibrated = true;
 
         waitForStart();
@@ -68,8 +66,8 @@ public class ArmPositionCalibration extends LinearOpMode {
 
             intake.resetArmEncoder();
 
-            intake.switchServoOpen();
-            intake.setArmCountPosition(intake.ARM_POS_AUTO);
+            intake.fingerServoOpen();
+            intake.setArmPosition(intake.ARM_POS_AUTO);
             sleep(2000);
             telemetry.addData("Arm calibration: ---", "done !");
             telemetry.update();

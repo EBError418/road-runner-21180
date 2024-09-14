@@ -37,25 +37,16 @@ import androidx.annotation.NonNull;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.ParallelAction;
-import com.acmerobotics.roadrunner.SequentialAction;
-import com.acmerobotics.roadrunner.SleepAction;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.openftc.easyopencv.OpenCvCamera;
-import org.openftc.easyopencv.OpenCvCameraFactory;
-import org.openftc.easyopencv.OpenCvCameraRotation;
 
 import java.util.List;
 
@@ -79,9 +70,9 @@ import java.util.List;
  *          "Webcam 1"
  */
 
-@Autonomous(name="Red Front Left", group="Concept")
-@Disabled
-public class AutoRedFrontLeft extends LinearOpMode {
+@Autonomous(name="Left side auto", group="Concept")
+//@Disabled
+public class AutoLeft extends LinearOpMode {
 
     /** 1 for Red Front, 2 for Red back, 3 for Blue Front, and 4 for Blue back
      */
@@ -107,6 +98,8 @@ public class AutoRedFrontLeft extends LinearOpMode {
     // Declare OpMode members.
     private final ElapsedTime runtime = new ElapsedTime();
     private intakeUnit intake;
+
+    private SlidersWith2Motors slider;
     private MecanumDrive drive;
 
     private Servo DroneServo;
@@ -122,6 +115,7 @@ public class AutoRedFrontLeft extends LinearOpMode {
 
     // road runner variables
     Pose2d startPose;
+    Pose2d newStartPose;
 
     final int WAIT_ALLIANCE_SECONDS = 6;
 
@@ -131,7 +125,7 @@ public class AutoRedFrontLeft extends LinearOpMode {
      */
     public void setRobotLocation() {
         startLoc = 1;
-        leftOrRight = -1;
+        //leftOrRight = -1;
     }
 
     /**
@@ -143,30 +137,22 @@ public class AutoRedFrontLeft extends LinearOpMode {
     private void setStartPoses(int startLocation) {
         // road runner variables
         switch(startLocation) {
-            case 1: // red front
-                blueOrRed = -1;
-                frontOrBack = 1;
+            case 1: // left
+                leftOrRight = 1;
                 break;
 
-            case 2: // red back
-                blueOrRed = -1;
-                frontOrBack = -1;
+            case 2: // right
+                leftOrRight = -1;
                 break;
 
-            case 3: //  blue front
-                blueOrRed = 1;
-                frontOrBack = 1;
-                break;
 
-            case 4: //  blue back
-                blueOrRed = 1;
-                frontOrBack = -1;
-                break;
         }
         startPose = new Pose2d((6 * Params.HALF_MAT - Params.CHASSIS_HALF_LENGTH - Params.CHASSIS_START_EXTRA) * blueOrRed,
                 //Params.HALF_MAT + (3 * Params.HALF_MAT - Params.CHASSIS_HALF_WIDTH) * frontOrBack,
                 Params.HALF_MAT + 2 * Params.HALF_MAT * frontOrBack,
                 Math.toRadians(90.0 + 90.0 * blueOrRed));
+        newStartPose = new Pose2d((-6 * Params.HALF_MAT + Params.CHASSIS_LENGTH / 2),(leftOrRight * 2 * Params.HALF_MAT),0);
+
     }
 
     @Override
@@ -174,8 +160,8 @@ public class AutoRedFrontLeft extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         Logging.log("Status - Initialized");
 
-        DroneServo = hardwareMap.get(Servo.class, "Drone");
-        DroneServo.setPosition(Params.DRONE_START);
+        //DroneServo = hardwareMap.get(Servo.class, "Drone");
+        //DroneServo.setPosition(Params.DRONE_START);
 
         setRobotLocation();
 
@@ -196,12 +182,12 @@ public class AutoRedFrontLeft extends LinearOpMode {
         }
 
         if (isCameraInstalled) {
-            camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(
-                    WebcamName.class, webcamName), cameraMonitorViewId);
+            //camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(
+                    //WebcamName.class, webcamName), cameraMonitorViewId);
 
-            camera.setPipeline(propDetect);
+            //camera.setPipeline(propDetect);
 
-            camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
+            /*camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
                 @Override
                 public void onOpened() {
                     camera.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
@@ -215,16 +201,23 @@ public class AutoRedFrontLeft extends LinearOpMode {
                     telemetry.update();
                 }
             });
+
+             */
         }
 
         // init drive with road runner
-        drive = new MecanumDrive(hardwareMap, startPose);
-        Params.startPose = startPose; // init storage pose.
+        drive = new MecanumDrive(hardwareMap, newStartPose);
+        Params.startPose = newStartPose; // init storage pose.
         Params.blueOrRed = blueOrRed;
 
-        intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
-                "Finger", "SwitchR", "SwitchL");
-        intake.setArmModeRunToPosition(intake.getArmPosition());
+        intake = new intakeUnit(hardwareMap, "Arm", "Wrist", "Finger");
+        //intake.setArmModeRunToPosition(intake.getArmPosition());
+
+        slider = new SlidersWith2Motors();
+
+        slider.init(hardwareMap, "sliderRight", "sliderLeft");
+
+        slider.resetEncoders();
 
         runtime.reset();
         while ((ObjectDetection.PropSide.UNKNOWN == propLocation) &&
@@ -239,8 +232,8 @@ public class AutoRedFrontLeft extends LinearOpMode {
             sleep(10);
             telemetry.addData( ((blueOrRed >0)? "Blue - " : "Red - "),((frontOrBack >0)? "front" : "back"));
 
-            telemetry.addData("Detected Prop location: ", propLocation);
-            telemetry.addData("Arm", "position = %d", intake.getArmPosition());
+            //telemetry.addData("Detected Prop location: ", propLocation);
+            //telemetry.addData("Arm", "position = %d", intake.getArmPosition());
 
             telemetry.update();
         }
@@ -266,44 +259,30 @@ public class AutoRedFrontLeft extends LinearOpMode {
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
 
+        intake.setFingerPosition(0.0);
+
+        intake.setWristPosition(0.1);
+
         waitForStart();
         runtime.reset();
 
         // run until the end of the match (driver presses STOP)
+
         if (opModeIsActive()) {
-            Logging.log("checkStatus = %d, desiredTagNum = %d", checkStatus, desiredTagNum);
-            Logging.log("frontOrBack = %d, blueOrRed = %d", frontOrBack, blueOrRed);
-
-            if (Params.armCalibrated) {
-
-
-                intake.autonomousInit();
-                camera.closeCameraDevice(); // close camera for spike mark location checking
-
-                autonomousCore();
-
-                Params.currentPose = drive.pose; // storage end pose of autonomous
-                intake.parkingPositions(); // Motors are at intake positions at the beginning of Tele-op
-                intake.fingerStop();
-                sleep(1000);
-
-                camera.closeCameraDevice(); // cost too times at the beginning to close camera about 300 ms
-                Logging.log("Autonomous time - total Run Time: " + runtime);
-            }
-            else {
-                telemetry.addData("Arm calibration: ---", "need to be done before starting!");
-                telemetry.update();
-                sleep(5000);
-            }
+            autonomousCore();
         }
+
+
     }
 
     private void autonomousCore() {
+
         autoCore();
-        intake.armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        //intake.armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
 
     private void autoCore() {
+        Logging.log("Status - Start auto core");
         Vector2d startArmFlip = new Vector2d(startPose.position.x - blueOrRed * 6, startPose.position.y);
 
         double pausePoseY = -2 * Params.HALF_MAT - 6;
@@ -313,6 +292,98 @@ public class AutoRedFrontLeft extends LinearOpMode {
 
         Vector2d vAprilTag = null;
 
+        //new stuff
+
+        //hang specimen
+        Vector2d prepareSpecimen = new Vector2d(- 3 * Params.HALF_MAT, 0);
+        Vector2d retractArm = new Vector2d(prepareSpecimen.x - Params.HALF_MAT, prepareSpecimen.y);
+
+        //grab
+        Vector2d grabNeutralSample = new Vector2d(- 3 * Params.HALF_MAT, 4 * Params.HALF_MAT);
+        Vector2d placeSample = new Vector2d(grabNeutralSample.x - 2 * Params.HALF_MAT + Params.CHASSIS_LENGTH / 2, grabNeutralSample.y + Params.HALF_MAT - Params.CHASSIS_HALF_WIDTH);
+
+        //ascent level 1
+        Vector2d parkStepOne = new Vector2d(- 4 * Params.HALF_MAT,  4 * Params.HALF_MAT);
+        Vector2d parkStepTwo = new Vector2d(parkStepOne.x + 3 * Params.HALF_MAT, parkStepOne.y);
+        Vector2d parkStepThree = new Vector2d(parkStepTwo.x, parkStepTwo.y - 2 * Params.HALF_MAT + Params.CHASSIS_HALF_LENGTH);
+
+        //Hang specimen
+
+        Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
+        Actions.runBlocking(
+                drive.actionBuilder(newStartPose)
+                        .strafeTo(prepareSpecimen)
+                        .build()
+        );
+        Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
+        sleep(1000);
+        slider.setInchPosition(23);
+        sleep(400);
+        intake.setArmPosition(0.4);
+        sleep(400);
+        intake.setWristPosition(0.5);
+        sleep(400);
+        intake.setArmPosition(0.9);
+        sleep(400);
+        intake.setFingerPosition(0.7);
+        sleep(1000);
+        Actions.runBlocking(
+                drive.actionBuilder(drive.pose)
+                        .lineToXConstantHeading(retractArm.x)
+                        .build()
+        );
+        sleep(500);
+        slider.setInchPosition(0.0);
+        sleep(200);
+
+        //Pick up and drop sample
+        Actions.runBlocking(
+                drive.actionBuilder(drive.pose)
+                        .strafeTo(grabNeutralSample)
+                        .build()
+        );
+        sleep(500);
+        intake.setFingerPosition(0.0);
+        sleep(200);
+        slider.setInchPosition(5.0);
+        sleep(200);
+        intake.setArmPosition(0.75);
+        sleep(500);
+        Actions.runBlocking(
+                drive.actionBuilder(drive.pose)
+                        .lineToXConstantHeading(placeSample.x)
+                        .turnTo(Math.toRadians(135))
+                        .build()
+        );
+        sleep(500);
+        slider.setInchPosition(40.0);
+        sleep(200);
+        intake.setArmPosition(0.9);
+        sleep(200);
+        intake.setFingerPosition(1.0);
+
+        sleep(200);
+
+        //Go to ascent level 1
+        slider.setInchPosition(7.0);
+        intake.setFingerPosition(0.0);
+        Actions.runBlocking(
+                drive.actionBuilder(drive.pose)
+                        .turnTo(Math.toRadians(90))
+                        .strafeTo(parkStepOne)
+                        .build()
+        );
+        slider.setInchPosition(7.0);
+        intake.setFingerPosition(0.0);
+        Actions.runBlocking(
+                drive.actionBuilder(drive.pose)
+                        .strafeTo(parkStepTwo)
+                        .strafeTo(parkStepThree)
+                        .build()
+        );
+        Logging.log("X position = %2f, Y position = %2f", drive.pose.position.x, drive.pose.position.y);
+
+        /*
         if (blueOrRed > 0) {
             vAprilTag = new Vector2d(vBackdrop.x + (2 - desiredTagNum) * Params.BACKDROP_SIDEWAYS, vBackdrop.y);
         } else {
@@ -431,7 +502,7 @@ public class AutoRedFrontLeft extends LinearOpMode {
             );//strafe several inches left to avoid hitting the beam
         }
 
-        // there is a bug somewhere in turn() function when using PI/2, it actually turn PI */
+        // there is a bug somewhere in turn() function when using PI/2, it actually turn PI
         double turnAngleToDrop = 0;
         if ((-4 == checkStatus) || (-3 == checkStatus)) {
             turnAngleToDrop = -blueOrRed * (Math.PI + 0.0001);
@@ -571,23 +642,29 @@ public class AutoRedFrontLeft extends LinearOpMode {
         );
         logVector("robot drive: drive.pose parking", drive.pose.position);
         logVector("robot drive: parking required", vParkPos);
+
+         */
     }
 
+
+    /*
     private void dropPurpleAction() {
         // 1. arm and wrist at correct positions
         intake.readyToDropPurple();
         sleep(100);
 
         // 2. open switch
-        intake.setSwitchLeftPosition(intake.SWITCH_LEFT_RELEASE);
+        intake.setWristServoPosition(intake.SWITCH_LEFT_RELEASE);
         sleep(1000);
     }
     private void dropYellowAction(){
-        intake.setSwitchRightPosition(intake.SWITCH_RIGHT_RELEASE);
+        intake.setArmServoPosition(intake.SWITCH_RIGHT_RELEASE);
         sleep(500);
         intake.setArmCountPosition(intake.getArmPosition() - 500);
         sleep(500);
     }
+
+
 
     private void logVector(String sTag, Vector2d vXY) {
         String vectorName = vXY.toString();
@@ -606,6 +683,8 @@ public class AutoRedFrontLeft extends LinearOpMode {
             return false;
         }
     }
+
+     */
 
     private void updateProfileAccel(boolean slowMode) {
         if (slowMode) {

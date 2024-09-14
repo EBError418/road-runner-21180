@@ -1,9 +1,10 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
 @Autonomous(name="03 Red Front Right + 1 white", group="Concept")
-//@Disabled
+@Disabled
 public class AutoRedFrontRight_twoPlusOne extends AutoRedFrontLeft_fast {
 
     @Override
