@@ -99,7 +99,7 @@ public class AutoLeft extends LinearOpMode {
     private final ElapsedTime runtime = new ElapsedTime();
     private intakeUnit intake;
 
-    private SlidersWith2Motors slider;
+    //private SlidersWith2Motors slider;
     private MecanumDrive drive;
 
     private Servo DroneServo;
@@ -213,11 +213,11 @@ public class AutoLeft extends LinearOpMode {
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist", "Finger");
         //intake.setArmModeRunToPosition(intake.getArmPosition());
 
-        slider = new SlidersWith2Motors();
+        //slider = new SlidersWith2Motors();
 
-        slider.init(hardwareMap, "sliderRight", "sliderLeft");
+        //slider.init(hardwareMap, "sliderRight", "sliderLeft");
 
-        slider.resetEncoders();
+        //slider.resetEncoders();
 
         runtime.reset();
         while ((ObjectDetection.PropSide.UNKNOWN == propLocation) &&
@@ -264,6 +264,15 @@ public class AutoLeft extends LinearOpMode {
         intake.setWristPosition(0.1);
 
         waitForStart();
+
+        intake.setWristPosition(0.5);
+
+        intake.setFingerPosition(intake.FINGER_CLOSE);
+
+        Logging.log("Before start wrist pos: %2f", intake.getWristPosition());
+        Logging.log("Before start finger pos: %2f", intake.getFingerPosition());
+        Logging.log("Before start arm pos: %s", intake.getArmPosition());
+
         runtime.reset();
 
         // run until the end of the match (driver presses STOP)
@@ -295,8 +304,9 @@ public class AutoLeft extends LinearOpMode {
         //new stuff
 
         //hang specimen
-        Vector2d prepareSpecimen = new Vector2d(- 3 * Params.HALF_MAT, 0);
-        Vector2d retractArm = new Vector2d(prepareSpecimen.x - Params.HALF_MAT, prepareSpecimen.y);
+        Vector2d hangSpecimen = new Vector2d(- 3.5 * Params.HALF_MAT, 0);
+        Vector2d armFlip = new Vector2d(-4.5 * Params.HALF_MAT, 0);
+        Vector2d retractArm = new Vector2d(hangSpecimen.x - Params.HALF_MAT, hangSpecimen.y);
 
         //grab
         Vector2d grabNeutralSample = new Vector2d(- 3 * Params.HALF_MAT, 4 * Params.HALF_MAT);
@@ -307,48 +317,55 @@ public class AutoLeft extends LinearOpMode {
         Vector2d parkStepTwo = new Vector2d(parkStepOne.x + 3 * Params.HALF_MAT, parkStepOne.y);
         Vector2d parkStepThree = new Vector2d(parkStepTwo.x, parkStepTwo.y - 2 * Params.HALF_MAT + Params.CHASSIS_HALF_LENGTH);
 
-        //Hang specimen
-
+        //Go to position for arm flip
         Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
         Actions.runBlocking(
                 drive.actionBuilder(newStartPose)
-                        .strafeTo(prepareSpecimen)
+                        .strafeTo(armFlip)
                         .build()
         );
         Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
+        sleep(500);
+        intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
+        sleep(400);
+        intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
         sleep(1000);
-        slider.setInchPosition(23);
+
+        //hang specimen on high chamber
+        Actions.runBlocking(
+                drive.actionBuilder(drive.pose)
+                        .strafeTo(hangSpecimen)
+                        .build()
+        );
+        //slider.setInchPosition(23);
         sleep(400);
-        intake.setArmPosition(0.4);
-        sleep(400);
-        intake.setWristPosition(0.5);
-        sleep(400);
-        intake.setArmPosition(0.9);
-        sleep(400);
-        intake.setFingerPosition(0.7);
+        intake.setFingerPosition(intake.FINGER_OPEN);
         sleep(1000);
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .lineToXConstantHeading(retractArm.x)
                         .build()
         );
-        sleep(500);
-        slider.setInchPosition(0.0);
         sleep(200);
+        //slider.setInchPosition(0.0);
 
-        //Pick up and drop sample
+        //Pick up sample
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .strafeTo(grabNeutralSample)
                         .build()
         );
         sleep(500);
-        intake.setFingerPosition(0.0);
+        intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE);
+        intake.setWristPosition(intake.WRIST_POS_GRAB_SAMPLE);
+        intake.setFingerPosition(intake.FINGER_CLOSE);
         sleep(200);
-        slider.setInchPosition(5.0);
+        //slider.setInchPosition(5.0);
         sleep(200);
-        intake.setArmPosition(0.75);
+        intake.setArmPosition(intake.ARM_POS_LOW_BUCKET);
         sleep(500);
+
+        //place sample in bucket
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .lineToXConstantHeading(placeSample.x)
@@ -356,16 +373,16 @@ public class AutoLeft extends LinearOpMode {
                         .build()
         );
         sleep(500);
-        slider.setInchPosition(40.0);
+        //slider.setInchPosition(40.0);
         sleep(200);
-        intake.setArmPosition(0.9);
+        intake.setArmPosition(intake.ARM_POS_LOW_BUCKET);
         sleep(200);
-        intake.setFingerPosition(1.0);
+        intake.setFingerPosition(intake.FINGER_OPEN);
 
         sleep(200);
 
         //Go to ascent level 1
-        slider.setInchPosition(7.0);
+        //slider.setInchPosition(7.0);
         intake.setFingerPosition(0.0);
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
@@ -373,8 +390,9 @@ public class AutoLeft extends LinearOpMode {
                         .strafeTo(parkStepOne)
                         .build()
         );
-        slider.setInchPosition(7.0);
-        intake.setFingerPosition(0.0);
+        //slider.setInchPosition(7.0);
+        sleep(400);
+
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .strafeTo(parkStepTwo)
