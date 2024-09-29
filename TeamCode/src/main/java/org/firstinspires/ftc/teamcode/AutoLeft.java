@@ -151,7 +151,7 @@ public class AutoLeft extends LinearOpMode {
                 //Params.HALF_MAT + (3 * Params.HALF_MAT - Params.CHASSIS_HALF_WIDTH) * frontOrBack,
                 Params.HALF_MAT + 2 * Params.HALF_MAT * frontOrBack,
                 Math.toRadians(90.0 + 90.0 * blueOrRed));
-        newStartPose = new Pose2d((-6 * Params.HALF_MAT + Params.CHASSIS_LENGTH / 2),(leftOrRight * 2 * Params.HALF_MAT),0);
+        newStartPose = new Pose2d((-6 * Params.HALF_MAT + Params.CHASSIS_LENGTH / 2),(leftOrRight * 0 * Params.CHASSIS_HALF_WIDTH),0);
 
     }
 
@@ -261,11 +261,11 @@ public class AutoLeft extends LinearOpMode {
 
         intake.setFingerPosition(0.0);
 
-        intake.setWristPosition(0.1);
+        intake.setWristPosition(0.95);
 
         waitForStart();
 
-        intake.setWristPosition(0.5);
+        intake.setWristPosition(0.95);
 
         intake.setFingerPosition(intake.FINGER_CLOSE);
 
@@ -291,6 +291,7 @@ public class AutoLeft extends LinearOpMode {
     }
 
     private void autoCore() {
+        Logging.log("Auto start wrist pos: %2f", intake.getWristPosition());
         Logging.log("Status - Start auto core");
         Vector2d startArmFlip = new Vector2d(startPose.position.x - blueOrRed * 6, startPose.position.y);
 
@@ -304,62 +305,67 @@ public class AutoLeft extends LinearOpMode {
         //new stuff
 
         //hang specimen
-        Vector2d hangSpecimen = new Vector2d(- 3.5 * Params.HALF_MAT, 0);
-        Vector2d armFlip = new Vector2d(-4.5 * Params.HALF_MAT, 0);
-        Vector2d retractArm = new Vector2d(hangSpecimen.x - Params.HALF_MAT, hangSpecimen.y);
+        //Vector2d hangSpecimen = new Vector2d(- 3.5 * Params.HALF_MAT, 0);
+        Vector2d armFlip = new Vector2d(-4.4 * Params.HALF_MAT, 0);
+        Vector2d retractArm = new Vector2d(armFlip.x - Params.HALF_MAT, armFlip.y);
 
         //grab
-        Vector2d grabNeutralSample = new Vector2d(- 3 * Params.HALF_MAT, 4 * Params.HALF_MAT);
-        Vector2d placeSample = new Vector2d(grabNeutralSample.x - 2 * Params.HALF_MAT + Params.CHASSIS_LENGTH / 2, grabNeutralSample.y + Params.HALF_MAT - Params.CHASSIS_HALF_WIDTH);
+        Vector2d grabNeutralSample = new Vector2d(- 4.5 * Params.HALF_MAT, 4 * Params.HALF_MAT);
+        Vector2d placeSample = new Vector2d(- 4.2 * Params.HALF_MAT, 4.2 * Params.HALF_MAT);
 
         //ascent level 1
         Vector2d parkStepOne = new Vector2d(- 4 * Params.HALF_MAT,  4 * Params.HALF_MAT);
         Vector2d parkStepTwo = new Vector2d(parkStepOne.x + 3 * Params.HALF_MAT, parkStepOne.y);
-        Vector2d parkStepThree = new Vector2d(parkStepTwo.x, parkStepTwo.y - 2 * Params.HALF_MAT + Params.CHASSIS_HALF_LENGTH);
+        Vector2d parkStepThree = new Vector2d(parkStepTwo.x, 2 * Params.HALF_MAT);
 
-        //Go to position for arm flip
+        //Go to position for arm flip and hang on high chamber
         Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
         Actions.runBlocking(
                 drive.actionBuilder(newStartPose)
                         .strafeTo(armFlip)
+                        .afterTime(0.8, new armFlipToHangAct())
                         .build()
         );
+        Logging.log("After arm flip pos wrist pos: %2f", intake.getWristPosition());
         Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
-        sleep(500);
-        intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
-        sleep(400);
+        //sleep(1000);
+        
+        //arm flip to hang
+        /*
         intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
-        sleep(1000);
-
-        //hang specimen on high chamber
-        Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
-                        .strafeTo(hangSpecimen)
-                        .build()
-        );
-        //slider.setInchPosition(23);
+        Logging.log("Wrist position for hang: %2f", intake.getWristPosition());
         sleep(400);
+        intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
+        sleep(1700);
+        //slider.setInchPosition(23);
+
+         */
+        sleep(2500);
         intake.setFingerPosition(intake.FINGER_OPEN);
-        sleep(1000);
+        sleep(300);
+        intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.1);
+        sleep(400);
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .lineToXConstantHeading(retractArm.x)
+                        .strafeToConstantHeading(grabNeutralSample)
+                        .afterTime(0.2, new armToPickUpPos())
                         .build()
         );
-        sleep(200);
         //slider.setInchPosition(0.0);
 
         //Pick up sample
-        Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
-                        .strafeTo(grabNeutralSample)
-                        .build()
-        );
+        /*
         sleep(500);
         intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE);
+        sleep(300);
         intake.setWristPosition(intake.WRIST_POS_GRAB_SAMPLE);
+        sleep(300);
+
+         */
+        sleep(300);
         intake.setFingerPosition(intake.FINGER_CLOSE);
-        sleep(200);
+        sleep(300);
         //slider.setInchPosition(5.0);
         sleep(200);
         intake.setArmPosition(intake.ARM_POS_LOW_BUCKET);
@@ -377,13 +383,14 @@ public class AutoLeft extends LinearOpMode {
         sleep(200);
         intake.setArmPosition(intake.ARM_POS_LOW_BUCKET);
         sleep(200);
+        intake.setWristPosition(intake.WRIST_POS_LOW_BUCKET);
+        sleep(200);
         intake.setFingerPosition(intake.FINGER_OPEN);
-
         sleep(200);
 
         //Go to ascent level 1
         //slider.setInchPosition(7.0);
-        intake.setFingerPosition(0.0);
+        //intake.setFingerPosition(0.0);
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .turnTo(Math.toRadians(90))
@@ -392,7 +399,8 @@ public class AutoLeft extends LinearOpMode {
         );
         //slider.setInchPosition(7.0);
         sleep(400);
-
+        intake.setArmPosition(intake.ARM_POS_PARKING);
+        intake.setWristPosition(intake.WRIST_POS_PARKING);
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .strafeTo(parkStepTwo)
@@ -662,6 +670,24 @@ public class AutoLeft extends LinearOpMode {
         logVector("robot drive: parking required", vParkPos);
 
          */
+    }
+
+    private class armFlipToHangAct implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
+            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+            return false;
+        }
+    }
+
+    private class armToPickUpPos implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE);
+            intake.setWristPosition(intake.WRIST_POS_GRAB_SAMPLE);
+            return false;
+        }
     }
 
 

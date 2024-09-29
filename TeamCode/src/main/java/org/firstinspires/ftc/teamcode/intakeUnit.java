@@ -96,9 +96,10 @@ public class intakeUnit
     //new stuff
     int ARM_POS_GRAB_SAMPLE;
     final double WRIST_POS_GRAB_SAMPLE = 0.362;
-    final double WRIST_POS_HIGH_CHAMBER = 0.466;
+    final double WRIST_POS_HIGH_CHAMBER = 0.556;
     final double WRIST_POS_LOW_BUCKET = 0.717;
-    final double FINGER_CLOSE = 0.0;
+    final double WRIST_POS_PARKING = 0.688;
+    final double FINGER_CLOSE = 0.08;
     final double FINGER_OPEN = 0.4;
     int ARM_MIN_COUNT_POS;
     int ARM_MAX_COUNT_POS;
@@ -106,6 +107,7 @@ public class intakeUnit
     int ARM_POS_AFTER_HANG;
     int ARM_POS_HIGH_CHAMBER;
     int ARM_POS_LOW_BUCKET = 1858;
+    int ARM_POS_PARKING = 832;
 
 
     /**
@@ -262,8 +264,8 @@ public class intakeUnit
     /*
     public void resetArmEncoder() {
         //sliderOneMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        setArmModeRunToPosition(0);
 
+        setArmModeRunToPosition(0);
         //Logging.log("Arm Motor mode = %s",  sliderOneMotor.getMode());
         //Logging.log("Arm Motor curr position = %d",  sliderOneMotor.getCurrentPosition());
         //Logging.log("Arm Motor target position = %d",  sliderOneMotor.getTargetPosition());
@@ -439,6 +441,6 @@ public class intakeUnit
         ARM_POS_GRAB_SAMPLE = 3736;
         ARM_POS_BEFORE_HANG = 973;
         ARM_POS_AFTER_HANG = 135;
-        ARM_POS_HIGH_CHAMBER = 2476;
+        ARM_POS_HIGH_CHAMBER = 2575;
     }
 }

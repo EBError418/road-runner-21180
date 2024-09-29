@@ -286,12 +286,12 @@ public class TeleopRR extends LinearOpMode {
             /*
             if (gpButtons.sliderUp){
                 //slider.setInchPosition(slider.getInchPosition() + 0.001);
-                slider.manualControlPos((gpButtons.sliderUpDowm));
+                slider.manualControlPos((gpButtons.sliderUpDown));
             }
 
             if (gpButtons.sliderDown){
                 //slider.setInchPosition(slider.getInchPosition() - 0.001);
-                slider.manualControlPos(gpButtons.sliderUpDowm);
+                slider.manualControlPos(gpButtons.sliderUpDown);
             }
 
              */
