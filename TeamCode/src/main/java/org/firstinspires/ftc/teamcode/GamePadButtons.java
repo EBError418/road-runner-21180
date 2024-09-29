@@ -57,8 +57,8 @@ public class GamePadButtons {
     public boolean speedCtrl;
     public boolean sliderUp;
 
-    //public float sliderUpDowm;
-    //public boolean sliderDown;
+    public float sliderUpDown;
+    public boolean sliderDown;
     public boolean armForwards;
     public boolean armBackwards;
     public boolean fingerOpen;
@@ -101,9 +101,9 @@ public class GamePadButtons {
         armBackwards = gamepad2.left_stick_y < 0;
 
         //slider
-        //sliderUp = gamepad2.right_stick_y > 0;
-        //sliderDown = gamepad2.right_stick_y < 0;
+        sliderUp = gamepad2.right_stick_y > 0;
+        sliderDown = gamepad2.right_stick_y < 0;
 
-        //sliderUpDowm  = gamepad2.right_stick_y;
+        sliderUpDown  = gamepad2.right_stick_y;
     }
 }
