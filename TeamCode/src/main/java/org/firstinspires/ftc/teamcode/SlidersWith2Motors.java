@@ -63,8 +63,10 @@ public class SlidersWith2Motors
     final double manualUpdatePos = COUNTS_PER_INCH / 0.75;
 
     // slider position variables
-    final int FOUR_STAGE_SLIDER_MAX_POS = 2600;
-    final int SLIDER_MIN_POS = 0;
+    final int FOUR_STAGE_SLIDER_MAX_POS = 0;
+    final int SLIDER_MIN_POS = -2000;
+    final int SLIDER_HIGH_CHAMBER_POS_ONE = -1700;
+    final int SLIDER_HIGH_CHAMBER_POS_TWO = -1400;
 
     /**
      * Init slider motors hardware, and set their behaviors.

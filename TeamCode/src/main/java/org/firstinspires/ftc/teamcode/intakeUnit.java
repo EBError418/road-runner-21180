@@ -157,11 +157,6 @@ public class intakeUnit
         //resetArmPositions(Params.armIntakeCount_InitFront);
     }
 
-    public void setArmServoPosition(int armPos) {
-        armPos = Range.clip(armPos, 0, 5000);
-        armMotor.setTargetPosition(armPos);
-    }
-
     public void setWristServoPosition(double wristPos){
         wristPos = Range.clip(wristPos, WRIST_SNAP_POSITION, SWITCH_LEFT_CLOSE_POS);
         wristServo.setPosition(wristPos);

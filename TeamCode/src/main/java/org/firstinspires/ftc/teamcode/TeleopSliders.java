@@ -85,7 +85,7 @@ public class TeleopSliders extends LinearOpMode {
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
 
-        GamePadButtons gpButtons = new GamePadButtons();
+        GamePadButtonsSliders gpButtons = new GamePadButtonsSliders();
 
         mecanum = new MecanumDrive(hardwareMap, Params.currentPose);
         mecanum.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -98,6 +98,12 @@ public class TeleopSliders extends LinearOpMode {
                 "Finger");
 
         slider = new SlidersWith2Motors();
+
+
+        slider.init(hardwareMap, "sliderRight", "sliderLeft");
+
+        slider.setCountPosition(slider.getPosition());
+        slider.runToPosition();
 
         //intake.setArmModeRunToPosition(intake.getArmPosition());
 
@@ -138,10 +144,7 @@ public class TeleopSliders extends LinearOpMode {
                     -gpButtons.robotTurn * maxDrivePower
             ));
 
-            slider.init(hardwareMap, "sliderRight", "sliderLeft");
-
-            slider.setCountPosition(slider.getPosition());
-            slider.runToPosition();
+            //slider.setCountPosition(slider.getPosition());
 
             /*
             // Set position only when button is hit.
@@ -285,41 +288,65 @@ public class TeleopSliders extends LinearOpMode {
              */
 
             if (gpButtons.sliderUp){
-                //slider.setInchPosition(slider.getInchPosition() + 0.001);
-                slider.manualControlPos((gpButtons.sliderUpDown));
+                slider.setInchPosition(slider.getInchPosition() - 4.5);
+                //slider.manualControlPos((gpButtons.sliderUpDown));
             }
 
             if (gpButtons.sliderDown){
-                //slider.setInchPosition(slider.getInchPosition() - 0.001);
-                slider.manualControlPos(gpButtons.sliderUpDown);
+                slider.setInchPosition(slider.getInchPosition() + 4.5);
+                //slider.manualControlPos(gpButtons.sliderUpDown);
             }
 
-
-
-            if (gpButtons.armBackwards) {
-                intake.setArmPosition(intake.getArmPosition() + 50);
-
+            if (gpButtons.sliderMin){
+                slider.setInchPosition(slider.FOUR_STAGE_SLIDER_MAX_POS);
+                sleep(2000);
             }
 
-            if (gpButtons.armForwards) {
-                intake.setArmPosition(intake.getArmPosition() - 50);
+            if (gpButtons.sliderMax){
+                slider.setInchPosition(slider.SLIDER_MIN_POS);
+            }
 
+            if (gpButtons.armForward) {
+                intake.setArmPosition(intake.getArmLeftPosition() - 0.008);
+            }
+
+            if (gpButtons.armBackward) {
+                intake.setArmPosition(intake.getArmRightPosition() + 0.008);
             }
 
             if (gpButtons.wristUp) {
-                intake.setWristPosition(intake.getWristPosition() + 0.002);
+                intake.setWristPosition(intake.getWristPosition() + 0.008);
             }
 
             if (gpButtons.wristDown) {
-                intake.setWristPosition(intake.getWristPosition() - 0.002);
+                intake.setWristPosition(intake.getWristPosition() - 0.008);
             }
 
+            //finger is on continuous mode
             if (gpButtons.fingerClose) {
-                intake.setFingerPosition(intake.FINGER_CLOSE);
+                intake.setFingerPosition(0.35);
+            }
+
+            if (gpButtons.fingerStop) {
+                intake.setFingerPosition(0.5);
             }
 
             if (gpButtons.fingerOpen) {
-                intake.setFingerPosition(intake.FINGER_OPEN);
+                intake.setFingerPosition(0.65);
+            }
+
+            if (gpButtons.pickupPos) {
+                intake.setFingerPosition(0.65);
+                intake.setWristPosition(intake.WRIST_POS_GRAB_SAMPLE);
+                intake.setArmPosition(0.432);
+                slider.setCountPosition(0);
+            }
+
+            if (gpButtons.highestPos) {
+                intake.setFingerPosition(0.35);
+                intake.setWristPosition(intake.WRIST_POS_GRAB_SAMPLE);
+                intake.setArmPosition(1.0);
+                slider.setCountPosition(-2000);
             }
 
             mecanum.updatePoseEstimate();
@@ -330,8 +357,11 @@ public class TeleopSliders extends LinearOpMode {
 
                 telemetry.addData("Wrist", "position %.3f", intake.getWristPosition());
 
-                telemetry.addData("Arm", "position = %.3f", (double)(intake.getArmPosition()));
+                telemetry.addData("ArmLeft", "position = %.3f", (double)(intake.getArmLeftPosition()));
+                telemetry.addData("ArmRight", "position = %.3f", (double)(intake.getArmRightPosition()));
 
+                telemetry.addData("sliderLeft", "position = %s", slider.LeftSliderMotor.getCurrentPosition());
+                telemetry.addData("sliderRight", "position = %s", slider.RightSliderMotor.getCurrentPosition());
 
                 //telemetry.addData("Finger", "position %.3f", intake.getFingerPosition());
 

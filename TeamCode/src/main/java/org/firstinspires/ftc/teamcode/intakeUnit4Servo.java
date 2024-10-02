@@ -30,7 +30,6 @@
 package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.Range;
@@ -94,9 +93,9 @@ public class intakeUnit4Servo
     int ARM_POS_INTAKE5;
 
     //new stuff
-    int ARM_POS_GRAB_SAMPLE;
-    final double WRIST_POS_GRAB_SAMPLE = 0.362;
-    final double WRIST_POS_HIGH_CHAMBER = 0.556;
+    double ARM_POS_GRAB_SAMPLE;
+    final double WRIST_POS_GRAB_SAMPLE = 0.4;
+    final double OLD_WRIST_POS_HIGH_CHAMBER = 0.556;
     final double WRIST_POS_LOW_BUCKET = 0.717;
     final double WRIST_POS_PARKING = 0.688;
     final double FINGER_CLOSE = 0.08;
@@ -105,9 +104,14 @@ public class intakeUnit4Servo
     int ARM_MAX_COUNT_POS;
     int ARM_POS_BEFORE_HANG;
     int ARM_POS_AFTER_HANG;
-    int ARM_POS_HIGH_CHAMBER;
+    double ARM_POS_HIGH_CHAMBER;
     int ARM_POS_LOW_BUCKET = 1858;
     int ARM_POS_PARKING = 832;
+    double WRIST_POS_HIGH_CHAMBER = 0.744;
+
+    //new arm servos
+    public Servo armLeftServo = null;
+    public Servo armRightServo = null;
 
     /**
      * This cont=structor is for new intake unit on new robot. It contains two arm servos,
@@ -150,6 +154,11 @@ public class intakeUnit4Servo
         wristServo.setDirection(Servo.Direction.FORWARD);
         sleep(200);
 
+        armLeftServo = hardwareMap.get(Servo.class, armLeftServoName);
+        armLeftServo.setDirection(Servo.Direction.FORWARD);
+        armRightServo = hardwareMap.get(Servo.class, armRightServoName);
+        armRightServo.setDirection(Servo.Direction.REVERSE);
+
 
 
         /*
@@ -164,10 +173,12 @@ public class intakeUnit4Servo
         //resetArmPositions(Params.armIntakeCount_InitFront);
     }
 
+    /*
     public void setArmServoPosition(int armPos) {
         armPos = Range.clip(armPos, 0, 5000);
         armMotor.setTargetPosition(armPos);
     }
+     */
 
     public void setWristServoPosition(double wristPos){
         wristPos = Range.clip(wristPos, WRIST_SNAP_POSITION, SWITCH_LEFT_CLOSE_POS);
@@ -256,15 +267,40 @@ public class intakeUnit4Servo
      * set the target position of arm servo motor
      * @param armPos the target position value for arm servo motor
      */
-    public void setArmPosition(double armPos) {
+    public void setArmMotorPosition(double armPos) {
         armMotor.setTargetPosition((int)(armPos));
     }
 
-
+    /*
     public void setArmModeRunToPosition(int armPos) {
         //setArmPosition(armPos);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armMotor.setPower(0.9);
+    }
+     */
+
+    public void setArmLeftPosition(double pos) {
+        //pos = Range.clip(pos, 0.0, 1.0);
+        armLeftServo.setPosition(pos);
+    }
+
+    public double getArmLeftPosition() {
+        return armLeftServo.getPosition();
+    }
+
+    public void setArmRightPosition(double pos) {
+        //pos = Range.clip(pos, 0.0, 1.0);
+        armRightServo.setPosition(pos);
+    }
+
+    public double getArmRightPosition() {
+        return armRightServo.getPosition();
+    }
+
+    public void setArmPosition(double pos) {
+        pos = Range.clip(pos, 0.15, 1.00);
+        setArmLeftPosition(pos);
+        setArmRightPosition(pos);
     }
 
 
@@ -393,9 +429,13 @@ public class intakeUnit4Servo
      * Get the arm servo motor current position value
      * @return the current arm servo motor position value
      */
+
+    /*
     public int getArmPosition() {
         return armMotor.getCurrentPosition();
     }
+
+     */
 
     /**
      * Get the wrist servo motor current position value
@@ -445,9 +485,9 @@ public class intakeUnit4Servo
         ARM_POS_INTAKE5 = ARM_POS_INTAKE - 126;
 
         //NEW STUFF
-        ARM_POS_GRAB_SAMPLE = 3736;
+        ARM_POS_GRAB_SAMPLE = 1.0;
         ARM_POS_BEFORE_HANG = 973;
         ARM_POS_AFTER_HANG = 135;
-        ARM_POS_HIGH_CHAMBER = 2575;
+        ARM_POS_HIGH_CHAMBER = 0.721;
     }
 }
