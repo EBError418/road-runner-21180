@@ -211,7 +211,7 @@ public class AutoLeft extends LinearOpMode {
         Params.blueOrRed = blueOrRed;
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist", "Finger");
-        //intake.setArmModeRunToPosition(intake.getArmPosition());
+        //intake.setArmModeRunToPosition(0);
 
         //slider = new SlidersWith2Motors();
 
@@ -310,21 +310,21 @@ public class AutoLeft extends LinearOpMode {
         Vector2d retractArm = new Vector2d(armFlip.x - Params.HALF_MAT, armFlip.y);
 
         //grab
-        Vector2d lowerArmForPickup = new Vector2d(- 3.5 * Params.HALF_MAT, 2 * Params.HALF_MAT);
-        Vector2d driveForwardToPickup = new Vector2d(- 3.29 * Params.HALF_MAT, 2.8 * Params.HALF_MAT);
+        Vector2d changeHeadingForPickup = new Vector2d(- 3.3 * Params.HALF_MAT, 2 * Params.HALF_MAT);
+        Vector2d driveForwardToPickup = new Vector2d(- 3.5 * Params.HALF_MAT, 2.8 * Params.HALF_MAT);
         Vector2d placeSample = new Vector2d(- 4.6 * Params.HALF_MAT, 4.6 * Params.HALF_MAT);
 
         //ascent level 1
         Vector2d parkStepOne = new Vector2d(- 4 * Params.HALF_MAT,  4 * Params.HALF_MAT);
         Vector2d parkStepTwo = new Vector2d(parkStepOne.x + 3 * Params.HALF_MAT, parkStepOne.y);
-        Vector2d parkStepThree = new Vector2d(parkStepTwo.x, 2 * Params.HALF_MAT);
+        Vector2d parkStepThree = new Vector2d(parkStepTwo.x, 1.8 * Params.HALF_MAT);
 
         //Go to position for arm flip and hang on high chamber
         Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
         Actions.runBlocking(
                 drive.actionBuilder(newStartPose)
+                        .afterTime(0.6, new armFlipToHangAct())
                         .strafeTo(armFlip)
-                        .afterTime(0.8, new armFlipToHangAct())
                         .build()
         );
         Logging.log("After arm flip pos wrist pos: %2f", intake.getWristPosition());
@@ -341,23 +341,26 @@ public class AutoLeft extends LinearOpMode {
         //slider.setInchPosition(23);
 
          */
-        sleep(2500);
+        sleep(2000);
         intake.setFingerPosition(intake.FINGER_OPEN);
+        //sleep(300);
+        //intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.08);
         sleep(300);
-        intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.04);
-        sleep(400);
+        intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 600);
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        .lineToXConstantHeading(retractArm.x)
-                        .turnTo(Math.toRadians(65))
-                        .strafeToConstantHeading(lowerArmForPickup)
-                        .afterTime(0.2, new armToPickUpPos())
+                        //.lineToXConstantHeading(retractArm.x)
+                        //.turnTo(Math.toRadians(70))
+                        .afterTime(0.4, new armToPickUpPos())
+                        //.strafeToConstantHeading(driveForwardToPickup)
+                        .splineTo(changeHeadingForPickup, Math.toRadians(58))
+                        .strafeTo(driveForwardToPickup)
                         .build()
         );
         //slider.setInchPosition(0.0);
 
         //Pick up sample
-
+        /*
         sleep(500);
         intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE);
         sleep(300);
@@ -369,6 +372,8 @@ public class AutoLeft extends LinearOpMode {
                         .afterTime(0.2, new armToPickUpPos())
                         .build()
         );
+         */
+
         sleep(300);
         intake.setFingerPosition(intake.FINGER_CLOSE);
         sleep(300);
@@ -399,20 +404,25 @@ public class AutoLeft extends LinearOpMode {
         //intake.setFingerPosition(0.0);
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        .turnTo(Math.toRadians(90))
-                        .strafeTo(parkStepOne)
+                        //.turnTo(Math.toRadians(90))
+                        //.strafeTo(parkStepOne)
+                        .splineToLinearHeading(new Pose2d(parkStepThree, Math.toRadians(90)), Math.toRadians(-90))
                         .build()
         );
         //slider.setInchPosition(7.0);
         sleep(400);
         intake.setArmPosition(intake.ARM_POS_PARKING);
         intake.setWristPosition(intake.WRIST_POS_PARKING);
+
+        /*
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .strafeTo(parkStepTwo)
                         .strafeTo(parkStepThree)
                         .build()
         );
+         */
+
         Logging.log("X position = %2f, Y position = %2f", drive.pose.position.x, drive.pose.position.y);
 
         /*

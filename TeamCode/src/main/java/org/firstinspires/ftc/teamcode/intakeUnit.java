@@ -94,18 +94,18 @@ public class intakeUnit
     int ARM_POS_INTAKE5;
 
     //new stuff
-    int ARM_POS_GRAB_SAMPLE;
-    final double WRIST_POS_GRAB_SAMPLE = 0.381;
+    int ARM_POS_GRAB_SAMPLE = 3700;
+    final double WRIST_POS_GRAB_SAMPLE = 0.431;
     final double WRIST_POS_HIGH_CHAMBER = 0.535;
     final double WRIST_POS_LOW_BUCKET = 0.717;
     final double WRIST_POS_PARKING = 0.688;
     final double FINGER_CLOSE = 0;
     final double FINGER_OPEN = 0.5;
-    int ARM_MIN_COUNT_POS;
-    int ARM_MAX_COUNT_POS;
-    int ARM_POS_BEFORE_HANG;
-    int ARM_POS_AFTER_HANG;
-    int ARM_POS_HIGH_CHAMBER;
+    int ARM_MIN_COUNT_POS = 3820;
+    int ARM_MAX_COUNT_POS = 0;
+    int ARM_POS_BEFORE_HANG = 973;
+    int ARM_POS_AFTER_HANG = 135;
+    int ARM_POS_HIGH_CHAMBER = 2570;
     int ARM_POS_LOW_BUCKET = 1858;
     int ARM_POS_PARKING = 832;
 
@@ -139,11 +139,9 @@ public class intakeUnit
         armMotor = hardwareMap.get(DcMotor.class, armServoName);
         armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        setArmPosition(ARM_POS_AUTO);
-
         setArmModeRunToPosition(0);
 
-        resetArmPositions(Params.armIntakeCount_InitFront);
+        //resetArmPositions(Params.armIntakeCount_InitFront);
 
         /*
         sliderOneMotor = hardwareMap.get(DcMotor.class, sliderOneMotorName);
@@ -250,7 +248,8 @@ public class intakeUnit
 
 
     public void setArmModeRunToPosition(int armPos) {
-        //setArmPosition(armPos);
+        armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setArmPosition(armPos);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armMotor.setPower(0.9);
     }
@@ -433,9 +432,9 @@ public class intakeUnit
         ARM_POS_INTAKE5 = ARM_POS_INTAKE - 126;
 
         //NEW STUFF
-        ARM_POS_GRAB_SAMPLE = 3836;
+        ARM_POS_GRAB_SAMPLE = 3676;
         ARM_POS_BEFORE_HANG = 973;
         ARM_POS_AFTER_HANG = 135;
-        ARM_POS_HIGH_CHAMBER = 2575;
+        ARM_POS_HIGH_CHAMBER = 2570;
     }
 }
