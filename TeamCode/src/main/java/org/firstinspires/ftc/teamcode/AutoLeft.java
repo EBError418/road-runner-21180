@@ -310,7 +310,8 @@ public class AutoLeft extends LinearOpMode {
         Vector2d retractArm = new Vector2d(armFlip.x - Params.HALF_MAT, armFlip.y);
 
         //grab
-        Vector2d grabNeutralSample = new Vector2d(- 4.5 * Params.HALF_MAT, 4 * Params.HALF_MAT);
+        Vector2d lowerArmForPickup = new Vector2d(- 3.5 * Params.HALF_MAT, 2 * Params.HALF_MAT);
+        Vector2d driveForwardToPickup = new Vector2d(- 3 * Params.HALF_MAT, 3.5 * Params.HALF_MAT);
         Vector2d placeSample = new Vector2d(- 4.2 * Params.HALF_MAT, 4.2 * Params.HALF_MAT);
 
         //ascent level 1
@@ -343,26 +344,31 @@ public class AutoLeft extends LinearOpMode {
         sleep(2500);
         intake.setFingerPosition(intake.FINGER_OPEN);
         sleep(300);
-        intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.1);
+        intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.02);
         sleep(400);
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .lineToXConstantHeading(retractArm.x)
-                        .strafeToConstantHeading(grabNeutralSample)
+                        .turnTo(Math.toRadians(65))
+                        .strafeToConstantHeading(lowerArmForPickup)
                         .afterTime(0.2, new armToPickUpPos())
                         .build()
         );
         //slider.setInchPosition(0.0);
 
         //Pick up sample
-        /*
+
         sleep(500);
         intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE);
         sleep(300);
         intake.setWristPosition(intake.WRIST_POS_GRAB_SAMPLE);
         sleep(300);
-
-         */
+        Actions.runBlocking(
+                drive.actionBuilder(drive.pose)
+                        .strafeToConstantHeading(driveForwardToPickup)
+                        .afterTime(0.2, new armToPickUpPos())
+                        .build()
+        );
         sleep(300);
         intake.setFingerPosition(intake.FINGER_CLOSE);
         sleep(300);
