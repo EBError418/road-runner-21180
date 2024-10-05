@@ -151,7 +151,7 @@ public class AutoLeft extends LinearOpMode {
                 //Params.HALF_MAT + (3 * Params.HALF_MAT - Params.CHASSIS_HALF_WIDTH) * frontOrBack,
                 Params.HALF_MAT + 2 * Params.HALF_MAT * frontOrBack,
                 Math.toRadians(90.0 + 90.0 * blueOrRed));
-        newStartPose = new Pose2d((-6 * Params.HALF_MAT + Params.CHASSIS_LENGTH / 2),(leftOrRight * 0 * Params.CHASSIS_HALF_WIDTH),0);
+        newStartPose = new Pose2d((-6 * Params.HALF_MAT + Params.CHASSIS_LENGTH / 2),(leftOrRight * Params.CHASSIS_HALF_WIDTH),0);
 
     }
 
@@ -306,13 +306,13 @@ public class AutoLeft extends LinearOpMode {
 
         //hang specimen
         //Vector2d hangSpecimen = new Vector2d(- 3.5 * Params.HALF_MAT, 0);
-        Vector2d armFlip = new Vector2d(-4.4 * Params.HALF_MAT, 0);
+        Vector2d armFlip = new Vector2d(-4.4 * Params.HALF_MAT, newStartPose.position.y);
         Vector2d retractArm = new Vector2d(armFlip.x - Params.HALF_MAT, armFlip.y);
 
         //grab
         Vector2d lowerArmForPickup = new Vector2d(- 3.5 * Params.HALF_MAT, 2 * Params.HALF_MAT);
-        Vector2d driveForwardToPickup = new Vector2d(- 3 * Params.HALF_MAT, 3.5 * Params.HALF_MAT);
-        Vector2d placeSample = new Vector2d(- 4.2 * Params.HALF_MAT, 4.2 * Params.HALF_MAT);
+        Vector2d driveForwardToPickup = new Vector2d(- 3.29 * Params.HALF_MAT, 2.8 * Params.HALF_MAT);
+        Vector2d placeSample = new Vector2d(- 4.6 * Params.HALF_MAT, 4.6 * Params.HALF_MAT);
 
         //ascent level 1
         Vector2d parkStepOne = new Vector2d(- 4 * Params.HALF_MAT,  4 * Params.HALF_MAT);
@@ -344,7 +344,7 @@ public class AutoLeft extends LinearOpMode {
         sleep(2500);
         intake.setFingerPosition(intake.FINGER_OPEN);
         sleep(300);
-        intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.02);
+        intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.04);
         sleep(400);
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
@@ -380,7 +380,7 @@ public class AutoLeft extends LinearOpMode {
         //place sample in bucket
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        .lineToXConstantHeading(placeSample.x)
+                        .strafeToConstantHeading(placeSample)
                         .turnTo(Math.toRadians(135))
                         .build()
         );
@@ -388,9 +388,9 @@ public class AutoLeft extends LinearOpMode {
         //slider.setInchPosition(40.0);
         sleep(200);
         intake.setArmPosition(intake.ARM_POS_LOW_BUCKET);
-        sleep(200);
+        sleep(300);
         intake.setWristPosition(intake.WRIST_POS_LOW_BUCKET);
-        sleep(200);
+        sleep(500);
         intake.setFingerPosition(intake.FINGER_OPEN);
         sleep(200);
 
@@ -692,6 +692,7 @@ public class AutoLeft extends LinearOpMode {
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE);
             intake.setWristPosition(intake.WRIST_POS_GRAB_SAMPLE);
+            intake.setFingerPosition(intake.FINGER_OPEN);
             return false;
         }
     }

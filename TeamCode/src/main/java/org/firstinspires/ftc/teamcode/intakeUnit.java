@@ -95,12 +95,12 @@ public class intakeUnit
 
     //new stuff
     int ARM_POS_GRAB_SAMPLE;
-    final double WRIST_POS_GRAB_SAMPLE = 0.361;
-    final double WRIST_POS_HIGH_CHAMBER = 0.525;
+    final double WRIST_POS_GRAB_SAMPLE = 0.381;
+    final double WRIST_POS_HIGH_CHAMBER = 0.535;
     final double WRIST_POS_LOW_BUCKET = 0.717;
     final double WRIST_POS_PARKING = 0.688;
-    final double FINGER_CLOSE = 0.08;
-    final double FINGER_OPEN = 0.4;
+    final double FINGER_CLOSE = 0;
+    final double FINGER_OPEN = 0.5;
     int ARM_MIN_COUNT_POS;
     int ARM_MAX_COUNT_POS;
     int ARM_POS_BEFORE_HANG;
@@ -250,7 +250,7 @@ public class intakeUnit
 
 
     public void setArmModeRunToPosition(int armPos) {
-        setArmPosition(armPos);
+        //setArmPosition(armPos);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armMotor.setPower(0.9);
     }
