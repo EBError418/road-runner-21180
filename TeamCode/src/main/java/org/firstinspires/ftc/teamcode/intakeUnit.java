@@ -94,7 +94,7 @@ public class intakeUnit
     int ARM_POS_INTAKE5;
 
     //new stuff
-    int ARM_POS_GRAB_SAMPLE = 3700;
+    int ARM_POS_GRAB_SAMPLE = 3715;
     final double WRIST_POS_GRAB_SAMPLE = 0.431;
     final double WRIST_POS_HIGH_CHAMBER = 0.535;
     final double WRIST_POS_LOW_BUCKET = 0.717;

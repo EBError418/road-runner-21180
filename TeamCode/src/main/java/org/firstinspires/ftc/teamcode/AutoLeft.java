@@ -311,8 +311,8 @@ public class AutoLeft extends LinearOpMode {
 
         //grab
         Vector2d changeHeadingForPickup = new Vector2d(- 3.5 * Params.HALF_MAT, 1.85 * Params.HALF_MAT);
-        Vector2d driveForwardToPickup = new Vector2d(- 3.5 * Params.HALF_MAT, 2.65 * Params.HALF_MAT);
-        Vector2d placeSample = new Vector2d(- 4.6 * Params.HALF_MAT, 4.6 * Params.HALF_MAT);
+        Vector2d driveForwardToPickup = new Vector2d(- 3.5 * Params.HALF_MAT, 2.55 * Params.HALF_MAT);
+        Vector2d placeSample = new Vector2d(- 4.7 * Params.HALF_MAT, 4.6 * Params.HALF_MAT);
 
         Vector2d splineThirdSample = new Vector2d(- 2.2 * Params.HALF_MAT, 3 * Params.HALF_MAT);
 
@@ -355,11 +355,11 @@ public class AutoLeft extends LinearOpMode {
         //place sample in bucket
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        .afterTime(0.2, new armToDropSampleAct())
+                        .afterTime(0.4, new armToDropSampleAct())
                         .splineToLinearHeading(new Pose2d(placeSample, Math.toRadians(135)), Math.toRadians(135))
                         .build()
         );
-        sleep(200);
+        sleep(400);
         intake.setFingerPosition(intake.FINGER_OPEN);
         sleep(200);
 
@@ -367,7 +367,7 @@ public class AutoLeft extends LinearOpMode {
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .afterTime(0.4, new armToPickUpPos())
-                        .splineToLinearHeading(new Pose2d(changeHeadingForPickup.x + 0.3 * Params.HALF_MAT, changeHeadingForPickup.y + 0.85 * Params.HALF_MAT, Math.toRadians(65)), Math.toRadians(90))
+                        .strafeToLinearHeading(new Vector2d(changeHeadingForPickup.x + 0.3 * Params.HALF_MAT, changeHeadingForPickup.y + 0.85 * Params.HALF_MAT), Math.toRadians(90))
                         .strafeTo(new Vector2d(driveForwardToPickup.x + 0.2 * Params.HALF_MAT, driveForwardToPickup.y + 0.85 * Params.HALF_MAT))
                         .build()
         );
@@ -380,29 +380,36 @@ public class AutoLeft extends LinearOpMode {
         //place second sample in bucket
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        .afterTime(0.2, new armToDropSampleAct())
+                        .afterTime(0.4, new armToDropSampleAct())
                         .splineToLinearHeading(new Pose2d(placeSample, Math.toRadians(135)), Math.toRadians(135))
                         .build()
         );
-        sleep(200);
+        sleep(400);
         intake.setFingerPosition(intake.FINGER_OPEN);
         sleep(200);
 
         //pick up third sample
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        .afterTime(0.3, new armToPickUpPos())
-                        .splineToLinearHeading(new Pose2d(splineThirdSample, Math.toRadians(90)), Math.toRadians(90))
+                        .afterTime(0.4, new armToPickUpPos())
+                        .strafeToLinearHeading(splineThirdSample, Math.toRadians(90))
+                        .strafeToConstantHeading(new Vector2d(splineThirdSample.x, splineThirdSample.y + 0.5 * Params.HALF_MAT))
+                        .build()
         );
+        sleep(100);
+        intake.setFingerPosition(intake.FINGER_CLOSE);
+        sleep(200);
+        intake.setArmPosition(intake.ARM_POS_LOW_BUCKET);
+        sleep(200);
 
         //place third sample in bucket
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        .afterTime(0.2, new armToDropSampleAct())
+                        .afterTime(0.4, new armToDropSampleAct())
                         .splineToLinearHeading(new Pose2d(placeSample, Math.toRadians(135)), Math.toRadians(135))
                         .build()
         );
-        sleep(200);
+        sleep(400);
         intake.setFingerPosition(intake.FINGER_OPEN);
         sleep(200);
 
