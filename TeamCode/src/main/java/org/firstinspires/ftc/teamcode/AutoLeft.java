@@ -307,12 +307,14 @@ public class AutoLeft extends LinearOpMode {
         //hang specimen
         //Vector2d hangSpecimen = new Vector2d(- 3.5 * Params.HALF_MAT, 0);
         Vector2d armFlip = new Vector2d(-4.4 * Params.HALF_MAT, newStartPose.position.y);
-        Vector2d retractArm = new Vector2d(armFlip.x - Params.HALF_MAT, armFlip.y);
+        //Vector2d retractArm = new Vector2d(armFlip.x - Params.HALF_MAT, armFlip.y);
 
         //grab
-        Vector2d changeHeadingForPickup = new Vector2d(- 3.3 * Params.HALF_MAT, 2 * Params.HALF_MAT);
-        Vector2d driveForwardToPickup = new Vector2d(- 3.5 * Params.HALF_MAT, 2.8 * Params.HALF_MAT);
+        Vector2d changeHeadingForPickup = new Vector2d(- 3.5 * Params.HALF_MAT, 1.85 * Params.HALF_MAT);
+        Vector2d driveForwardToPickup = new Vector2d(- 3.5 * Params.HALF_MAT, 2.65 * Params.HALF_MAT);
         Vector2d placeSample = new Vector2d(- 4.6 * Params.HALF_MAT, 4.6 * Params.HALF_MAT);
+
+        Vector2d splineThirdSample = new Vector2d(- 2.2 * Params.HALF_MAT, 3 * Params.HALF_MAT);
 
         //ascent level 1
         Vector2d parkStepOne = new Vector2d(- 4 * Params.HALF_MAT,  4 * Params.HALF_MAT);
@@ -329,90 +331,90 @@ public class AutoLeft extends LinearOpMode {
         );
         Logging.log("After arm flip pos wrist pos: %2f", intake.getWristPosition());
         Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
-        //sleep(1000);
-        
-        //arm flip to hang
-        /*
-        intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
-        Logging.log("Wrist position for hang: %2f", intake.getWristPosition());
-        sleep(400);
-        intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
         sleep(1700);
-        //slider.setInchPosition(23);
 
-         */
-        sleep(2000);
+        //release specimen and raise arm to clear high chamber
         intake.setFingerPosition(intake.FINGER_OPEN);
-        //sleep(300);
-        //intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.08);
-        sleep(300);
+        sleep(100);
         intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 600);
+
+        //Go to pick up neutral sample
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        //.lineToXConstantHeading(retractArm.x)
-                        //.turnTo(Math.toRadians(70))
                         .afterTime(0.4, new armToPickUpPos())
-                        //.strafeToConstantHeading(driveForwardToPickup)
                         .splineTo(changeHeadingForPickup, Math.toRadians(58))
                         .strafeTo(driveForwardToPickup)
                         .build()
         );
-        //slider.setInchPosition(0.0);
-
-        //Pick up sample
-        /*
-        sleep(500);
-        intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE);
-        sleep(300);
-        intake.setWristPosition(intake.WRIST_POS_GRAB_SAMPLE);
-        sleep(300);
-        Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
-                        .strafeToConstantHeading(driveForwardToPickup)
-                        .afterTime(0.2, new armToPickUpPos())
-                        .build()
-        );
-         */
-
-        sleep(300);
+        sleep(100);
         intake.setFingerPosition(intake.FINGER_CLOSE);
-        sleep(300);
-        //slider.setInchPosition(5.0);
         sleep(200);
         intake.setArmPosition(intake.ARM_POS_LOW_BUCKET);
-        sleep(500);
+        sleep(200);
 
         //place sample in bucket
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        .strafeToConstantHeading(placeSample)
-                        .turnTo(Math.toRadians(135))
+                        .afterTime(0.2, new armToDropSampleAct())
+                        .splineToLinearHeading(new Pose2d(placeSample, Math.toRadians(135)), Math.toRadians(135))
                         .build()
         );
-        sleep(500);
-        //slider.setInchPosition(40.0);
+        sleep(200);
+        intake.setFingerPosition(intake.FINGER_OPEN);
+        sleep(200);
+
+        //pick up second sample
+        Actions.runBlocking(
+                drive.actionBuilder(drive.pose)
+                        .afterTime(0.4, new armToPickUpPos())
+                        .splineToLinearHeading(new Pose2d(changeHeadingForPickup.x + 0.3 * Params.HALF_MAT, changeHeadingForPickup.y + 0.85 * Params.HALF_MAT, Math.toRadians(65)), Math.toRadians(90))
+                        .strafeTo(new Vector2d(driveForwardToPickup.x + 0.2 * Params.HALF_MAT, driveForwardToPickup.y + 0.85 * Params.HALF_MAT))
+                        .build()
+        );
+        sleep(100);
+        intake.setFingerPosition(intake.FINGER_CLOSE);
         sleep(200);
         intake.setArmPosition(intake.ARM_POS_LOW_BUCKET);
-        sleep(300);
-        intake.setWristPosition(intake.WRIST_POS_LOW_BUCKET);
-        sleep(500);
+        sleep(200);
+
+        //place second sample in bucket
+        Actions.runBlocking(
+                drive.actionBuilder(drive.pose)
+                        .afterTime(0.2, new armToDropSampleAct())
+                        .splineToLinearHeading(new Pose2d(placeSample, Math.toRadians(135)), Math.toRadians(135))
+                        .build()
+        );
+        sleep(200);
+        intake.setFingerPosition(intake.FINGER_OPEN);
+        sleep(200);
+
+        //pick up third sample
+        Actions.runBlocking(
+                drive.actionBuilder(drive.pose)
+                        .afterTime(0.3, new armToPickUpPos())
+                        .splineToLinearHeading(new Pose2d(splineThirdSample, Math.toRadians(90)), Math.toRadians(90))
+        );
+
+        //place third sample in bucket
+        Actions.runBlocking(
+                drive.actionBuilder(drive.pose)
+                        .afterTime(0.2, new armToDropSampleAct())
+                        .splineToLinearHeading(new Pose2d(placeSample, Math.toRadians(135)), Math.toRadians(135))
+                        .build()
+        );
+        sleep(200);
         intake.setFingerPosition(intake.FINGER_OPEN);
         sleep(200);
 
         //Go to ascent level 1
-        //slider.setInchPosition(7.0);
-        //intake.setFingerPosition(0.0);
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
-                        //.turnTo(Math.toRadians(90))
-                        //.strafeTo(parkStepOne)
-                        .splineToLinearHeading(new Pose2d(parkStepThree, Math.toRadians(90)), Math.toRadians(-90))
+                        .afterTime(0.2, new armToParkingAct())
+                        .splineToLinearHeading(new Pose2d(parkStepThree, Math.toRadians(-90)), Math.toRadians(-90))
                         .build()
         );
-        //slider.setInchPosition(7.0);
-        sleep(400);
-        intake.setArmPosition(intake.ARM_POS_PARKING);
-        intake.setWristPosition(intake.WRIST_POS_PARKING);
+        sleep(100);
+
 
         /*
         Actions.runBlocking(
@@ -688,6 +690,7 @@ public class AutoLeft extends LinearOpMode {
          */
     }
 
+    //action for arm flip to hang
     private class armFlipToHangAct implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
@@ -697,12 +700,33 @@ public class AutoLeft extends LinearOpMode {
         }
     }
 
+    //action for arm to pick up neutral sample
     private class armToPickUpPos implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE);
             intake.setWristPosition(intake.WRIST_POS_GRAB_SAMPLE);
             intake.setFingerPosition(intake.FINGER_OPEN);
+            return false;
+        }
+    }
+
+    //action for arm to reach out for parking
+    private class armToParkingAct implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            intake.setArmPosition(intake.ARM_POS_PARKING);
+            intake.setWristPosition(intake.WRIST_POS_PARKING);
+            return false;
+        }
+    }
+
+    //action for arm to drop sample
+    private class armToDropSampleAct implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            intake.setArmPosition(intake.ARM_POS_LOW_BUCKET);
+            intake.setWristPosition(intake.WRIST_POS_LOW_BUCKET);
             return false;
         }
     }
