@@ -94,9 +94,9 @@ public class intakeUnit
     int ARM_POS_INTAKE5;
 
     //new stuff
-    int ARM_POS_GRAB_SAMPLE = 3715;
-    final double WRIST_POS_GRAB_SAMPLE = 0.431;
-    final double WRIST_POS_HIGH_CHAMBER = 0.535;
+    int ARM_POS_GRAB_SAMPLE = 3725;
+    final double WRIST_POS_GRAB_SAMPLE = 0.446;
+    final double WRIST_POS_HIGH_CHAMBER = 0.550;
     final double WRIST_POS_LOW_BUCKET = 0.717;
     final double WRIST_POS_PARKING = 0.5;
     final double FINGER_CLOSE = 0;
@@ -105,7 +105,7 @@ public class intakeUnit
     int ARM_MAX_COUNT_POS = 0;
     int ARM_POS_BEFORE_HANG = 973;
     int ARM_POS_AFTER_HANG = 135;
-    int ARM_POS_HIGH_CHAMBER = 2570;
+    int ARM_POS_HIGH_CHAMBER = 2575;
     int ARM_POS_LOW_BUCKET = 1858;
     int ARM_POS_PARKING = 2050;
 

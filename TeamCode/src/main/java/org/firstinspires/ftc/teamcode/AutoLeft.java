@@ -314,7 +314,7 @@ public class AutoLeft extends LinearOpMode {
         Vector2d driveForwardToPickup = new Vector2d(- 3.5 * Params.HALF_MAT, 2.55 * Params.HALF_MAT);
         Vector2d placeSample = new Vector2d(- 4.7 * Params.HALF_MAT, 4.6 * Params.HALF_MAT);
 
-        Vector2d splineThirdSample = new Vector2d(- 2.2 * Params.HALF_MAT, 3 * Params.HALF_MAT);
+        Vector2d splineThirdSample = new Vector2d(- 2.5 * Params.HALF_MAT, 3 * Params.HALF_MAT);
 
         //ascent level 1
         Vector2d parkStepOne = new Vector2d(- 4 * Params.HALF_MAT,  4 * Params.HALF_MAT);
@@ -331,7 +331,7 @@ public class AutoLeft extends LinearOpMode {
         );
         Logging.log("After arm flip pos wrist pos: %2f", intake.getWristPosition());
         Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
-        sleep(1700);
+        sleep(1600);
 
         //release specimen and raise arm to clear high chamber
         intake.setFingerPosition(intake.FINGER_OPEN);
@@ -367,7 +367,7 @@ public class AutoLeft extends LinearOpMode {
         Actions.runBlocking(
                 drive.actionBuilder(drive.pose)
                         .afterTime(0.4, new armToPickUpPos())
-                        .strafeToLinearHeading(new Vector2d(changeHeadingForPickup.x + 0.3 * Params.HALF_MAT, changeHeadingForPickup.y + 0.85 * Params.HALF_MAT), Math.toRadians(90))
+                        .strafeToLinearHeading(new Vector2d(changeHeadingForPickup.x + 0.3 * Params.HALF_MAT, changeHeadingForPickup.y + 0.85 * Params.HALF_MAT), Math.toRadians(65))
                         .strafeTo(new Vector2d(driveForwardToPickup.x + 0.2 * Params.HALF_MAT, driveForwardToPickup.y + 0.85 * Params.HALF_MAT))
                         .build()
         );
@@ -393,7 +393,7 @@ public class AutoLeft extends LinearOpMode {
                 drive.actionBuilder(drive.pose)
                         .afterTime(0.4, new armToPickUpPos())
                         .strafeToLinearHeading(splineThirdSample, Math.toRadians(90))
-                        .strafeToConstantHeading(new Vector2d(splineThirdSample.x, splineThirdSample.y + 0.5 * Params.HALF_MAT))
+                        .strafeToConstantHeading(new Vector2d(splineThirdSample.x, splineThirdSample.y + 0.9 * Params.HALF_MAT))
                         .build()
         );
         sleep(100);
@@ -401,6 +401,11 @@ public class AutoLeft extends LinearOpMode {
         sleep(200);
         intake.setArmPosition(intake.ARM_POS_LOW_BUCKET);
         sleep(200);
+        Actions.runBlocking(
+                drive.actionBuilder(drive.pose)
+                        .strafeToConstantHeading(new Vector2d(splineThirdSample.x, splineThirdSample.y + 0.7 * Params.HALF_MAT))
+                        .build()
+        );
 
         //place third sample in bucket
         Actions.runBlocking(
