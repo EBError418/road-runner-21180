@@ -94,20 +94,23 @@ public class intakeUnit
     int ARM_POS_INTAKE5;
 
     //new stuff
-    int ARM_POS_GRAB_SAMPLE = 3725;
+    int ARM_POS_GRAB_SAMPLE = 3650;
     final double WRIST_POS_GRAB_SAMPLE = 0.446;
-    final double WRIST_POS_HIGH_CHAMBER = 0.550;
+    final double WRIST_POS_HIGH_CHAMBER = 0.545;
     final double WRIST_POS_LOW_BUCKET = 0.717;
     final double WRIST_POS_PARKING = 0.5;
+    final double WRIST_POS_OBS_ZONE = 0.4;
     final double FINGER_CLOSE = 0;
     final double FINGER_OPEN = 0.5;
     int ARM_MIN_COUNT_POS = 3820;
     int ARM_MAX_COUNT_POS = 0;
     int ARM_POS_BEFORE_HANG = 973;
     int ARM_POS_AFTER_HANG = 135;
-    int ARM_POS_HIGH_CHAMBER = 2575;
+    int ARM_POS_HIGH_CHAMBER = 2560;
     int ARM_POS_LOW_BUCKET = 1858;
     int ARM_POS_PARKING = 2050;
+    int ARM_POS_OBS_ZONE = 3350;
+
 
 
     /**
@@ -432,7 +435,7 @@ public class intakeUnit
         ARM_POS_INTAKE5 = ARM_POS_INTAKE - 126;
 
         //NEW STUFF
-        ARM_POS_GRAB_SAMPLE = 3676;
+        //ARM_POS_GRAB_SAMPLE = 3676;
         ARM_POS_BEFORE_HANG = 973;
         ARM_POS_AFTER_HANG = 135;
         ARM_POS_HIGH_CHAMBER = 2570;

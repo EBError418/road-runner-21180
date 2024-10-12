@@ -13,5 +13,6 @@ public class AutoRight extends AutoLeft {
     @Override
     public void setRobotLocation() {
         startLoc = 2;
+        leftOrRight = 1;
     }
 }
