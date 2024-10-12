@@ -63,8 +63,8 @@ public class SlidersWith2Motors
     final double manualUpdatePos = COUNTS_PER_INCH / 0.75;
 
     // slider position variables
-    final int FOUR_STAGE_SLIDER_MAX_POS = 0;
-    final int SLIDER_MIN_POS = -2000;
+    final int FOUR_STAGE_SLIDER_MAX_POS = -20;
+    final int SLIDER_MIN_POS = -2500;
     final int SLIDER_HIGH_CHAMBER_POS_ONE = -1700;
     final int SLIDER_HIGH_CHAMBER_POS_TWO = -1400;
 
@@ -84,6 +84,8 @@ public class SlidersWith2Motors
         /* slider motor control */
         LeftSliderMotor.setDirection(DcMotorSimple.Direction.REVERSE);
         RightSliderMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+
+        LeftSliderMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
     }
 
     /**

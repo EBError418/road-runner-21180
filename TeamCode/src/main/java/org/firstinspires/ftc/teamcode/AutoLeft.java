@@ -393,6 +393,7 @@ public class AutoLeft extends LinearOpMode {
                 drive.actionBuilder(drive.pose)
                         .afterTime(0.3, new armToPickUpPos())
                         .splineToLinearHeading(new Pose2d(splineThirdSample, Math.toRadians(90)), Math.toRadians(90))
+                        .build()
         );
 
         //place third sample in bucket

@@ -102,6 +102,8 @@ public class TeleopSliders extends LinearOpMode {
 
         slider.init(hardwareMap, "sliderRight", "sliderLeft");
 
+        slider.resetEncoders(); // should move this reset code to auto finally.
+
         slider.setCountPosition(slider.getPosition());
         slider.runToPosition();
 
