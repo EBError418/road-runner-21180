@@ -63,10 +63,10 @@ public class SlidersWith2Motors
     final double manualUpdatePos = COUNTS_PER_INCH / 0.75;
 
     // slider position variables
-    final int FOUR_STAGE_SLIDER_MAX_POS = -20;
-    final int SLIDER_MIN_POS = -2500;
-    final int SLIDER_HIGH_CHAMBER_POS_ONE = -1700;
-    final int SLIDER_HIGH_CHAMBER_POS_TWO = -1400;
+    final int FOUR_STAGE_SLIDER_MAX_POS = 0;
+    final int SLIDER_MIN_POS = 2500;
+    final int SLIDER_HIGH_CHAMBER_POS_ONE = 1700;
+    final int SLIDER_HIGH_CHAMBER_POS_TWO = 1400;
 
     /**
      * Init slider motors hardware, and set their behaviors.
@@ -82,10 +82,8 @@ public class SlidersWith2Motors
         LeftSliderMotor = hardwareMap.get(DcMotor.class, leftMotorName);
 
         /* slider motor control */
-        LeftSliderMotor.setDirection(DcMotorSimple.Direction.REVERSE);
-        RightSliderMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        LeftSliderMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        RightSliderMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        LeftSliderMotor.setDirection(DcMotorSimple.Direction.FORWARD);
     }
 
     /**
@@ -93,7 +91,7 @@ public class SlidersWith2Motors
      * @param sliderMotorPosition the target position for slider left motor and right motor.
      */
     public void setCountPosition(int sliderMotorPosition) {
-        sliderMotorPosition = Range.clip(sliderMotorPosition, SLIDER_MIN_POS, FOUR_STAGE_SLIDER_MAX_POS);
+        sliderMotorPosition = Range.clip(sliderMotorPosition, FOUR_STAGE_SLIDER_MAX_POS, SLIDER_MIN_POS);
         RightSliderMotor.setTargetPosition(sliderMotorPosition);
         LeftSliderMotor.setTargetPosition(sliderMotorPosition);
     }
