@@ -63,6 +63,11 @@ public class GamePadButtons {
     public boolean armBackwards;
     public boolean fingerOpen;
     public boolean fingerClose;
+    public boolean SpecimenPosOne;
+    public boolean SpecimenPosTwo;
+    public boolean SpecimenPosThree;
+
+    public boolean PickUpSpecimen;
 
     public void checkGamepadButtons(@NonNull Gamepad gamepad1, @NonNull Gamepad gamepad2) {
         //game pad 1 buttons
@@ -103,7 +108,12 @@ public class GamePadButtons {
         //slider
         sliderUp = gamepad2.right_stick_y > 0;
         sliderDown = gamepad2.right_stick_y < 0;
-
         sliderUpDown  = gamepad2.right_stick_y;
+
+        //specimen presets
+        SpecimenPosOne = gamepad1.right_trigger > 0;
+        SpecimenPosTwo = gamepad2.right_trigger > 0;
+        SpecimenPosThree = gamepad2.left_trigger > 0;
+        PickUpSpecimen = gamepad2.x;
     }
 }
