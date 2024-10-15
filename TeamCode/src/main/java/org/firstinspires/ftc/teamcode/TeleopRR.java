@@ -322,6 +322,26 @@ public class TeleopRR extends LinearOpMode {
                 intake.setFingerPosition(intake.FINGER_OPEN);
             }
 
+            if (gpButtons.SpecimenPosOne) {
+                intake.setArmPosition(intake.ARM_POS_BEFORE_HANG);
+                intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+            }
+
+            if (gpButtons.SpecimenPosTwo) {
+                intake.setArmPosition(intake.ARM_POS_BACK);
+                intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+            }
+
+            if (gpButtons.SpecimenPosThree) {
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
+                intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+            }
+
+            if (gpButtons.PickUpSpecimen) {
+                intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN);
+                intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN);
+            }
+
             mecanum.updatePoseEstimate();
             Params.currentPose = mecanum.pose;
             if (debugFlag) {
