@@ -322,22 +322,28 @@ public class TeleopRR extends LinearOpMode {
                 intake.setFingerPosition(intake.FINGER_OPEN);
             }
 
-            if (gpButtons.SpecimenPosOne) {
+            if (gpButtons.SpecimenAlignment) {
                 intake.setArmPosition(intake.ARM_POS_BEFORE_HANG);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
             }
 
-            if (gpButtons.SpecimenPosTwo) {
+            if (gpButtons.SpecimenHangAction) {
                 intake.setArmPosition(intake.ARM_POS_BACK);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
-            }
-
-            if (gpButtons.SpecimenPosThree) {
+                sleep(100);
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
             }
 
-            if (gpButtons.PickUpSpecimen) {
+            if (gpButtons.SpecimenPickupAction) {
+                intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.05);
+                sleep(100);
+                intake.setFingerPosition(intake.FINGER_CLOSE);
+                sleep(100);
+                intake.setArmPosition(intake.ARM_POS_BACK);
+            }
+
+            if (gpButtons.SpecimenPickupAlign) {
                 intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN);
                 intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN);
             }

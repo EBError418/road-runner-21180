@@ -81,8 +81,6 @@ public class intakeUnit
     final double WRIST_POS_REACH_FORWARD = 0.5;
 
     // slider motor variables
-    //public DcMotor sliderOneMotor = null;
-    //public DcMotor sliderTwoMotor = null;
     int ARM_POS_INTAKE = Params.armIntakeCount_InitFront;
     int ARM_POS_AUTO;
     int ARM_POS_READY_FOR_HANG;
@@ -99,14 +97,14 @@ public class intakeUnit
     final double WRIST_POS_LOW_BUCKET = 0.717;
     final double WRIST_POS_PARKING = 0.5;
     final double WRIST_POS_OBS_ZONE = 0.4;
-    final double WRIST_POS_GRAB_SPECIMEN = 0.500;
+    final double WRIST_POS_GRAB_SPECIMEN = 0.486;
 
     //finger
     final double FINGER_CLOSE = 0;
     final double FINGER_OPEN = 0.5;
 
     //arm
-    int ARM_POS_GRAB_SAMPLE = 3700;
+    int ARM_POS_GRAB_SAMPLE = 3650;
     int ARM_MIN_COUNT_POS = 3820;
     int ARM_MAX_COUNT_POS = 0;
     int ARM_POS_AFTER_HANG = 135;
@@ -114,9 +112,9 @@ public class intakeUnit
     int ARM_POS_LOW_BUCKET = 1858;
     int ARM_POS_PARKING = 2050;
     int ARM_POS_OBS_ZONE = 3350;
-    int ARM_POS_BACK = 300;
-    int ARM_POS_BEFORE_HANG = ARM_POS_HIGH_CHAMBER - 200;
-    int ARM_POS_GRAB_SPECIMEN = 500;
+    int ARM_POS_BACK = 900;
+    int ARM_POS_BEFORE_HANG = ARM_POS_HIGH_CHAMBER - 295;
+    int ARM_POS_GRAB_SPECIMEN = 3171;
 
 
     /**
