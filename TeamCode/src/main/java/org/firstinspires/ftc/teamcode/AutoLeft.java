@@ -389,7 +389,7 @@ public class AutoLeft extends LinearOpMode {
             sleep(400);
             intake.setFingerPosition(intake.FINGER_OPEN);
             sleep(200);
-
+            
             //pick up third sample
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
@@ -406,6 +406,7 @@ public class AutoLeft extends LinearOpMode {
                             .strafeToConstantHeading(splineThirdSample)
                             .build()
             );
+
 
             //place third sample in bucket
             Actions.runBlocking(
