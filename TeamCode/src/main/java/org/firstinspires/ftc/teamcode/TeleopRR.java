@@ -25,6 +25,10 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import androidx.annotation.NonNull;
+
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
@@ -109,9 +113,9 @@ public class TeleopRR extends LinearOpMode {
 
         //preset positions used for teleop commands
         Pose2d pickUpSpecimenPos = new Pose2d(- 4.5 * Params.HALF_MAT, - 6 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH, Math.toRadians(179.9998));
-        Vector2d hangSpecimenPos = new Vector2d(- 4.4 * Params.HALF_MAT, - Params.CHASSIS_HALF_WIDTH);
+        Vector2d hangSpecimenPos = new Vector2d(- 4.85 * Params.HALF_MAT, - Params.CHASSIS_HALF_WIDTH);
         Vector2d outOfSubPose = new Vector2d(- 5 * Params.HALF_MAT, - 3 * Params.HALF_MAT);
-        Vector2d pickupSamplePos = new Vector2d(- Params.HALF_MAT, - 3 * Params.HALF_MAT);
+        Vector2d pickupSamplePos = new Vector2d(- Params.HALF_MAT, - 4 * Params.HALF_MAT);
 
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Mode", "waiting for start: %s", (Params.blueOrRed > 0) ? "Blue" : "Red");
@@ -333,9 +337,9 @@ public class TeleopRR extends LinearOpMode {
 
             if (gpButtons.SpecimenHangAction) {
                 intake.setArmPosition(intake.ARM_POS_BACK);
-                sleep(400);
+                //sleep(2000);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
-                sleep(100);
+                sleep(2000);
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
             }
@@ -347,12 +351,13 @@ public class TeleopRR extends LinearOpMode {
                 intake.setFingerPosition(intake.FINGER_CLOSE);
                 sleep(250);
                 intake.setArmPosition(intake.ARM_POS_BEFORE_HANG);
-                intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
                 Actions.runBlocking(
                         drive.actionBuilder(pickUpSpecimenPos)
                                 .strafeToLinearHeading(hangSpecimenPos, 0)
                                 .build()
                 );
+                sleep(100);
+                intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
             }
 
             if (gpButtons.SpecimenPickupAlign) {
@@ -363,13 +368,16 @@ public class TeleopRR extends LinearOpMode {
 
             if (gpButtons.SubPickupPos) {
                 drive.pose = new Pose2d(hangSpecimenPos, 0);
-                intake.setArmPosition(intake.ARM_POS_BACK);
+                intake.setWristPosition(0.250);
+                sleep(400);
                 Actions.runBlocking(
                         drive.actionBuilder(new Pose2d(hangSpecimenPos, 0))
                                 .strafeToConstantHeading(outOfSubPose)
                                 .splineToLinearHeading(new Pose2d(pickupSamplePos, Math.toRadians(90)), Math.toRadians(60))
+                                .afterTime(0.6, new armPickupFromSub())
                                 .build()
                 );
+
             }
 
             drive.updatePoseEstimate();
@@ -541,5 +549,27 @@ public class TeleopRR extends LinearOpMode {
         logRobotHeading("after moving to back area");
         logVector("robot drive: arrive back area, drive pose", drive.pose.position);
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+    }
+
+    /*
+    //action for arm to retract when backing up
+    private class armBackUpAct implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            intake.setArmPosition(intake.ARM_POS_BACK);
+            return false;
+        }
+    }
+
+     */
+
+    //action for arm to pick up from sub
+    private class armPickupFromSub implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            intake.setArmPosition(intake.ARM_POS_SUB);
+            intake.setWristPosition(intake.WRIST_POS_SUB);
+            return false;
+        }
     }
 }
