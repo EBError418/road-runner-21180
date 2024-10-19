@@ -97,7 +97,7 @@ public class intakeUnit
     final double WRIST_POS_LOW_BUCKET = 0.717;
     final double WRIST_POS_PARKING = 0.5;
     final double WRIST_POS_OBS_ZONE = 0.4;
-    final double WRIST_POS_GRAB_SPECIMEN = 0.486;
+    final double WRIST_POS_GRAB_SPECIMEN = 0.43;
 
     //finger
     final double FINGER_CLOSE = 0;
@@ -114,7 +114,7 @@ public class intakeUnit
     int ARM_POS_OBS_ZONE = 3350;
     int ARM_POS_BACK = 900;
     int ARM_POS_BEFORE_HANG = ARM_POS_HIGH_CHAMBER - 295;
-    int ARM_POS_GRAB_SPECIMEN = 3171;
+    int ARM_POS_GRAB_SPECIMEN = 3200;
 
 
     /**

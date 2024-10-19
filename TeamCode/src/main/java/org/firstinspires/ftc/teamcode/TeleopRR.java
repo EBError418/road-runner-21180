@@ -97,9 +97,8 @@ public class TeleopRR extends LinearOpMode {
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
                 "Finger");
 
-        //slider = new SlidersWith2Motors();
-
         //intake.setArmModeRunToPosition(intake.getArmPosition());
+        intake.setArmModeRunToPosition(0);
 
         // bulk reading setting - auto refresh mode
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
@@ -329,6 +328,7 @@ public class TeleopRR extends LinearOpMode {
 
             if (gpButtons.SpecimenHangAction) {
                 intake.setArmPosition(intake.ARM_POS_BACK);
+                sleep(400);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
                 sleep(100);
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
@@ -336,16 +336,17 @@ public class TeleopRR extends LinearOpMode {
             }
 
             if (gpButtons.SpecimenPickupAction) {
-                intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.05);
-                sleep(100);
+                intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.04);
+                sleep(250);
                 intake.setFingerPosition(intake.FINGER_CLOSE);
-                sleep(100);
+                sleep(250);
                 intake.setArmPosition(intake.ARM_POS_BACK);
             }
 
             if (gpButtons.SpecimenPickupAlign) {
                 intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN);
                 intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN);
+                intake.setFingerPosition(intake.FINGER_OPEN);
             }
 
             mecanum.updatePoseEstimate();
