@@ -55,19 +55,23 @@ public class GamePadButtons {
     public boolean wristUp;
     public boolean wristDown;
     public boolean speedCtrl;
-    public boolean sliderUp;
 
+    public boolean sliderUp;
     public float sliderUpDown;
     public boolean sliderDown;
+
     public boolean armForwards;
     public boolean armBackwards;
+
     public boolean fingerOpen;
     public boolean fingerClose;
-    public boolean SpecimenAlignment;
-    public boolean SpecimenHangAction;
-    public boolean SpecimenPickupAction;
 
+    public boolean SpecimenHangAlign;
+    public boolean SpecimenHangAction;
+
+    public boolean SpecimenPickupAction;
     public boolean SpecimenPickupAlign;
+    public boolean SubPickupPos;
 
     public void checkGamepadButtons(@NonNull Gamepad gamepad1, @NonNull Gamepad gamepad2) {
         //game pad 1 buttons
@@ -111,9 +115,11 @@ public class GamePadButtons {
         sliderUpDown  = gamepad2.right_stick_y;
 
         //specimen presets
-        SpecimenAlignment = gamepad1.right_trigger > 0 || gamepad2.right_trigger > 0;
+        SpecimenHangAlign = gamepad1.right_trigger > 0 || gamepad2.right_trigger > 0;
         SpecimenHangAction = gamepad1.y;
         SpecimenPickupAction = gamepad1.left_trigger > 0 || gamepad2.left_trigger > 0;
         SpecimenPickupAlign = gamepad1.x;
+
+        SubPickupPos = gamepad1.dpad_up;
     }
 }

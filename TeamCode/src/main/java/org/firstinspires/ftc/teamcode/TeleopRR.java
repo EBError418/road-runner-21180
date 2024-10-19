@@ -25,6 +25,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
@@ -64,7 +65,7 @@ public class TeleopRR extends LinearOpMode {
     private final ElapsedTime runtime = new ElapsedTime();
 
     // chassis
-    MecanumDrive mecanum;
+    MecanumDrive drive;
 
     //claw and arm unit
     private intakeUnit intake;
@@ -87,8 +88,8 @@ public class TeleopRR extends LinearOpMode {
 
         GamePadButtons gpButtons = new GamePadButtons();
 
-        mecanum = new MecanumDrive(hardwareMap, Params.currentPose);
-        mecanum.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        drive = new MecanumDrive(hardwareMap, Params.currentPose);
+        drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         //tag = new AprilTagTest(mecanum, hardwareMap, 0, "Webcam 1");
 
@@ -106,7 +107,11 @@ public class TeleopRR extends LinearOpMode {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
 
-
+        //preset positions used for teleop commands
+        Pose2d pickUpSpecimenPos = new Pose2d(- 4.5 * Params.HALF_MAT, - 6 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH, Math.toRadians(179.9998));
+        Vector2d hangSpecimenPos = new Vector2d(- 4.4 * Params.HALF_MAT, - Params.CHASSIS_HALF_WIDTH);
+        Vector2d outOfSubPose = new Vector2d(- 5 * Params.HALF_MAT, - 3 * Params.HALF_MAT);
+        Vector2d pickupSamplePos = new Vector2d(- Params.HALF_MAT, - 3 * Params.HALF_MAT);
 
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Mode", "waiting for start: %s", (Params.blueOrRed > 0) ? "Blue" : "Red");
@@ -129,7 +134,7 @@ public class TeleopRR extends LinearOpMode {
             } else {
                 maxDrivePower = Params.POWER_NORMAL;
             }
-            mecanum.setDrivePowers(new PoseVelocity2d(
+            drive.setDrivePowers(new PoseVelocity2d(
                     new Vector2d(
                             -gpButtons.robotDrive * maxDrivePower,
                             -gpButtons.robotStrafe * maxDrivePower
@@ -321,7 +326,7 @@ public class TeleopRR extends LinearOpMode {
                 intake.setFingerPosition(intake.FINGER_OPEN);
             }
 
-            if (gpButtons.SpecimenAlignment) {
+            if (gpButtons.SpecimenHangAlign) {
                 intake.setArmPosition(intake.ARM_POS_BEFORE_HANG);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
             }
@@ -336,11 +341,18 @@ public class TeleopRR extends LinearOpMode {
             }
 
             if (gpButtons.SpecimenPickupAction) {
+                drive.pose = pickUpSpecimenPos;
                 intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.04);
                 sleep(250);
                 intake.setFingerPosition(intake.FINGER_CLOSE);
                 sleep(250);
-                intake.setArmPosition(intake.ARM_POS_BACK);
+                intake.setArmPosition(intake.ARM_POS_BEFORE_HANG);
+                intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+                Actions.runBlocking(
+                        drive.actionBuilder(pickUpSpecimenPos)
+                                .strafeToLinearHeading(hangSpecimenPos, 0)
+                                .build()
+                );
             }
 
             if (gpButtons.SpecimenPickupAlign) {
@@ -349,8 +361,19 @@ public class TeleopRR extends LinearOpMode {
                 intake.setFingerPosition(intake.FINGER_OPEN);
             }
 
-            mecanum.updatePoseEstimate();
-            Params.currentPose = mecanum.pose;
+            if (gpButtons.SubPickupPos) {
+                drive.pose = new Pose2d(hangSpecimenPos, 0);
+                intake.setArmPosition(intake.ARM_POS_BACK);
+                Actions.runBlocking(
+                        drive.actionBuilder(new Pose2d(hangSpecimenPos, 0))
+                                .strafeToConstantHeading(outOfSubPose)
+                                .splineToLinearHeading(new Pose2d(pickupSamplePos, Math.toRadians(90)), Math.toRadians(60))
+                                .build()
+                );
+            }
+
+            drive.updatePoseEstimate();
+            Params.currentPose = drive.pose;
             if (debugFlag) {
                 // claw arm servo log
                 telemetry.addData("Finger", "position %.3f", intake.getFingerPosition());
@@ -370,9 +393,9 @@ public class TeleopRR extends LinearOpMode {
 
 
 
-                telemetry.addData("heading", " %.3f", Math.toDegrees(mecanum.pose.heading.log()));
+                telemetry.addData("heading", " %.3f", Math.toDegrees(drive.pose.heading.log()));
 
-                telemetry.addData("location", " %s", mecanum.pose.position.toString());
+                telemetry.addData("location", " %s", drive.pose.position.toString());
 
                 //telemetry.addData("motor velocity = ", " %.3f", mecanum.leftFront.getVelocity());
 
@@ -474,7 +497,7 @@ public class TeleopRR extends LinearOpMode {
     */
 
     private void logRobotHeading(String sTag) {
-        Logging.log("%s drive.pose: %.2f", sTag, Math.toDegrees(mecanum.pose.heading.log()));
+        Logging.log("%s drive.pose: %.2f", sTag, Math.toDegrees(drive.pose.heading.log()));
         //Logging.log("%s imu: %.2f", sTag, mecanum.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) - Math.toDegrees(Params.startPose.heading.log()));
     }
 
@@ -482,41 +505,41 @@ public class TeleopRR extends LinearOpMode {
         intake.underTheBeam();
         sleep(300); // make sure arm is out of camera sight
 
-        mecanum.updatePoseEstimate();
-        mecanum.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        drive.updatePoseEstimate();
+        drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        logVector("robot drive: current drive pose", mecanum.pose.position);
+        logVector("robot drive: current drive pose", drive.pose.position);
         logRobotHeading("before moving to back area");
 
-        double turnAngle = -mecanum.pose.heading.log() - Math.PI / 2.0;
+        double turnAngle = -drive.pose.heading.log() - Math.PI / 2.0;
         turnAngle = (Math.abs(turnAngle) > Math.PI)? (turnAngle - Math.signum(turnAngle) * 2 * Math.PI) :  turnAngle;
         // shift to AprilTag
         Actions.runBlocking(
-                mecanum.actionBuilder(mecanum.pose)
+                drive.actionBuilder(drive.pose)
                         .turn(turnAngle)
-                        .lineToYLinearHeading(mecanum.pose.position.y - moveDistance, -Math.PI / 2.0)
+                        .lineToYLinearHeading(drive.pose.position.y - moveDistance, -Math.PI / 2.0)
                         .build()
         );
         logRobotHeading("after moving to back area");
-        logVector("robot drive: arrive back area, drive pose", mecanum.pose.position);
-        mecanum.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        logVector("robot drive: arrive back area, drive pose", drive.pose.position);
+        drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 
     private void moveBack(double moveDistance) {
-        mecanum.updatePoseEstimate();
-        mecanum.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        drive.updatePoseEstimate();
+        drive.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        logVector("robot drive: current drive pose", mecanum.pose.position);
+        logVector("robot drive: current drive pose", drive.pose.position);
         logRobotHeading("before moving to back area");
 
         // shift to AprilTag
         Actions.runBlocking(
-                mecanum.actionBuilder(mecanum.pose)
-                        .lineToYLinearHeading(mecanum.pose.position.y + moveDistance, -Math.PI / 2.0)
+                drive.actionBuilder(drive.pose)
+                        .lineToYLinearHeading(drive.pose.position.y + moveDistance, -Math.PI / 2.0)
                         .build()
         );
         logRobotHeading("after moving to back area");
-        logVector("robot drive: arrive back area, drive pose", mecanum.pose.position);
-        mecanum.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        logVector("robot drive: arrive back area, drive pose", drive.pose.position);
+        drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
     }
 }
