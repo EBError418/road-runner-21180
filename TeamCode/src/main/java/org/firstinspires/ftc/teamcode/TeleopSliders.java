@@ -184,7 +184,7 @@ public class TeleopSliders extends LinearOpMode {
             }
 
             if (gpButtons.fingerOpen) {
-                intake.setFingerPosition(0.65);
+                intake.setFingerPosition(0.9);
             }
 
             if (gpButtons.pickupPos) {
