@@ -102,18 +102,16 @@ public class TeleopSliders extends LinearOpMode {
 
         slider.init(hardwareMap, "sliderRight", "sliderLeft");
 
-        slider.setCountPosition(slider.getPosition());
-        slider.runToPosition();
+        slider.resetEncoders(); // should move this reset code to auto finally.
 
-        //intake.setArmModeRunToPosition(intake.getArmPosition());
+        //slider.setCountPosition(slider.getPosition());
+        //slider.runToPosition();
 
         // bulk reading setting - auto refresh mode
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
-
-
 
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Mode", "waiting for start: %s", (Params.blueOrRed > 0) ? "Blue" : "Red");
@@ -144,165 +142,19 @@ public class TeleopSliders extends LinearOpMode {
                     -gpButtons.robotTurn * maxDrivePower
             ));
 
-            //slider.setCountPosition(slider.getPosition());
-
-            /*
-            // Set position only when button is hit.
-            if (gpButtons.wristDown) {
-                intake.wristDown();
-            }
-
-            // Set position only when button is hit.
-            if (gpButtons.wristUp) {
-                intake.wristUp();
-            }
-
-            if (gpButtons.fingerOuttake) {
-                intake.fingerOuttake();
-            }
-
-            if (gpButtons.fingerStop) {
-                intake.fingerStop();
-            }
-
-            if (gpButtons.fingerIntake) {
-                intake.fingerIntake();
-            }
-
-            if (!gpButtons.speedCtrl) {
-                if (gpButtons.armUp) {
-                    intake.armLiftAcc();
-                }
-
-                if (gpButtons.armDown) {
-                    intake.armDownAcc();
-                }
-            } else {
-                if (gpButtons.armUp) {
-                    intake.armUp();
-                }
-
-                if (gpButtons.armDown) {
-                    intake.armDown();
-                }
-            }
-
-            if (gpButtons.armBeamPosition) {
-                intake.underTheBeamIntake();
-            }
-
-            if (gpButtons.readyToIntake) {
-                intake.intakePositions(intake.ARM_POS_INTAKE);
-            }
-            if (gpButtons.readyToIntake2nd) {
-                intake.intakePositions(intake.ARM_POS_INTAKE2);
-            }
-            if (gpButtons.readyToIntake3rd) {
-                intake.intakePositions(intake.ARM_POS_INTAKE3);
-            }
-            if (gpButtons.readyToIntake4th) {
-                intake.intakePositions(intake.ARM_POS_INTAKE4);
-            }
-
-            if (gpButtons.readyToIntake5th) {
-                intake.intakePositions(intake.ARM_POS_INTAKE5);
-            }
-            if (gpButtons.switchOpen) {
-                intake.fingerServoOpen();
-            }
-
-            if (gpButtons.dropAndBack) {
-                intake.fingerServoOpen();
-                moveBack(Params.HALF_MAT * 1.5);
-            }
-
-            if(gpButtons.lowDropPos){
-                intake.readyToDropYellow(intake.ARM_POS_DROP_YELLOW);
-            }
-
-            if (gpButtons.switchDropRight) {
-                intake.switchServoDropRight();
-            }
-
-            if(gpButtons.switchDropLeft){
-                intake.switchServoDropLeft();
-            }
-
-            if (gpButtons.switchClose) {
-                intake.switchServoClose();
-            }
-
-            if (gpButtons.readyToDrop) {
-                intake.dropPositions();
-            }
-
-            if (gpButtons.readyToHang) {
-                intake.setArmCountPosition(intake.ARM_POS_READY_FOR_HANG);
-            }
-
-            if (gpButtons.hangingRobot) {
-                intake.hangingRobot();
-            }
-
-            if (gpButtons.droneLaunch) {
-                DroneServo.setPosition(Params.DRONE_LAUNCH);
-            }
-
-            if (gpButtons.moveToLeftTag) {
-                moveByAprilTag_new(1 + ((Params.blueOrRed > 0) ? 0 : 3));
-
-            }
-
-            if (gpButtons.moveToCenterTag) {
-                moveByAprilTag_new(2 + ((Params.blueOrRed > 0)? 0 : 3));
-            }
-
-            if (gpButtons.moveToRightTag) {
-                moveByAprilTag_new(3 + ((Params.blueOrRed > 0) ? 0 : 3));
-            }
-
-            if (gpButtons.goThroughGate) {
-                moveForward(6 * Params.HALF_MAT);
-            }
-
-            if (gpButtons.moveToFront) {
-                lineWithAprilTag(2 + ((Params.blueOrRed > 0) ? 0 : 3));
-            }
-
-            if (gpButtons.armReset) {
-                intake.resetArmPositions(intake.getArmPosition());
-            }
-
-            if (gpButtons.setPos) {
-                intake.movingPixelPosition();
-            }
-
-            if (gpButtons.testDropYellow) {
-                intake.readyToDropYellow(intake.ARM_POS_DROP_YELLOW);
-            }
-
-            if (gpButtons.testDropWhite) {
-                intake.dropWhitePositions();
-            }
-
-             */
-
             if (gpButtons.sliderUp){
-                slider.setInchPosition(slider.getInchPosition() - 4.5);
-                //slider.manualControlPos((gpButtons.sliderUpDown));
+                slider.setInchPosition(slider.getInchPosition() + 4.0);
             }
 
             if (gpButtons.sliderDown){
-                slider.setInchPosition(slider.getInchPosition() + 4.5);
-                //slider.manualControlPos(gpButtons.sliderUpDown);
+                slider.setInchPosition(slider.getInchPosition() - 4.0);
+            }
+
+            if (gpButtons.sliderMax ){
+                slider.setInchPosition(slider.FOUR_STAGE_SLIDER_MAX_POS);
             }
 
             if (gpButtons.sliderMin){
-                slider.setInchPosition(slider.FOUR_STAGE_SLIDER_MAX_POS);
-                sleep(2000);
-            }
-
-            if (gpButtons.sliderMax){
                 slider.setInchPosition(slider.SLIDER_MIN_POS);
             }
 
@@ -380,6 +232,7 @@ public class TeleopSliders extends LinearOpMode {
                 //telemetry.addData("motor velocity = ", " %.3f", mecanum.leftFront.getVelocity());
 
                 telemetry.update(); // update message at the end of while loop
+
 
             }
 
