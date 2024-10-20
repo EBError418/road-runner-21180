@@ -73,27 +73,10 @@ import java.util.List;
 @Autonomous(name="Left side auto", group="Concept")
 //@Disabled
 public class AutoLeft extends LinearOpMode {
-
-    /** 1 for Red Front, 2 for Red back, 3 for Blue Front, and 4 for Blue back
-     */
-    public int startLoc = 1;
-    /** blue: 1; red: -1
-     */
-    private int blueOrRed = 1; // blue: 1; red: -1
-    /** front: 1; back -1
-     */
-    private int frontOrBack = 1; // front: 1; back -1
     /**
-     * Parking location: "1" - right of backdrop; "-1" - left of backdrop.
+     * Robot Start location: "1" - right side; "-1" - left side.
      */
-    public int leftOrRight = -1; // -1) means the robot parks near the blue side no matter the autonomous, right(1) is the opposite
-    /**
-     * blue: 1,2,3; red: 4,5,6
-     */
-    private int desiredTagNum = 0; // blue: 1,2,3; red: 4,5,6
-    private int checkStatus = 1;
-    final private double BUCKET_SHIFT = 2.0; // yellow pixel is in the right bucket.
-    // USE LATER: boolean debug_flag = true;
+    public int leftOrRight = -1;
 
     // Declare OpMode members.
     private final ElapsedTime runtime = new ElapsedTime();
@@ -102,57 +85,24 @@ public class AutoLeft extends LinearOpMode {
     //private SlidersWith2Motors slider;
     private MecanumDrive drive;
 
-    private Servo DroneServo;
-
-    // camera and sleeve color
-    ObjectDetection.PropSide propLocation = ObjectDetection.PropSide.UNKNOWN;
-    ObjectDetection propDetect;
-    OpenCvCamera camera;
-    String webcamName = "Webcam 1";
-    boolean isCameraInstalled = true;
-    // sensing april tag tools
-    private AprilTagTest tag = null;
-
-    // road runner variables
-    Pose2d startPose;
     Pose2d newStartPose;
-
-    final int WAIT_ALLIANCE_SECONDS = 6;
 
     /**
      * Set robot starting location on the field:
      * 1 for Red Front, 2 for Red back, 3 for Blue Front, and 4 for Blue back
      */
     public void setRobotLocation() {
-        startLoc = 1;
         leftOrRight = -1;
     }
 
     /**
      * Set robot starting position, and blueOrRed, frontOrBack variables:
-     * @param startLocation : the value of robot location in the field.
-     *                      1 for Red Front, 2 for Red back,
-     *                      3 for Blue Front, and 4 for Blue back
+     * @param leftRight : the value of robot location in the field.
+     *                      -1 for left, -1 for left,
      */
-    private void setStartPoses(int startLocation) {
+    private void setStartPoses(int leftRight) {
         // road runner variables
-        switch(startLocation) {
-            case 1: // left
-                leftOrRight = -1;
-                break;
-
-            case 2: // right
-                leftOrRight = 1;
-                break;
-
-
-        }
-        startPose = new Pose2d((6 * Params.HALF_MAT - Params.CHASSIS_HALF_LENGTH - Params.CHASSIS_START_EXTRA) * blueOrRed,
-                //Params.HALF_MAT + (3 * Params.HALF_MAT - Params.CHASSIS_HALF_WIDTH) * frontOrBack,
-                Params.HALF_MAT + 2 * Params.HALF_MAT * frontOrBack,
-                Math.toRadians(90.0 + 90.0 * blueOrRed));
-        newStartPose = new Pose2d((-6 * Params.HALF_MAT + Params.CHASSIS_LENGTH / 2),(- leftOrRight * Params.CHASSIS_HALF_WIDTH),0);
-
+        newStartPose = new Pose2d((-6 * Params.HALF_MAT + Params.CHASSIS_LENGTH / 2),(-leftRight * Params.CHASSIS_HALF_WIDTH),0.0);
     }
 
     @Override
@@ -162,61 +112,21 @@ public class AutoLeft extends LinearOpMode {
 
         setRobotLocation();
 
-        setStartPoses(startLoc);
+        setStartPoses(leftOrRight);
 
         // use slow mode if starting from front
-        updateProfileAccel(frontOrBack > 0);
-
-        int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier(
-                "cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-
-        propDetect = new ObjectDetection();
-
-        if (startLoc <= 2) {
-            propDetect.setColorFlag(ObjectDetection.ColorS.RED);
-        } else {
-            propDetect.setColorFlag(ObjectDetection.ColorS.BLUE);
-        }
-
-        if (isCameraInstalled) {
-            //camera = OpenCvCameraFactory.getInstance().createWebcam(hardwareMap.get(
-                    //WebcamName.class, webcamName), cameraMonitorViewId);
-
-            //camera.setPipeline(propDetect);
-
-            /*camera.openCameraDeviceAsync(new OpenCvCamera.AsyncCameraOpenListener() {
-                @Override
-                public void onOpened() {
-                    camera.startStreaming(320, 240, OpenCvCameraRotation.UPRIGHT);
-                    Logging.log("Start stream to detect sleeve color.");
-                }
-
-                @Override
-                public void onError(int errorCode) {
-                    Logging.log("Start stream error.");
-                    telemetry.addData("Start stream to detect sleeve color.", "error");
-                    telemetry.update();
-                }
-            });
-
-             */
-        }
+        updateProfileAccel(true);
 
         // init drive with road runner
         drive = new MecanumDrive(hardwareMap, newStartPose);
         Params.startPose = newStartPose; // init storage pose.
-        Params.blueOrRed = blueOrRed;
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist", "Finger");
         //intake.setArmModeRunToPosition(0);
 
-        //slider = new SlidersWith2Motors();
+        intake.setFingerPosition(0.0);
 
-        //slider.init(hardwareMap, "sliderRight", "sliderLeft");
-
-        //slider.resetEncoders();
-
-
+        intake.setWristPosition(0.95);
 
         while (!isStarted()) {
             sleep(10);
@@ -230,10 +140,6 @@ public class AutoLeft extends LinearOpMode {
         // bulk reading setting - auto refresh mode
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
-
-        intake.setFingerPosition(0.0);
-
-        intake.setWristPosition(0.95);
 
         waitForStart();
 
