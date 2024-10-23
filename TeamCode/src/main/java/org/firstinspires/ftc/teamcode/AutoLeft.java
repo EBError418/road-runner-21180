@@ -122,7 +122,7 @@ public class AutoLeft extends LinearOpMode {
         Params.startPose = newStartPose; // init storage pose.
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist", "Finger");
-        //intake.setArmModeRunToPosition(0);
+        intake.resetArmEncoder();
 
         intake.setFingerPosition(0.0);
 
@@ -172,7 +172,7 @@ public class AutoLeft extends LinearOpMode {
         //new stuff for 2024-2025 season
         //hang specimen
         //Vector2d hangSpecimen = new Vector2d(- 3.5 * Params.HALF_MAT, 0);
-        Vector2d armFlip = new Vector2d(-4.4 * Params.HALF_MAT, newStartPose.position.y);
+        Vector2d armFlip = new Vector2d(-4.42 * Params.HALF_MAT, newStartPose.position.y);
         //Vector2d retractArm = new Vector2d(armFlip.x - Params.HALF_MAT, armFlip.y);
 
         //grab

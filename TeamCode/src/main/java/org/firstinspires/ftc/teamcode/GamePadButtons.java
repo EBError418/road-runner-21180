@@ -72,6 +72,10 @@ public class GamePadButtons {
     public boolean SpecimenPickupAction;
     public boolean SpecimenPickupAlign;
     public boolean SubPickupPos;
+    public boolean ArmPickUpPos;
+    public boolean LowBucketPos;
+    public boolean EndgameHangingLineup;
+    public boolean EndgameHangingPos;
 
     public void checkGamepadButtons(@NonNull Gamepad gamepad1, @NonNull Gamepad gamepad2) {
         //game pad 1 buttons
@@ -102,12 +106,12 @@ public class GamePadButtons {
         fingerOpen = gamepad2.dpad_down;
 
         //wrists
-        wristUp = gamepad2.right_stick_y < 0;
-        wristDown = gamepad2.right_stick_y > 0;
+        wristUp = gamepad2.left_stick_y < 0;
+        wristDown = gamepad2.left_stick_y > 0;
 
         //arm
-        armForwards = gamepad2.left_stick_y > 0;
-        armBackwards = gamepad2.left_stick_y < 0;
+        armForwards = gamepad2.right_stick_y > 0;
+        armBackwards = gamepad2.right_stick_y < 0;
 
         //slider
         sliderUp = gamepad2.right_stick_y > 0;
@@ -120,6 +124,12 @@ public class GamePadButtons {
         SpecimenPickupAction = gamepad1.left_trigger > 0 || gamepad2.left_trigger > 0;
         SpecimenPickupAlign = gamepad1.x;
 
+        //sample presets
         SubPickupPos = gamepad1.dpad_up;
+        ArmPickUpPos = gamepad1.right_bumper || gamepad2.right_bumper;
+
+        LowBucketPos = gamepad2.left_bumper;
+        EndgameHangingLineup = gamepad2.x;
+        EndgameHangingPos = gamepad2.y;
     }
 }
