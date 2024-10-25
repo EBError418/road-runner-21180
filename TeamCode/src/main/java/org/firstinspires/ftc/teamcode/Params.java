@@ -29,7 +29,6 @@
 
 package org.firstinspires.ftc.teamcode;
 
-
 import com.acmerobotics.roadrunner.Pose2d;
 
 /**
@@ -43,9 +42,7 @@ public class Params {
     static Pose2d currentPose = new Pose2d(0,0,0);
 
     static boolean armCalibrated = false;
-    static boolean deadWheelOn = true;
     static int blueOrRed = 1;
-
 
     static int armIntakeCount_InitFront = -30;
 
@@ -58,12 +55,7 @@ public class Params {
     static final double CHASSIS_HALF_LENGTH = CHASSIS_LENGTH / 2.0;
     static final double CHASSIS_START_EXTRA = 3.25;
 
-    // moving distance variables
-    static final double AUTO_DISTANCE_TO_TAG = 8.5; //this is how close the camera should get to the target (inches)
-
     static final double TELEOP_DISTANCE_TO_TAG = 7.0;
-
-    static final double BACKDROP_SIDEWAYS = 6.0; // 1 inch more to side tag
 
     // chassis power factors
     static final double POWER_LOW = 0.3;
@@ -72,7 +64,4 @@ public class Params {
 
     // drone servo parameters
     static final double DRONE_START = 0.57;
-    static final double DRONE_LAUNCH = 0.18;
-
 }
-

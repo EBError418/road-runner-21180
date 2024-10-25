@@ -115,7 +115,7 @@ public class intakeUnit
     int ARM_POS_PARKING = 2050;
     int ARM_POS_OBS_ZONE = 3350;
     int ARM_POS_BACK = 900;
-    int ARM_POS_BEFORE_HANG = ARM_POS_HIGH_CHAMBER - 295;
+    int ARM_POS_BEFORE_HANG = ARM_POS_HIGH_CHAMBER - 280;
     int ARM_POS_GRAB_SPECIMEN = 3200;
     int ARM_POS_SUB = 2925;
     int ARM_POS_HANGING = 1820;
@@ -387,8 +387,8 @@ public class intakeUnit
         wristServo.setPosition(WRIST_POS_INTAKE);
     }
     /**
-     * Get the arm servo motor current position value
-     * @return the current arm servo motor position value
+     * Get the arm motor current position value
+     * @return the current arm motor position value
      */
     public int getArmPosition() {
         return armMotor.getCurrentPosition();

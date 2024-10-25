@@ -74,16 +74,8 @@ public class TeleopRR extends LinearOpMode {
     //claw and arm unit
     private intakeUnit intake;
 
-    //private SlidersWith2Motors slider;
-
-    private Servo DroneServo;
-
     // debug flags, turn it off for formal version to save time of logging
     boolean debugFlag = true;
-
-    private AprilTagTest tag = null;
-
-    final double DESIRED_DISTANCE = 3.0;
 
 
     @Override
@@ -94,10 +86,6 @@ public class TeleopRR extends LinearOpMode {
 
         drive = new MecanumDrive(hardwareMap, Params.currentPose);
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-
-        //tag = new AprilTagTest(mecanum, hardwareMap, 0, "Webcam 1");
-
-        //tag.initAprilTag();
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
                 "Finger");
@@ -148,12 +136,10 @@ public class TeleopRR extends LinearOpMode {
 
             if (gpButtons.armBackwards) {
                 intake.setArmPosition(intake.getArmPosition() + 50);
-
             }
 
             if (gpButtons.armForwards) {
                 intake.setArmPosition(intake.getArmPosition() - 50);
-
             }
 
             if (gpButtons.wristUp) {
@@ -172,11 +158,13 @@ public class TeleopRR extends LinearOpMode {
                 intake.setFingerPosition(intake.FINGER_OPEN);
             }
 
+            // Align specimen to the high chamber, get ready for hanging.
             if (gpButtons.SpecimenHangAlign) {
                 intake.setArmPosition(intake.ARM_POS_BEFORE_HANG);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
             }
 
+            // hanging specimen action, arm back then forward to hang the specimen
             if (gpButtons.SpecimenHangAction) {
                 intake.setArmPosition(intake.ARM_POS_BACK);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
@@ -185,6 +173,7 @@ public class TeleopRR extends LinearOpMode {
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
             }
 
+            // pick up specimen from sub and drive to high chamber automatically
             if (gpButtons.SpecimenPickupAction) {
                 drive.pose = pickUpSpecimenPos;
                 intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.04);
@@ -197,16 +186,18 @@ public class TeleopRR extends LinearOpMode {
                                 .strafeToLinearHeading(hangSpecimenPos, 0)
                                 .build()
                 );
-                sleep(100);
+                //sleep(100);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
             }
 
+            // set arm, wrist positions before pickup specimen.
             if (gpButtons.SpecimenPickupAlign) {
                 intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN);
                 intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN);
                 intake.setFingerPosition(intake.FINGER_OPEN);
             }
 
+            // move robot to pickup element from the center of field
             if (gpButtons.SubPickupPos) {
                 drive.pose = new Pose2d(hangSpecimenPos, 0);
                 intake.setWristPosition(0.250);
@@ -220,21 +211,26 @@ public class TeleopRR extends LinearOpMode {
                 );
             }
 
+            // set arm and wrist position for picking up at the center of field
+            // right bumper of pad1 or pad2
             if (gpButtons.ArmPickUpPos) {
                 intake.setArmPosition(intake.ARM_POS_SUB);
                 intake.setWristPosition(intake.WRIST_POS_SUB);
             }
 
+            // set arm and wrist position for drop off at low bucket.
             if (gpButtons.LowBucketPos) {
                 intake.setArmPosition(intake.ARM_POS_LOW_BUCKET);
                 intake.setWristPosition(intake.WRIST_POS_LOW_BUCKET);
             }
 
+            // get ready for hanging at end game
             if (gpButtons.EndgameHangingLineup) {
                 intake.setArmPosition(intake.ARM_POS_HANGING);
                 intake.setWristPosition(intake.WRIST_POS_HANGING);
             }
 
+            // hanging robot
             if (gpButtons.EndgameHangingPos) {
                 intake.setArmPosition(intake.ARM_POS_DOWN_HANGING);
             }
@@ -255,10 +251,7 @@ public class TeleopRR extends LinearOpMode {
 
                 telemetry.addData("location", " %s", drive.pose.position.toString());
 
-                //telemetry.addData("motor velocity = ", " %.3f", mecanum.leftFront.getVelocity());
-
                 telemetry.update(); // update message at the end of while loop
-
             }
 
         }
@@ -267,17 +260,7 @@ public class TeleopRR extends LinearOpMode {
         // The motor stop on their own but power is still applied. Turn off motor.
     }
 
-    private void logVector(String sTag, Vector2d vXY) {
-        String vectorName = vXY.toString();
-        Logging.log("%s: %s", sTag, vectorName);
-    }
-
-    private void logRobotHeading(String sTag) {
-        Logging.log("%s drive.pose: %.2f", sTag, Math.toDegrees(drive.pose.heading.log()));
-        //Logging.log("%s imu: %.2f", sTag, mecanum.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) - Math.toDegrees(Params.startPose.heading.log()));
-    }
-
-    //action for arm to pick up from sub
+    //action to set arm and wrist position to pick up from sub
     private class armPickupFromSub implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
