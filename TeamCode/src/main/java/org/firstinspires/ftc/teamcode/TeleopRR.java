@@ -190,7 +190,7 @@ public class TeleopRR extends LinearOpMode {
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
             }
 
-            // set arm, wrist positions before pickup specimen.
+            // set arm, wrist, finger positions before pickup specimen.
             if (gpButtons.SpecimenPickupAlign) {
                 intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN);
                 intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN);
@@ -200,6 +200,7 @@ public class TeleopRR extends LinearOpMode {
             // move robot to pickup element from the center of field
             if (gpButtons.SubPickupPos) {
                 drive.pose = new Pose2d(hangSpecimenPos, 0);
+                intake.setFingerPosition(intake.FINGER_OPEN);
                 intake.setWristPosition(0.250);
                 sleep(400);
                 Actions.runBlocking(
@@ -212,7 +213,7 @@ public class TeleopRR extends LinearOpMode {
             }
 
             // set arm and wrist position for picking up at the center of field
-            // right bumper of pad1 or pad2
+            // right bumper of pad1
             if (gpButtons.ArmPickUpPos) {
                 intake.setArmPosition(intake.ARM_POS_SUB);
                 intake.setWristPosition(intake.WRIST_POS_SUB);

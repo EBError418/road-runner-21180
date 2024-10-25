@@ -113,10 +113,10 @@ public class GamePadButtons {
         sliderUpDown  = gamepad2.right_stick_y;
 
         //specimen presets
-        SpecimenHangAlign = gamepad1.right_trigger > 0 || gamepad2.right_trigger > 0;
+        SpecimenHangAlign = gamepad1.right_trigger > 0;// || gamepad2.right_trigger > 0;
         SpecimenHangAction = gamepad1.y;
-        SpecimenPickupAction = gamepad1.left_trigger > 0 || gamepad2.left_trigger > 0;
-        SpecimenPickupAlign = gamepad1.x;
+        SpecimenPickupAction = gamepad1.left_trigger > 0;// || gamepad2.left_trigger > 0;
+        SpecimenPickupAlign = gamepad2.left_trigger > 0;
 
         //sample presets
         SubPickupPos = gamepad1.dpad_up;
