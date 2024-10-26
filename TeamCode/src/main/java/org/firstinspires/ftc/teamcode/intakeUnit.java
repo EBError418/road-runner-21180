@@ -54,31 +54,14 @@ public class intakeUnit
     // arm servo motor variables
     private DcMotor armMotor = null;
 
-
-    final double FINGER_INTAKE_POS = 0;
-    final double FINGER_STOP_POS = 0.5;
-    final double FINGER_OUTTAKE_POS = 1.0;
-
     //wrist servo
     private Servo wristServo = null;
-    final double SWITCH_RIGHT_CLOSE_POS = 0.27;
-    final double ARM_FORE_POSITION = 0.36;
 
     final double SWITCH_LEFT_CLOSE_POS = 0.21;
     final double WRIST_SNAP_POSITION = 0.03;
 
     //finger servo
     public Servo fingerServo = null;
-    final double FINGER_CLOSE_POS = 0.2;  // Minimum rotational position
-    final double FINGER_OPEN_POS = 0.95; // Maximum rotational position
-    final double WRIST_POS_DROP_TURN = 0.30;
-    final double WRIST_POS_DROP_PURPLE = 0.35;
-    final double WRIST_POS_DROP_YELLOW_BACK = 0.36;
-
-    final double WRIST_POS_DROP_YELLOW = 0.39;
-    final double WRIST_POS_INTAKE5 = 0.455;
-    final double WRIST_POS_INTAKE = 0.475;
-    final double WRIST_POS_REACH_FORWARD = 0.5;
 
     // slider motor variables
     int ARM_POS_INTAKE = Params.armIntakeCount_InitFront;
@@ -92,17 +75,18 @@ public class intakeUnit
     int ARM_POS_INTAKE5;
 
     //new stuff
-    final double WRIST_POS_GRAB_SAMPLE = 0.446;
-    final double WRIST_POS_HIGH_CHAMBER = 0.545;
-    final double WRIST_POS_LOW_BUCKET = 0.717;
-    final double WRIST_POS_PARKING = 0.5;
-    final double WRIST_POS_OBS_ZONE = 0.4;
-    final double WRIST_POS_GRAB_SPECIMEN = 0.43;
-    final double WRIST_POS_SUB = 0.674;
-    final double WRIST_POS_HANGING = 0.200;
+    final double WRIST_POS_DELTA = -0.091;
+    final double WRIST_POS_GRAB_SAMPLE = WRIST_POS_DELTA + 0.446;
+    final double WRIST_POS_HIGH_CHAMBER = WRIST_POS_DELTA + 0.545;
+    final double WRIST_POS_LOW_BUCKET = WRIST_POS_DELTA + 0.717;
+    final double WRIST_POS_PARKING = WRIST_POS_DELTA + 0.95;
+    final double WRIST_POS_OBS_ZONE = WRIST_POS_DELTA + 0.4;
+    final double WRIST_POS_GRAB_SPECIMEN = WRIST_POS_DELTA + 0.4;
+    final double WRIST_POS_SUB = WRIST_POS_DELTA + 0.674;
+    final double WRIST_POS_HANGING = WRIST_POS_DELTA + 0.2;
 
     //finger
-    final double FINGER_CLOSE = 0;
+    final double FINGER_CLOSE = 0.0;
     final double FINGER_OPEN = 0.5;
 
     //arm
@@ -116,7 +100,7 @@ public class intakeUnit
     int ARM_POS_OBS_ZONE = 3350;
     int ARM_POS_BACK = 900;
     int ARM_POS_BEFORE_HANG = ARM_POS_HIGH_CHAMBER - 280;
-    int ARM_POS_GRAB_SPECIMEN = 3200;
+    int ARM_POS_GRAB_SPECIMEN = 3300;
     int ARM_POS_SUB = 2925;
     int ARM_POS_HANGING = 1820;
     int ARM_POS_DOWN_HANGING = 4150;
@@ -155,15 +139,6 @@ public class intakeUnit
 
         //resetArmPositions(Params.armIntakeCount_InitFront);
 
-        /*
-        sliderOneMotor = hardwareMap.get(DcMotor.class, sliderOneMotorName);
-        sliderOneMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-        sliderTwoMotor = hardwareMap.get(DcMotor.class, sliderOneMotorName);
-        sliderTwoMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-         */
-
         //resetArmPositions(Params.armIntakeCount_InitFront);
     }
 
@@ -173,82 +148,22 @@ public class intakeUnit
     }
 
     public void fingerServoOpen() {
-        fingerServo.setPosition(FINGER_OPEN_POS);
+        fingerServo.setPosition(FINGER_OPEN);
     }
 
-    public void fingerServoClose() {
-        fingerServo.setPosition(FINGER_CLOSE_POS);
-    }
-
-    /*
-    public void extendSlide(int amount) {
-        sliderOneMotor.setTargetPosition(sliderOneMotor.getCurrentPosition() + amount);
-        sliderOneMotor.setTargetPosition(sliderTwoMotor.getCurrentPosition() - amount);
-    }
-
-    public void setCountPosition(int sliderMotorPosition) {
-        sliderMotorPosition = Range.clip(sliderMotorPosition, 0, 1000);
-        sliderOneMotor.setTargetPosition(sliderMotorPosition);
-        sliderTwoMotor.setTargetPosition(sliderMotorPosition);
-    }
-
-     */
-
-    /*
-    public void armServoForward() {
-        setArmServoPosition(ARM_FORE_POSITION);
-    }
-
-    public void wristServoSnapSpecimen(){
-        setWristServoPosition(WRIST_SNAP_POSITION);
-    }
-
-     */
-
-    /*
-    public void switchServoClose() {
-        setArmServoPosition(SWITCH_RIGHT_CLOSE_POS);
-        setWristServoPosition(SWITCH_LEFT_CLOSE_POS);
-    }
-
-     */
 
     /**
      * set the target position of wrist servo motor
      * @param wristPos the target position value for wrist servo motor
      */
     public void setWristPosition(double wristPos) {
-        wristPos = Range.clip(wristPos, FINGER_CLOSE_POS, FINGER_OPEN_POS);
         wristServo.setPosition(wristPos);
     }
 
     public void setFingerPosition(double fingerpos){
         fingerServo.setPosition(fingerpos);
     }
-    /**
-     * set the wrist servo motor position to open the wrist
-     */
-    public void wristUp() {
-        setWristPosition(wristServo.getPosition() + 0.001);
-    }
 
-    /**
-     * set the wrist servo motor position to close the wrist
-     */
-    public void wristDown() {
-        setWristPosition(wristServo.getPosition() - 0.001);
-    }
-
-    // Finger servo control methods.
-    public void fingerIntake() {
-        //fingerServo.setPosition(FINGER_INTAKE_POS);
-    }
-    public void fingerStop() {
-        //fingerServo.setPosition(FINGER_STOP_POS);
-    }
-    public void fingerOuttake() {
-        //fingerServo.setPosition(FINGER_OUTTAKE_POS);
-    }
 
     /**
      * set the target position of arm servo motor
@@ -275,117 +190,7 @@ public class intakeUnit
         //Logging.log("Arm Motor target position = %d",  sliderOneMotor.getTargetPosition());
     }
 
-    /*
-    public void armUp() {
-        setArmCountPosition(sliderOneMotor.getCurrentPosition() + 5);
-    }
 
-    public void armDown() {
-        setArmCountPosition(sliderOneMotor.getCurrentPosition() - 5);
-    }
-
-    public void armLiftAcc() {
-        setArmCountPosition(sliderOneMotor.getCurrentPosition() + 50);
-    }
-
-    public void armDownAcc() {
-        setArmCountPosition(sliderOneMotor.getCurrentPosition() - 50);
-    }
-
-    public void hangingRobot() {
-        setArmCountPosition(ARM_POS_HANG);
-    }
-
-    // auto setting positions
-    /*
-    public void intakePositions(int armPosition) {
-        setArmCountPosition(armPosition);
-        wristServo.setPosition(WRIST_POS_INTAKE);
-        switchServoClose();
-        fingerIntake();
-    }
-
-    public void intakeWhite2Positions() {
-        setArmCountPosition(ARM_POS_INTAKE_WHITE2);
-        wristServo.setPosition(WRIST_POS_INTAKE5);
-        switchServoClose();
-        fingerIntake();
-    }
-
-    public void parkingPositions() {
-        setArmCountPosition(ARM_POS_INTAKE);
-        wristServo.setPosition(WRIST_POS_INTAKE);
-        switchServoClose();
-        fingerStop();
-    }
-
-
-
-    public void dropPositions() {
-        setArmCountPosition(ARM_POS_DROP);
-        wristServo.setPosition(WRIST_POS_DROP);
-        switchServoClose();
-        fingerStop();
-    }
-
-    public void dropWhitePositions() {
-        setArmCountPosition(ARM_POS_DROP_WHITE);
-        wristServo.setPosition(WRIST_POS_DROP_WHITE);
-        switchServoClose();
-        fingerStop();
-    }
-
-     */
-
-    public void autonomousInit() {
-
-    }
-
-    /*
-    public void readyToDropPurple() {
-        setArmCountPosition(ARM_POS_DROP_PURPLE);
-        wristServo.setPosition(WRIST_POS_DROP_PURPLE);
-        switchServoClose();
-        fingerStop();
-    }
-
-
-
-    public void pushPropPose() {
-        setArmCountPosition(ARM_POS_PUSH_PROP);
-        wristServo.setPosition(WRIST_POS_INTAKE);
-        switchServoClose();
-    }
-    */
-    /*
-    public void readyToDropYellow(int armPosition){
-        setArmPosition(armPosition);
-        wristServo.setPosition(WRIST_POS_DROP_YELLOW);
-        switchServoClose();
-    }
-
-    public void readyToDropWhite(int armPosition){
-        setArmPosition(armPosition);
-        wristServo.setPosition(WRIST_POS_DROP_WHITE);
-        switchServoClose();
-    }
-
-     */
-
-    public void underTheBeam(){
-        setArmPosition(ARM_POS_UNDER_BEAM);
-        wristServo.setPosition(WRIST_POS_DROP_PURPLE);
-    }
-
-    public void movingPixelPosition() {
-        setArmPosition(ARM_POS_MOVING_PIXEL_ON_BOARD);
-        wristServo.setPosition(WRIST_POS_REACH_FORWARD);
-    }
-
-    public void underTheBeamIntake(){
-        setArmPosition(ARM_POS_UNDER_BEAM);
-        wristServo.setPosition(WRIST_POS_INTAKE);
-    }
     /**
      * Get the arm motor current position value
      * @return the current arm motor position value
@@ -406,18 +211,6 @@ public class intakeUnit
     public double getFingerPosition() {
         return fingerServo.getPosition();
     }
-
-
-
-    /*
-    public double getSwitchRightPosition() {
-        return switchRightServo.getPosition();
-    }
-    public double getSwitchLeftPosition() {
-        return switchLeftServo.getPosition();
-    }
-
-     */
 
 
     private void sleep(long milliseconds) {

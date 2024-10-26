@@ -176,7 +176,7 @@ public class TeleopRR extends LinearOpMode {
             // pick up specimen from sub and drive to high chamber automatically
             if (gpButtons.SpecimenPickupAction) {
                 drive.pose = pickUpSpecimenPos;
-                intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.04);
+                intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.038);
                 sleep(250);
                 intake.setFingerPosition(intake.FINGER_CLOSE);
                 sleep(250);
