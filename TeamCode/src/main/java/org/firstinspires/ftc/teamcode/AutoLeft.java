@@ -124,9 +124,9 @@ public class AutoLeft extends LinearOpMode {
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist", "Finger");
         intake.resetArmEncoder();
 
-        intake.setFingerPosition(0.0);
+        intake.setFingerPosition(intake.FINGER_CLOSE);
 
-        intake.setWristPosition(0.95);
+        //intake.setWristPosition(0.95);
 
         while (!isStarted()) {
             sleep(10);
@@ -143,9 +143,9 @@ public class AutoLeft extends LinearOpMode {
 
         waitForStart();
 
-        intake.setWristPosition(0.95);
+        //intake.setWristPosition(0.95);
 
-        intake.setFingerPosition(intake.FINGER_CLOSE);
+        //intake.setFingerPosition(intake.FINGER_CLOSE);
 
         Logging.log("Before start wrist pos: %2f", intake.getWristPosition());
         Logging.log("Before start finger pos: %2f", intake.getFingerPosition());
@@ -401,7 +401,7 @@ public class AutoLeft extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
-            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+            intake .setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
             return false;
         }
     }
