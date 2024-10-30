@@ -79,9 +79,9 @@ public class intakeUnit
     final double WRIST_POS_GRAB_SAMPLE = WRIST_POS_DELTA + 0.446;
     final double WRIST_POS_HIGH_CHAMBER = WRIST_POS_DELTA + 0.545;
     final double WRIST_POS_LOW_BUCKET = WRIST_POS_DELTA + 0.717;
-    final double WRIST_POS_PARKING = WRIST_POS_DELTA + 0.95;
+    final double WRIST_POS_PARKING = WRIST_POS_DELTA + 0.1;
     final double WRIST_POS_OBS_ZONE = WRIST_POS_DELTA + 0.4;
-    final double WRIST_POS_GRAB_SPECIMEN = WRIST_POS_DELTA + 0.4;
+    final double WRIST_POS_GRAB_SPECIMEN = WRIST_POS_DELTA + 0.418;
     final double WRIST_POS_SUB = WRIST_POS_DELTA + 0.674;
     final double WRIST_POS_HANGING = WRIST_POS_DELTA + 0.2;
 
@@ -90,11 +90,11 @@ public class intakeUnit
     final double FINGER_OPEN = 0.5;
 
     //arm
-    int ARM_POS_GRAB_SAMPLE = 3475;
+    int ARM_POS_GRAB_SAMPLE = 3565;
     int ARM_MIN_COUNT_POS = 3820;
     int ARM_MAX_COUNT_POS = 0;
     int ARM_POS_AFTER_HANG = 135;
-    int ARM_POS_HIGH_CHAMBER = 2560;
+    int ARM_POS_HIGH_CHAMBER = 2540;
     int ARM_POS_LOW_BUCKET = 1858;
     int ARM_POS_PARKING = 2050;
     int ARM_POS_OBS_ZONE = 3350;

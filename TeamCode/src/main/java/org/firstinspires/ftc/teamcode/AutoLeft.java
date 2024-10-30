@@ -172,8 +172,8 @@ public class AutoLeft extends LinearOpMode {
         //new stuff for 2024-2025 season
         //hang specimen
         //Vector2d hangSpecimen = new Vector2d(- 3.5 * Params.HALF_MAT, 0);
-        Vector2d armFlip = new Vector2d(-4.42 * Params.HALF_MAT, newStartPose.position.y);
-        //Vector2d retractArm = new Vector2d(armFlip.x - Params.HALF_MAT, armFlip.y);
+        Vector2d armFlip = new Vector2d(-4.4 * Params.HALF_MAT, newStartPose.position.y);
+        Vector2d retractArm = new Vector2d(- 4.9 * Params.HALF_MAT, armFlip.y);
 
         //grab
         Vector2d changeHeadingForPickup = new Vector2d(- 3.5 * Params.HALF_MAT, - leftOrRight * 1.85 * Params.HALF_MAT);
@@ -202,6 +202,12 @@ public class AutoLeft extends LinearOpMode {
 
             //release specimen and raise arm to clear high chamber
             intake.setFingerPosition(intake.FINGER_OPEN);
+            Actions.runBlocking(
+                    drive.actionBuilder(newStartPose)
+                            .waitSeconds(0.1)
+                            .strafeToConstantHeading(retractArm)
+                            .build()
+            );
             sleep(100);
             intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 600);
 
@@ -310,6 +316,12 @@ public class AutoLeft extends LinearOpMode {
 
             //release specimen and raise arm to clear high chamber
             intake.setFingerPosition(intake.FINGER_OPEN);
+            Actions.runBlocking(
+                    drive.actionBuilder(newStartPose)
+                            .waitSeconds(0.5)
+                            .strafeToConstantHeading(retractArm)
+                            .build()
+            );
             sleep(100);
             intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 600);
 
