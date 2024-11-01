@@ -63,27 +63,16 @@ public class intakeUnit
     //finger servo
     public Servo fingerServo = null;
 
-    // slider motor variables
-    int ARM_POS_INTAKE = Params.armIntakeCount_InitFront;
-    int ARM_POS_AUTO;
-    int ARM_POS_READY_FOR_HANG;
-    int ARM_POS_CAMERA_READ;
-    int ARM_POS_UNDER_BEAM;
-    int ARM_POS_MOVING_PIXEL_ON_BOARD;
-    int ARM_POS_DROP_PURPLE;
-    int ARM_POS_PUSH_PROP;
-    int ARM_POS_INTAKE5;
-
     //new stuff
-    final double WRIST_POS_DELTA = -0.091;
-    final double WRIST_POS_GRAB_SAMPLE = WRIST_POS_DELTA + 0.446;
-    final double WRIST_POS_HIGH_CHAMBER = WRIST_POS_DELTA + 0.545;
-    final double WRIST_POS_LOW_BUCKET = WRIST_POS_DELTA + 0.717;
+    final double WRIST_POS_DELTA = 0.0;
+    final double WRIST_POS_GRAB_SAMPLE = WRIST_POS_DELTA + 0.355;
+    final double WRIST_POS_HIGH_CHAMBER = WRIST_POS_DELTA + 0.454;
+    final double WRIST_POS_LOW_BUCKET = WRIST_POS_DELTA + 0.626;
     final double WRIST_POS_PARKING = WRIST_POS_DELTA + 0.1;
-    final double WRIST_POS_OBS_ZONE = WRIST_POS_DELTA + 0.4;
-    final double WRIST_POS_GRAB_SPECIMEN = WRIST_POS_DELTA + 0.418;
-    final double WRIST_POS_SUB = WRIST_POS_DELTA + 0.674;
-    final double WRIST_POS_HANGING = WRIST_POS_DELTA + 0.2;
+    final double WRIST_POS_OBS_ZONE = WRIST_POS_DELTA + 0.309;
+    final double WRIST_POS_GRAB_SPECIMEN = WRIST_POS_DELTA + 0.327;
+    final double WRIST_POS_SUB = WRIST_POS_DELTA + 0.583;
+    final double WRIST_POS_HANGING = WRIST_POS_DELTA + 0.1;
 
     //finger
     final double FINGER_CLOSE = 0.0;
@@ -94,12 +83,12 @@ public class intakeUnit
     int ARM_MIN_COUNT_POS = 3820;
     int ARM_MAX_COUNT_POS = 0;
     int ARM_POS_AFTER_HANG = 135;
-    int ARM_POS_HIGH_CHAMBER = 2540;
+    int ARM_POS_HIGH_CHAMBER = 2490;
     int ARM_POS_LOW_BUCKET = 1858;
     int ARM_POS_PARKING = 2050;
     int ARM_POS_OBS_ZONE = 3350;
-    int ARM_POS_BACK = 900;
-    int ARM_POS_BEFORE_HANG = ARM_POS_HIGH_CHAMBER - 280;
+    int ARM_POS_BACK = 1000;
+    int ARM_POS_BEFORE_HANG = ARM_POS_HIGH_CHAMBER - 100;
     int ARM_POS_GRAB_SPECIMEN = 3300;
     int ARM_POS_SUB = 2925;
     int ARM_POS_HANGING = 1820;
@@ -119,14 +108,8 @@ public class intakeUnit
         this.hardwareMap = hardwareMap;
 
         Logging.log("init motors for finger, wrist and arm.");
-        //switchRightServo = hardwareMap.get(Servo.class, rightSwitchName);
-        //switchRightServo.setPosition(SWITCH_RIGHT_CLOSE_POS);
 
-        //switchLeftServo = hardwareMap.get(Servo.class, leftSwitchName);
-        //switchLeftServo.setPosition(SWITCH_LEFT_CLOSE_POS);
-
-        fingerServo = hardwareMap.get(Servo.class, fingerServoName);
-        //fingerStop();
+         fingerServo = hardwareMap.get(Servo.class, fingerServoName);
 
         wristServo = hardwareMap.get(Servo.class, wristServoName);
         wristServo.setDirection(Servo.Direction.FORWARD);
@@ -136,8 +119,6 @@ public class intakeUnit
         armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         //setArmModeRunToPosition(0);
-
-        //resetArmPositions(Params.armIntakeCount_InitFront);
 
         //resetArmPositions(Params.armIntakeCount_InitFront);
     }
@@ -151,7 +132,6 @@ public class intakeUnit
         fingerServo.setPosition(FINGER_OPEN);
     }
 
-
     /**
      * set the target position of wrist servo motor
      * @param wristPos the target position value for wrist servo motor
@@ -164,7 +144,6 @@ public class intakeUnit
         fingerServo.setPosition(fingerpos);
     }
 
-
     /**
      * set the target position of arm servo motor
      * @param armPos the target position value for arm servo motor
@@ -173,23 +152,16 @@ public class intakeUnit
         armMotor.setTargetPosition((int)(armPos));
     }
 
-
     public void setArmModeRunToPosition(int armPos) {
         setArmPosition(armPos);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         armMotor.setPower(0.9);
     }
 
-
-
     public void resetArmEncoder() {
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setArmModeRunToPosition(0);
-        //Logging.log("Arm Motor mode = %s",  sliderOneMotor.getMode());
-        //Logging.log("Arm Motor curr position = %d",  sliderOneMotor.getCurrentPosition());
-        //Logging.log("Arm Motor target position = %d",  sliderOneMotor.getTargetPosition());
     }
-
 
     /**
      * Get the arm motor current position value
@@ -207,11 +179,9 @@ public class intakeUnit
         return wristServo.getPosition();
     }
 
-
     public double getFingerPosition() {
         return fingerServo.getPosition();
     }
-
 
     private void sleep(long milliseconds) {
         try {
@@ -220,7 +190,7 @@ public class intakeUnit
             Thread.currentThread().interrupt();
         }
     }
-
+    /*
     public void resetArmPositions(int intakePos) {
         ARM_POS_INTAKE = intakePos;
         ARM_MIN_COUNT_POS = ARM_POS_INTAKE - 3320; //0;
@@ -240,4 +210,5 @@ public class intakeUnit
         ARM_POS_AFTER_HANG = 135;
         ARM_POS_HIGH_CHAMBER = 2570;
     }
+    */
 }

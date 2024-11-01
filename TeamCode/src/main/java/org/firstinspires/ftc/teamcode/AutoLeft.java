@@ -325,12 +325,12 @@ public class AutoLeft extends LinearOpMode {
             sleep(100);
             intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 600);
 
-            //Go to pick up neutral sample
+            //Go to pick up red sample
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
                             .afterTime(0.4, new armToPickUpPos())
                             .splineTo(changeHeadingForPickup, Math.toRadians(-58))
-                            .turnTo(Math.toRadians(302))
+                            .turnTo(Math.toRadians(297))
                             .strafeTo(new Vector2d(driveForwardToPickup.x + 0.3 * Params.HALF_MAT, driveForwardToPickup.y + 0.2 * Params.HALF_MAT))
                             .build()
             );
@@ -365,7 +365,7 @@ public class AutoLeft extends LinearOpMode {
             intake.setArmPosition(intake.ARM_POS_OBS_ZONE);
             sleep(200);
 
-            //place second sample in bucket
+            //place second sample in observation zone
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
                             .afterTime(0.4, new armToObsZoneAct())

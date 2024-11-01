@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
 
-
 /**
  * Game pad buttons design:
  * Game Pad1:

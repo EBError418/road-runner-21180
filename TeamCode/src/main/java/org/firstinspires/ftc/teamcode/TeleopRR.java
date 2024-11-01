@@ -84,6 +84,8 @@ public class TeleopRR extends LinearOpMode {
 
         GamePadButtons gpButtons = new GamePadButtons();
 
+        updateProfileAccel(true);
+
         drive = new MecanumDrive(hardwareMap, Params.currentPose);
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -168,7 +170,7 @@ public class TeleopRR extends LinearOpMode {
             if (gpButtons.SpecimenHangAction) {
                 intake.setArmPosition(intake.ARM_POS_BACK);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
-                sleep(1500);
+                sleep(1000);
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
             }
@@ -268,6 +270,13 @@ public class TeleopRR extends LinearOpMode {
             intake.setArmPosition(intake.ARM_POS_SUB);
             intake.setWristPosition(intake.WRIST_POS_SUB);
             return false;
+        }
+    }
+
+    private void updateProfileAccel(boolean fastMode) {
+        if (fastMode) {
+            MecanumDrive.PARAMS.minProfileAccel = -40;
+            MecanumDrive.PARAMS.maxProfileAccel = 60;
         }
     }
 }
