@@ -79,7 +79,7 @@ public class intakeUnit
     final double FINGER_OPEN = 0.5;
 
     //arm
-    int ARM_POS_GRAB_SAMPLE = 3565;
+    int ARM_POS_GRAB_SAMPLE = 3585;
     int ARM_MIN_COUNT_POS = 3820;
     int ARM_MAX_COUNT_POS = 0;
     int ARM_POS_AFTER_HANG = 135;
