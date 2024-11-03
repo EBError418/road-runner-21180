@@ -209,10 +209,10 @@ public class AutoRightHanging extends LinearOpMode {
                     drive.actionBuilder(drive.pose)
                             .afterTime(0.5, new armToPickupAndRetract())
                             //.setReversed(true)
-                            .splineTo(changeHeadingForPickup,Math.toRadians(-63) )
+                            .splineTo(new Vector2d(driveForwardToPickup.x + 0.3 * Params.HALF_MAT, driveForwardToPickup.y + 0.2 * Params.HALF_MAT),Math.toRadians(-63) )
                             //.splineToLinearHeading(new Pose2d(changeHeadingForPickup, Math.toRadians(297)), Math.toRadians(-63))
                             //.turnTo(Math.toRadians(297))
-                            .strafeTo(new Vector2d(driveForwardToPickup.x + 0.3 * Params.HALF_MAT, driveForwardToPickup.y + 0.2 * Params.HALF_MAT))
+                            //.strafeTo(new Vector2d(driveForwardToPickup.x + 0.3 * Params.HALF_MAT, driveForwardToPickup.y + 0.2 * Params.HALF_MAT))
                             .build()
             );
 
@@ -230,9 +230,9 @@ public class AutoRightHanging extends LinearOpMode {
                             .splineToLinearHeading(new Pose2d(obsZone, Math.toRadians(-135)), Math.toRadians(-135))
                             .build()
             );
-            sleep(150);
+            //sleep(150);
             intake.setFingerPosition(intake.FINGER_OPEN);
-            sleep(150);
+            //sleep(150);
 
             //pick up second sample
             Actions.runBlocking(
