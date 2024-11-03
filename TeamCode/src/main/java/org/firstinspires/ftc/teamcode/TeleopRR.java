@@ -170,7 +170,7 @@ public class TeleopRR extends LinearOpMode {
             if (gpButtons.SpecimenHangAction) {
                 intake.setArmPosition(intake.ARM_POS_BACK);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
-                sleep(1000);
+                sleep(1000); // TODO : optimize sleep time
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
             }
@@ -179,9 +179,9 @@ public class TeleopRR extends LinearOpMode {
             if (gpButtons.SpecimenPickupAction) {
                 drive.pose = pickUpSpecimenPos;
                 intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.038);
-                sleep(250);
+                sleep(250); // TODO : optimize sleep time
                 intake.setFingerPosition(intake.FINGER_CLOSE);
-                sleep(250);
+                sleep(250); // TODO : optimize sleep time
                 intake.setArmPosition(intake.ARM_POS_BEFORE_HANG);
                 Actions.runBlocking(
                         drive.actionBuilder(pickUpSpecimenPos)
@@ -201,6 +201,7 @@ public class TeleopRR extends LinearOpMode {
 
             // move robot to pickup element from the center of field
             if (gpButtons.SubPickupPos) {
+                // TODO : update acting by using arm up, wrist down, moving using spline to directly.
                 drive.pose = new Pose2d(hangSpecimenPos, 0);
                 intake.setFingerPosition(intake.FINGER_OPEN);
                 intake.setWristPosition(0.250);
