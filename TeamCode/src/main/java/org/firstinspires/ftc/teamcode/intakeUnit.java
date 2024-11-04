@@ -84,7 +84,7 @@ public class intakeUnit
     int ARM_MIN_COUNT_POS = 3820;
     int ARM_MAX_COUNT_POS = 0;
     int ARM_POS_AFTER_HANG = 135;
-    int ARM_POS_HIGH_CHAMBER = ARM_POS_DELTA + 2510;//2490;
+    int ARM_POS_HIGH_CHAMBER = ARM_POS_DELTA + 2580;//2490;
     int ARM_POS_LOW_BUCKET = ARM_POS_DELTA + 1858;
     int ARM_POS_PARKING = ARM_POS_DELTA + 2050;
     int ARM_POS_OBS_ZONE = ARM_POS_DELTA + 3500;
@@ -163,6 +163,15 @@ public class intakeUnit
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setArmModeRunToPosition(0);
     }
+
+    // release arm motor
+    public void releaseArmMotor() {
+        setArmPosition(armMotor.getCurrentPosition());
+        armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
+        armMotor.setPower(0);
+    }
+
 
     /**
      * Get the arm motor current position value

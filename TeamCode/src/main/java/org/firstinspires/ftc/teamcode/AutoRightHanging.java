@@ -167,11 +167,11 @@ public class AutoRightHanging extends LinearOpMode {
         Vector2d changeHeadingForPickup = new Vector2d(- 3.5 * Params.HALF_MAT, - leftOrRight * 1.85 * Params.HALF_MAT);
         Vector2d driveForwardToPickup = new Vector2d(- 3.5 * Params.HALF_MAT, - leftOrRight * 2.7 * Params.HALF_MAT);
         //Vector2d placeSample = new Vector2d(- 4.6 * Params.HALF_MAT, 4.5 * Params.HALF_MAT);
-        Vector2d obsZone = new Vector2d(- 3.3 * Params.HALF_MAT, - 3.5 * Params.HALF_MAT);
-        Vector2d hangSpecimenPos = new Vector2d(armFlip.x + 0.04 * Params.HALF_MAT, 0);
-        Pose2d pickUpSpecimenPos = new Pose2d(- 4 * Params.HALF_MAT, - 6 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH + 1, Math.toRadians(179.9998));
-        Pose2d specimenLineUpPos = new Pose2d(pickUpSpecimenPos.position.x + 1.3 * Params.HALF_MAT, pickUpSpecimenPos.position.y, Math.toRadians(179.9998));
-        Vector2d splineThirdSample = new Vector2d(- 3.2 * Params.HALF_MAT, - leftOrRight * 3 * Params.HALF_MAT);
+        Vector2d obsZone = new Vector2d(- 3.4 * Params.HALF_MAT, - 3.8 * Params.HALF_MAT);
+        Vector2d hangSpecimenPos = new Vector2d(armFlip.x - 0.04 * Params.HALF_MAT, 0);
+        Pose2d pickUpSpecimenPos = new Pose2d(- 4 * Params.HALF_MAT, - 6 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH, Math.toRadians(179.9998));
+        Pose2d specimenLineUpPos = new Pose2d(pickUpSpecimenPos.position.x + 0.5 * Params.HALF_MAT, pickUpSpecimenPos.position.y, Math.toRadians(179.9998));
+        Vector2d splineThirdSample = new Vector2d(- 2.8 * Params.HALF_MAT, - leftOrRight * 3 * Params.HALF_MAT);
 
         //ascent level 1
         Vector2d parkStepOne = new Vector2d(- 4 * Params.HALF_MAT,  4 * Params.HALF_MAT);
@@ -182,7 +182,7 @@ public class AutoRightHanging extends LinearOpMode {
             Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
             Actions.runBlocking(
                     drive.actionBuilder(newStartPose)
-                            .afterTime(0.5, new armFlipToHangAct()) // TODO: optimize the time 0.6
+                            .afterTime(0.5, new armFlipToHangAct())
                             .strafeTo(armFlip)
                             .build()
             );
@@ -193,13 +193,11 @@ public class AutoRightHanging extends LinearOpMode {
             updateProfileAccel(true);
             //release specimen and raise arm to clear high chamber
             intake.setFingerPosition(intake.FINGER_OPEN);
-            //sleep(100);
             intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 600);
-            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.25);
-            sleep(100);
+            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.1);
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
-                            .afterTime(0.5, new armToPickupAndRetract())
+                            .afterTime(0.75, new armToPickUpPos())
                             .splineToLinearHeading(new Pose2d(changeHeadingForPickup, Math.toRadians(297)), Math.toRadians(-63))
                             .strafeTo(new Vector2d(driveForwardToPickup.x + 0.3 * Params.HALF_MAT, driveForwardToPickup.y + 0.2 * Params.HALF_MAT) )
                             .build()
@@ -227,52 +225,63 @@ public class AutoRightHanging extends LinearOpMode {
                     drive.actionBuilder(drive.pose)
                             .afterTime(0.4, new armToPickUpPos())
                             .strafeToLinearHeading(new Vector2d(changeHeadingForPickup.x + 0.3 * Params.HALF_MAT, changeHeadingForPickup.y - 0.85 * Params.HALF_MAT), Math.toRadians(-65))
-                            .afterTime(0.25, new fingerCloseEnRouteAct())
-                            .strafeTo(new Vector2d(driveForwardToPickup.x + 0.3 * Params.HALF_MAT, driveForwardToPickup.y - 0.7 * Params.HALF_MAT))
+                            .afterTime(0.35, new fingerCloseEnRouteAct())
+                            .strafeTo(new Vector2d(driveForwardToPickup.x + 0.3 * Params.HALF_MAT, driveForwardToPickup.y - 0.8 * Params.HALF_MAT))
                             .afterTime(0.05, new armToObsZoneAct())
-                            .strafeToLinearHeading(obsZone, Math.toRadians(179.9998)) // TODO : try updating heading to -160
+                            .strafeToLinearHeading(obsZone, Math.toRadians(-160)) // TODO : try updating heading to -160
                             .afterTime(0.2, new fingerOpenEnRouteAct())
                             .afterTime(0.05, new armToPickupSpecimen())
-                            .strafeToLinearHeading(pickUpSpecimenPos.position, pickUpSpecimenPos.heading)
+                            .strafeToLinearHeading(specimenLineUpPos.position, pickUpSpecimenPos.heading)
+                            .strafeToConstantHeading(pickUpSpecimenPos.position)
                             .build()
             );
 
             updateProfileAccel(false);
 
             //put specimen on high chamber
+            intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.038);
+            sleep(100); //200
+            intake.setFingerPosition(intake.FINGER_CLOSE);
+            sleep(100); // 200
+            intake.setArmPosition(intake.ARM_POS_BACK);
+            sleep(200);
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
                             //.turnTo(Math.toRadians(-179.99)) // TODO : check if we need this fine heading adjust
-                            .afterTime(0.35, new pickUpSpecimenAct()) // TODO : move this act above this runBlocking so we can remove waiting time
-                            .waitSeconds(0.55) // TODO : possibly able to be removed
-                            .afterTime(0.3, new armToBackAct())
+                            //.afterTime(0.35, new pickUpSpecimenAct()) // TODO : move this act above this runBlocking so we can remove waiting time
+                            //.afterTime(0.45, new armToBackAct())
+                            //.waitSeconds(0.55) // TODO : possibly able to be removed
+                            //.afterTime(0.7, new armFlipToHangAct())
                             .strafeToLinearHeading(hangSpecimenPos, 0)
                             .build()
             );
-
-            sleep(250); // TODO : remove this sleep time
             intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
+            intake .setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+
+            //sleep(250); // TODO : remove this sleep time
+            //intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
             //intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
-            sleep(1000);
+            sleep(900);
             intake.setFingerPosition(intake.FINGER_OPEN);
             //sleep(100);
 
             /* start for second specimen */
             //back to observation zone for next specimen
-            intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 600);
-            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.25);
-            sleep(150); //arm runs into hanged specimen
+            intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 750);
+            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.1);
+            sleep(300); //arm runs into hanged specimen
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
                             .setReversed(true)
-                            .afterTime(0.5, new armToPickUpPos())
+                            .afterTime(0.7, new armToPickUpPos())
                             .splineToLinearHeading(new Pose2d(splineThirdSample, Math.toRadians(-90)), Math.toRadians(-90))
                             .afterTime(0.7, new fingerCloseEnRouteAct())
-                            .strafeToConstantHeading(new Vector2d(splineThirdSample.x + 1.2 * Params.HALF_MAT, splineThirdSample.y - 0.7 * Params.HALF_MAT))
-                            .strafeToLinearHeading(obsZone, Math.toRadians(179.9998)) // TODO : update heading to -160
+                            .strafeToConstantHeading(new Vector2d(splineThirdSample.x + 0.6 * Params.HALF_MAT, splineThirdSample.y - 0.8 * Params.HALF_MAT))
+                            .strafeToLinearHeading(obsZone, Math.toRadians(-160)) // TODO : update heading to -160
                             .afterTime(0.2, new fingerOpenEnRouteAct())
                             .afterTime(0.3, new armToPickupSpecimen())
-                            .strafeToLinearHeading(pickUpSpecimenPos.position, pickUpSpecimenPos.heading)
+                            .strafeToLinearHeading(specimenLineUpPos.position, pickUpSpecimenPos.heading)
+                            .strafeToConstantHeading(pickUpSpecimenPos.position)
                             .afterTime(0.35, new pickUpSpecimenAct())
                             .waitSeconds(0.55)
                             .build()
@@ -283,8 +292,8 @@ public class AutoRightHanging extends LinearOpMode {
                             .afterTime(0.3, new armToBackAct())
                             .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x, hangSpecimenPos.y + Params.CHASSIS_HALF_WIDTH), 0)
                             .afterTime(0.2, new armFlipToHangAct())
-                            .afterTime(1.2, new fingerOpenEnRouteAct())
-                            .waitSeconds(1.35)
+                            .afterTime(1.35, new fingerOpenEnRouteAct())
+                            .waitSeconds(1.45)
                             .afterTime(0.1, new armToBackAct())
                             .afterTime(0.1, new wristToBackAct())
                             .strafeTo(new Vector2d(-5.0 * Params.HALF_MAT,-4.0 * Params.HALF_MAT))
@@ -308,17 +317,6 @@ public class AutoRightHanging extends LinearOpMode {
     private class armToPickUpPos implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE);
-            intake.setWristPosition(intake.WRIST_POS_GRAB_SAMPLE);
-            intake.setFingerPosition(intake.FINGER_OPEN);
-            return false;
-        }
-    }
-    private class armToPickupAndRetract implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            //intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 600);
-            //sleep(500);
             intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE);
             intake.setWristPosition(intake.WRIST_POS_GRAB_SAMPLE);
             intake.setFingerPosition(intake.FINGER_OPEN);
