@@ -171,7 +171,7 @@ public class TeleopRR extends LinearOpMode {
                 intake.setArmPosition(intake.ARM_POS_BACK);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
                 sleep(1000); // TODO : optimize sleep time
-                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_TELEOP);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
             }
 
