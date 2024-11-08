@@ -75,7 +75,7 @@ public class intakeUnit
     final double WRIST_POS_HANGING = WRIST_POS_DELTA + 0.1;
 
     //finger
-    final double FINGER_CLOSE = 0.0;
+    final double FINGER_CLOSE = 0.01;
     final double FINGER_OPEN = 0.5;
 
     //arm
@@ -84,8 +84,8 @@ public class intakeUnit
     int ARM_MIN_COUNT_POS = 3820;
     int ARM_MAX_COUNT_POS = 0;
     int ARM_POS_AFTER_HANG = 135;
-    int ARM_POS_HIGH_CHAMBER = ARM_POS_DELTA + 2585;//2490;
-    int ARM_POS_HIGH_CHAMBER_TELEOP = 2520;
+    int ARM_POS_HIGH_CHAMBER = ARM_POS_DELTA + 2600;//2490;
+    int ARM_POS_HIGH_CHAMBER_TELEOP = 2600;
     int ARM_POS_LOW_BUCKET = ARM_POS_DELTA + 1858;
     int ARM_POS_PARKING = ARM_POS_DELTA + 2050;
     int ARM_POS_OBS_ZONE = ARM_POS_DELTA + 3500;

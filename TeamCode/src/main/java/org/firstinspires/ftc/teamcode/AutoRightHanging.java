@@ -199,7 +199,7 @@ public class AutoRightHanging extends LinearOpMode {
                     drive.actionBuilder(drive.pose)
                             .afterTime(0.75, new armToPickUpPos())
                             .splineToLinearHeading(new Pose2d(changeHeadingForPickup, Math.toRadians(297)), Math.toRadians(-63))
-                            .strafeTo(new Vector2d(driveForwardToPickup.x + 0.3 * Params.HALF_MAT, driveForwardToPickup.y + 0.2 * Params.HALF_MAT) )
+                            .strafeTo(new Vector2d(driveForwardToPickup.x + 0.45 * Params.HALF_MAT, driveForwardToPickup.y + 0.2 * Params.HALF_MAT) )
                             .build()
             );
 
@@ -226,7 +226,7 @@ public class AutoRightHanging extends LinearOpMode {
                             .afterTime(0.4, new armToPickUpPos())
                             .strafeToLinearHeading(new Vector2d(changeHeadingForPickup.x + 0.3 * Params.HALF_MAT, changeHeadingForPickup.y - 0.85 * Params.HALF_MAT), Math.toRadians(-65))
                             .afterTime(0.35, new fingerCloseEnRouteAct())
-                            .strafeTo(new Vector2d(driveForwardToPickup.x + 0.3 * Params.HALF_MAT, driveForwardToPickup.y - 0.8 * Params.HALF_MAT))
+                            .strafeTo(new Vector2d(driveForwardToPickup.x + 0.45 * Params.HALF_MAT, driveForwardToPickup.y - 0.8 * Params.HALF_MAT))
                             .afterTime(0.05, new armToObsZoneAct())
                             .strafeToLinearHeading(obsZone, Math.toRadians(-160)) // TODO : try updating heading to -160
                             .afterTime(0.2, new fingerOpenEnRouteAct())
