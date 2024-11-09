@@ -227,24 +227,24 @@ public class AutoRightHanging2 extends LinearOpMode {
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
                             //.turnTo(Math.toRadians(-179.99)) // TODO : check if we need this fine heading adjust
-                            .afterTime(1.7, new intakeAct(intake.ARM_POS_HIGH_CHAMBER, intake.WRIST_POS_HIGH_CHAMBER, 0)) // forward arm to hang first specimen
-                            .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x - 0.1 * Params.HALF_MAT, hangSpecimenPos.y), 0) //adjustment for error en route
+                            .afterTime(1.8, new intakeAct(intake.ARM_POS_HIGH_CHAMBER, intake.WRIST_POS_HIGH_CHAMBER, 0)) // forward arm to hang first specimen
+                            .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x - 0.03 * Params.HALF_MAT, hangSpecimenPos.y), 0) //adjustment for error en route
                             .build()
             );
             //intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
             //intake .setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
-            sleep(400);
+            sleep(700);
             intake.setFingerPosition(intake.FINGER_OPEN);
 
             /* start for second specimen */
             //back to observation zone for next specimen
-            //intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 1200);
-            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.2);
+            intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 400);
+            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.15);
             //sleep(300); //arm runs into hanged specimen
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
                             .setReversed(true)
-                            .afterTime(0.4, new armToPickupSpecimen()) // get arm ready for second specimen pick up
+                            .afterTime(1.0, new armToPickupSpecimen()) // get arm ready for second specimen pick up
                             .strafeToLinearHeading(specimenLineUpPos.position, pickUpSpecimenPos.heading) // spline to side wall for second specimen
                             .strafeToConstantHeading(pickUpSpecimenPos.position)
                             //.afterTime(0.01, new pickUpSpecimenAct()) // finger close, arm back
@@ -262,23 +262,23 @@ public class AutoRightHanging2 extends LinearOpMode {
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
                             // forward arm during strafe
-                            .afterTime(1.6, new intakeAct(intake.ARM_POS_HIGH_CHAMBER, intake.WRIST_POS_HIGH_CHAMBER, 0)) // forward arm to hang first specimen
+                            .afterTime(1.9, new intakeAct(intake.ARM_POS_HIGH_CHAMBER, intake.WRIST_POS_HIGH_CHAMBER, 0)) // forward arm to hang first specimen
                             //.strafeToLinearHeading(hangSpecimenPos, 0)
-                            .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x - 0.2 * Params.HALF_MAT, hangSpecimenPos.y + Params.CHASSIS_HALF_WIDTH), 0)
+                            .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x - 0.1 * Params.HALF_MAT, hangSpecimenPos.y + Params.CHASSIS_HALF_WIDTH), 0)
                             .build()
             );
 
             // back arm after hanging the second specimen
-            sleep(400);
+            sleep(900);
             intake.setFingerPosition(intake.FINGER_OPEN);
             intake.setArmPosition(intake.ARM_POS_BACK);
-            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.25);
+            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.15);
 
             // back to obs zone for parking
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
                             .setReversed(true) // for parking
-                            .splineTo(parkObz, Math.toRadians(-90))
+                            .strafeTo(parkObz)
                             .build()
             );
         }
