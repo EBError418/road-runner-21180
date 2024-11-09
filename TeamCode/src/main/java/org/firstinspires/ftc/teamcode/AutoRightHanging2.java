@@ -152,7 +152,7 @@ public class AutoRightHanging2 extends LinearOpMode {
         Pose2d pickUpSpecimenPos = new Pose2d(- 6 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH, - 3.96 * Params.HALF_MAT, Math.toRadians(269.9998));
         Vector2d splineThirdSample = new Vector2d(-2.35 * Params.HALF_MAT, - leftOrRight * 3.4 * Params.HALF_MAT);
         //Vector2d newSpecimenPos = new Vector2d(pickUpSpecimenPos.position.x, pickUpSpecimenPos.position.y - 0.07 * Params.HALF_MAT);
-        Pose2d specimenLineUpPos = new Pose2d(pickUpSpecimenPos.position.x + 0.5 * Params.HALF_MAT, pickUpSpecimenPos.position.y + Params.HALF_MAT, Math.toRadians(179.9998));
+        Pose2d specimenLineUpPos = new Pose2d(pickUpSpecimenPos.position.x + 0.3 * Params.HALF_MAT, pickUpSpecimenPos.position.y + Params.HALF_MAT, Math.toRadians(179.9998));
 
         //ascent level 1
         Vector2d parkObz = new Vector2d(-5.0 * Params.HALF_MAT,-4.0 * Params.HALF_MAT);
@@ -196,8 +196,8 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .afterTime(0.35, new fingerCloseEnRouteAct())
                             .strafeTo(new Vector2d(driveForwardToPickup.x + 0.45 * Params.HALF_MAT, driveForwardToPickup.y - 0.8 * Params.HALF_MAT))
                             .afterTime(0.01, new intakeAct(intake.ARM_POS_OBS_ZONE, 0 /*intake.WRIST_POS_OBS_ZONE*/, 0)) // lift arm a little bit
-                            .strafeToLinearHeading(obsZone, Math.toRadians(-160))
-                            .afterTime(0.01, new intakeAct(0,0,intake.FINGER_OPEN)) // drop off second sample
+                            .strafeToLinearHeading(new Vector2d(obsZone.x - 5.0, obsZone.y), Math.toRadians(-160))
+                            .afterTime(0.01, new intakeAct(intake.ARM_POS_OBS_ZONE -200,0,intake.FINGER_OPEN)) // drop off second sample
                             .splineToLinearHeading(new Pose2d(splineThirdSample, Math.toRadians(-90)), Math.toRadians(90)) // move back for picking 3rd sample
                             .afterTime(0.01, new armToPickUpPos()) // start for third sample
                             .afterTime(0.7, new fingerCloseEnRouteAct())
