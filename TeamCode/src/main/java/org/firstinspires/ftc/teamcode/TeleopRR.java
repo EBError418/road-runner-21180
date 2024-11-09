@@ -170,7 +170,7 @@ public class TeleopRR extends LinearOpMode {
             if (gpButtons.SpecimenHangAction) {
                 intake.setArmPosition(intake.ARM_POS_BACK);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
-                sleep(1000); // TODO : optimize sleep time
+                sleep(1000); // waiting arm to back position before flip forward to hanging specimen
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_TELEOP);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
             }
@@ -179,9 +179,9 @@ public class TeleopRR extends LinearOpMode {
             if (gpButtons.SpecimenPickupAction) {
                 drive.pose = pickUpSpecimenPos;
                 intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.038);
-                sleep(250); // TODO : optimize sleep time
+                sleep(100);
                 intake.setFingerPosition(intake.FINGER_CLOSE);
-                sleep(250); // TODO : optimize sleep time
+                sleep(100);
                 intake.setArmPosition(intake.ARM_POS_BEFORE_HANG);
                 Actions.runBlocking(
                         drive.actionBuilder(pickUpSpecimenPos)

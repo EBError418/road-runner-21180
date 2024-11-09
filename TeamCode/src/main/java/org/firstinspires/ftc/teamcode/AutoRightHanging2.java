@@ -183,8 +183,8 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .splineToLinearHeading(new Pose2d(changeHeadingForPickup, Math.toRadians(-60)), Math.toRadians(-60))
                             .afterTime(0.35, new intakeAct(0,0, intake.FINGER_CLOSE)) // close finger during strafe
                             .strafeTo(new Vector2d(driveForwardToPickup.x + 0.45 * Params.HALF_MAT, driveForwardToPickup.y + 0.1 * Params.HALF_MAT) )
-                            .afterTime(0.01, new intakeAct(intake.ARM_POS_OBS_ZONE, 0 /*intake.WRIST_POS_OBS_ZONE*/, 0)) // lift arm a little bit
-                            .strafeToLinearHeading(new Vector2d(obsZone.x - Params.HALF_MAT, obsZone.y + Params.HALF_MAT), Math.toRadians(-120.0)) // moving to obs zone
+                            .afterTime(0.01, new intakeAct(intake.ARM_POS_OBS_ZONE, 0, 0)) // lift arm a little bit
+                            .strafeToLinearHeading(new Vector2d(obsZone.x - 1.3 * Params.HALF_MAT, obsZone.y + Params.HALF_MAT), Math.toRadians(-120.0)) // moving to obs zone
                             .afterTime(0.01, new intakeAct(0,0,intake.FINGER_OPEN)) // drop off first sample after 4 inch strafe
                             .build()
             );
@@ -197,20 +197,18 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .strafeTo(new Vector2d(driveForwardToPickup.x + 0.45 * Params.HALF_MAT, driveForwardToPickup.y - 0.8 * Params.HALF_MAT))
                             .afterTime(0.01, new intakeAct(intake.ARM_POS_OBS_ZONE, 0 /*intake.WRIST_POS_OBS_ZONE*/, 0)) // lift arm a little bit
                             .strafeToLinearHeading(new Vector2d(obsZone.x - 5.0, obsZone.y), Math.toRadians(-160))
-                            .afterTime(0.01, new intakeAct(intake.ARM_POS_OBS_ZONE -200,0,intake.FINGER_OPEN)) // drop off second sample
+                            .afterTime(0.01, new intakeAct(intake.ARM_POS_OBS_ZONE -100,0,intake.FINGER_OPEN)) // drop off second sample
+                            .afterTime(0.4, new armToPickUpPos()) // start for third sample
                             .splineToLinearHeading(new Pose2d(splineThirdSample, Math.toRadians(-90)), Math.toRadians(90)) // move back for picking 3rd sample
-                            .afterTime(0.01, new armToPickUpPos()) // start for third sample
-                            .afterTime(0.7, new fingerCloseEnRouteAct())
+                            .afterTime(0.5, new fingerCloseEnRouteAct())
+                            .afterTime(0.6, new intakeAct(intake.ARM_POS_OBS_ZONE, 0, 0)) // lift arm a little bit
                             .strafeToConstantHeading(new Vector2d(splineThirdSample.x + 0.1 * Params.HALF_MAT, splineThirdSample.y - 0.4 * Params.HALF_MAT))
                             .setReversed(true) // to avoid hitting wall during strafe
-                            //.strafeToLinearHeading(new Vector2d(specimenLineUpPos.position.x, obsZone.y + Params.HALF_MAT), Math.toRadians(-90.0)) // strafe to obz
-                            //.afterTime(0.01, new fingerOpenEnRouteAct()) // drop off third sample
-                            //.afterTime(0.01, new armToPickupSpecimen()) // get arm ready for first specimen pick up
-                            .strafeToLinearHeading(specimenLineUpPos.position, pickUpSpecimenPos.heading) // spline to side wall
-                            .afterTime(0.01, new fingerOpenEnRouteAct()) // drop off third sample
-                            .afterTime(0.01, new armToPickupSpecimen()) // get arm ready for first specimen pick up
-                            .strafeToConstantHeading(pickUpSpecimenPos.position)
-                            //.afterTime(0.01, new pickUpSpecimenAct()) // finger close, arm back
+                            .strafeToLinearHeading(specimenLineUpPos.position, Math.toRadians(-100.0)) // spline to side wall
+                            .afterTime(0.01, new intakeAct(intake.ARM_POS_OBS_ZONE - 100, 0, intake.FINGER_OPEN)) // drop off 3rd sample. lift arm a little bit
+                            .afterTime(0.2, new armToPickupSpecimen()) // get arm ready for first specimen pick up
+                            .strafeToLinearHeading(pickUpSpecimenPos.position, Math.toRadians(-90.0)) // spline to side wall
+                            //.strafeToConstantHeading(pickUpSpecimenPos.position)
                             .build()
             );
 
@@ -232,8 +230,6 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x - 0.03 * Params.HALF_MAT, hangSpecimenPos.y), 0) //adjustment for error en route
                             .build()
             );
-            //intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
-            //intake .setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
             sleep(700);
             intake.setFingerPosition(intake.FINGER_OPEN);
 
@@ -248,7 +244,6 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .afterTime(1.0, new armToPickupSpecimen()) // get arm ready for second specimen pick up
                             .strafeToLinearHeading(specimenLineUpPos.position, pickUpSpecimenPos.heading) // spline to side wall for second specimen
                             .strafeToConstantHeading(pickUpSpecimenPos.position)
-                            //.afterTime(0.01, new pickUpSpecimenAct()) // finger close, arm back
                             .build()
             );
             //pickup second specimen
@@ -265,7 +260,8 @@ public class AutoRightHanging2 extends LinearOpMode {
                             // forward arm during strafe
                             .afterTime(1.9, new intakeAct(intake.ARM_POS_HIGH_CHAMBER, intake.WRIST_POS_HIGH_CHAMBER, 0)) // forward arm to hang first specimen
                             //.strafeToLinearHeading(hangSpecimenPos, 0)
-                            .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x - 0.1 * Params.HALF_MAT, hangSpecimenPos.y + Params.CHASSIS_HALF_WIDTH), 0)
+                            //.strafeToLinearHeading(new Vector2d(hangSpecimenPos.x - 0.1 * Params.HALF_MAT, hangSpecimenPos.y + Params.CHASSIS_HALF_WIDTH), 0)
+                            .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x - 0.1 * Params.HALF_MAT, hangSpecimenPos.y - Params.CHASSIS_HALF_WIDTH - 3.0), 0)
                             .build()
             );
 
