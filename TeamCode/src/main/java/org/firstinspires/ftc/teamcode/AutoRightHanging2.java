@@ -175,6 +175,7 @@ public class AutoRightHanging2 extends LinearOpMode {
             intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 1200);
             intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.15);
 
+            sleep(300);
             //Go to pick up first sample on mat
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
@@ -271,7 +272,7 @@ public class AutoRightHanging2 extends LinearOpMode {
             // back arm after hanging the second specimen
             sleep(900);
             intake.setFingerPosition(intake.FINGER_OPEN);
-            intake.setArmPosition(intake.ARM_POS_BACK);
+            intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 400);
             intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.15);
 
             // back to obs zone for parking
