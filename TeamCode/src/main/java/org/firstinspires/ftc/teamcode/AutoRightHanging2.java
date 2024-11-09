@@ -149,10 +149,10 @@ public class AutoRightHanging2 extends LinearOpMode {
         Vector2d driveForwardToPickup = new Vector2d(- 3.5 * Params.HALF_MAT, - leftOrRight * 2.7 * Params.HALF_MAT);
         Vector2d obsZone = new Vector2d(- 3.3 * Params.HALF_MAT, - 3.8 * Params.HALF_MAT);
         Vector2d hangSpecimenPos = new Vector2d(armFlip.x - 0.06 * Params.HALF_MAT, 0);
-        Pose2d pickUpSpecimenPos = new Pose2d(- 6 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH, - 4.06 * Params.HALF_MAT, Math.toRadians(269.9998));
+        Pose2d pickUpSpecimenPos = new Pose2d(- 6 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH, - 3.96 * Params.HALF_MAT, Math.toRadians(269.9998));
         Vector2d splineThirdSample = new Vector2d(-2.35 * Params.HALF_MAT, - leftOrRight * 3.4 * Params.HALF_MAT);
         //Vector2d newSpecimenPos = new Vector2d(pickUpSpecimenPos.position.x, pickUpSpecimenPos.position.y - 0.07 * Params.HALF_MAT);
-        Pose2d specimenLineUpPos = new Pose2d(pickUpSpecimenPos.position.x, pickUpSpecimenPos.position.y + Params.HALF_MAT, Math.toRadians(179.9998));
+        Pose2d specimenLineUpPos = new Pose2d(pickUpSpecimenPos.position.x + 0.5 * Params.HALF_MAT, pickUpSpecimenPos.position.y + Params.HALF_MAT, Math.toRadians(179.9998));
 
         //ascent level 1
         Vector2d parkObz = new Vector2d(-5.0 * Params.HALF_MAT,-4.0 * Params.HALF_MAT);
@@ -173,7 +173,7 @@ public class AutoRightHanging2 extends LinearOpMode {
             //release specimen and raise arm to clear high chamber
             intake.setFingerPosition(intake.FINGER_OPEN);
             intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 1200);
-            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.25);
+            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.15);
 
             //Go to pick up first sample on mat
             Actions.runBlocking(
@@ -227,7 +227,7 @@ public class AutoRightHanging2 extends LinearOpMode {
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
                             //.turnTo(Math.toRadians(-179.99)) // TODO : check if we need this fine heading adjust
-                            .afterTime(1.6, new intakeAct(intake.ARM_POS_HIGH_CHAMBER, intake.WRIST_POS_HIGH_CHAMBER, 0)) // forward arm to hang first specimen
+                            .afterTime(1.7, new intakeAct(intake.ARM_POS_HIGH_CHAMBER, intake.WRIST_POS_HIGH_CHAMBER, 0)) // forward arm to hang first specimen
                             .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x - 0.1 * Params.HALF_MAT, hangSpecimenPos.y), 0) //adjustment for error en route
                             .build()
             );
