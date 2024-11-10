@@ -75,11 +75,11 @@ public class intakeUnit
     final double WRIST_POS_HANGING = WRIST_POS_DELTA + 0.1;
 
     //finger
-    final double FINGER_CLOSE = 0.01;
+    final double FINGER_CLOSE = 0.01; // must bigger than 0 for action builder working
     final double FINGER_OPEN = 0.5;
 
     //arm
-    final int ARM_POS_DELTA = 100;
+    int ARM_POS_DELTA = -3600;
     int ARM_POS_GRAB_SAMPLE = ARM_POS_DELTA + 3585;
     int ARM_POS_HIGH_CHAMBER = ARM_POS_DELTA + 2670;//2490;
     int ARM_POS_HIGH_CHAMBER_TELEOP = ARM_POS_HIGH_CHAMBER;

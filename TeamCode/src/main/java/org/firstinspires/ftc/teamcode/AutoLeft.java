@@ -122,7 +122,7 @@ public class AutoLeft extends LinearOpMode {
         Params.startPose = newStartPose; // init storage pose.
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist", "Finger");
-        intake.resetArmEncoder();
+        //intake.resetArmEncoder();
 
         intake.setFingerPosition(intake.FINGER_CLOSE);
 
@@ -133,7 +133,9 @@ public class AutoLeft extends LinearOpMode {
             telemetry.addData( "FTC 2024 - ", "Wait for starting ");
 
             telemetry.addData("Arm", "position = %d", intake.getArmPosition());
+            telemetry.addData(" ---- ", " ---  ");
 
+            telemetry.addData("Arm calibration - -    ", Params.armCalibrated? "Pass!" :" Failed !!!!!");
             telemetry.update();
         }
 
@@ -155,7 +157,15 @@ public class AutoLeft extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         if (opModeIsActive()) {
-            autonomousCore();
+            if (Params.armCalibrated) {
+                autonomousCore();
+
+                Logging.log("Autonomous time - total Run Time: " + runtime);
+            } else {
+                telemetry.addData("Arm calibration: ---", "need to be done before starting!");
+                telemetry.update();
+                sleep(4000);
+            }
         }
     }
 

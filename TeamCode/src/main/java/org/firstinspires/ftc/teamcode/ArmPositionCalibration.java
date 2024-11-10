@@ -45,15 +45,11 @@ public class ArmPositionCalibration extends LinearOpMode {
     // Declare OpMode members.
     private final ElapsedTime runtime = new ElapsedTime();
     private intakeUnit intake;
-    private Servo DroneServo;
 
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
         Logging.log("Status - Initialized");
-
-        DroneServo = hardwareMap.get(Servo.class, "Drone");
-        DroneServo.setPosition(Params.DRONE_START);
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist", "Finger");
         Params.armCalibrated = true;
@@ -64,30 +60,14 @@ public class ArmPositionCalibration extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         if (opModeIsActive()) {
 
-            //intake.resetArmEncoder();
+            intake.resetArmEncoder();
 
             intake.fingerServoOpen();
+            intake.setArmPosition(intake.ARM_POS_BACK);
 
             sleep(2000);
             telemetry.addData("Arm calibration: ---", "done !");
             telemetry.update();
-            /*
-                    intake.setWristPosition(intake.WRIST_POS_INTAKE);
-            intake.setArmCountPosition(intake.ARM_POS_UNDER_BEAM); // lift arm
-            sleep(1000);
-            intake.armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            intake.armMotor.setPower(0.05); // slowly down arm to ground
-            sleep(200);
-            intake.armMotor.setPower(0);
-            intake.armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-            sleep(3000);  // floating time
-            intake.resetArmEncoder(); // reset arm encoder
-            sleep(100);
-            intake.setArmCountPosition(intake.ARM_POS_AUTO); // get ready for autonomous
-            sleep(1500);
-            telemetry.addData("Arm calibration: ---", "done !");
-            telemetry.update();
-             */
         }
     }
 }

@@ -42,6 +42,7 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -68,7 +69,7 @@ import java.util.List;
  */
 
 @Autonomous(name="Right side auto with hanging", group="Concept")
-//@Disabled
+@Disabled
 public class AutoRightHanging extends LinearOpMode {
     /**
      * Robot Start location: "1" - right side; "-1" - left side.
@@ -117,7 +118,7 @@ public class AutoRightHanging extends LinearOpMode {
         Params.startPose = newStartPose; // init storage pose.
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist", "Finger");
-        intake.resetArmEncoder();
+        //intake.resetArmEncoder();
 
         intake.setFingerPosition(intake.FINGER_CLOSE);
 
