@@ -91,7 +91,7 @@ public class GamePadButtons {
         robotTurn = gamepad1.right_stick_x * gamepad1.right_stick_x * gamepad1.right_stick_x;
 
         //speed controls
-        speedCtrl = gamepad1.back || gamepad2.back;
+        speedCtrl = gamepad1.right_bumper || gamepad2.back;
         speedDown = speedCtrl;
 
         //finger
@@ -119,7 +119,7 @@ public class GamePadButtons {
 
         //sample presets
         SubPickupPos = gamepad1.dpad_up;
-        ArmPickUpPos = gamepad1.right_bumper || gamepad2.right_bumper;
+        ArmPickUpPos = gamepad2.right_bumper;
 
         LowBucketPos = gamepad2.left_bumper;
         EndgameHangingLineup = gamepad2.x;
