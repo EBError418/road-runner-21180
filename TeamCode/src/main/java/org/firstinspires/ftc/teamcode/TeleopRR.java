@@ -92,7 +92,7 @@ public class TeleopRR extends LinearOpMode {
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
                 "Finger");
 
-        intake.setArmModeRunToPosition(intake.getArmPosition());
+        //intake.setArmModeRunToPosition(intake.getArmPosition());
         //intake.resetArmEncoder();
 
         // bulk reading setting - auto refresh mode
@@ -168,10 +168,10 @@ public class TeleopRR extends LinearOpMode {
 
             // hanging specimen action, arm back then forward to hang the specimen
             if (gpButtons.SpecimenHangAction) {
-                intake.setArmPosition(intake.ARM_POS_BACK);
-                intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
-                sleep(1000); // waiting arm to back position before flip forward to hanging specimen
-                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_TELEOP);
+                //intake.setArmPosition(intake.ARM_POS_BACK);
+                //intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+                //sleep(1000); // waiting arm to back position before flip forward to hanging specimen
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_TELEOP+30);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
             }
 

@@ -79,16 +79,16 @@ public class intakeUnit
     final double FINGER_OPEN = 0.5;
 
     //arm
-    int ARM_POS_DELTA = -3600;
-    int ARM_POS_GRAB_SAMPLE = ARM_POS_DELTA + 3585;
-    int ARM_POS_HIGH_CHAMBER = ARM_POS_DELTA + 2670;//2490;
+    int ARM_POS_DELTA = -3920;
+    int ARM_POS_GRAB_SAMPLE = -255;
+    int ARM_POS_HIGH_CHAMBER = -1250;//2490;
     int ARM_POS_HIGH_CHAMBER_TELEOP = ARM_POS_HIGH_CHAMBER;
     int ARM_POS_LOW_BUCKET = ARM_POS_DELTA + 1858;
     int ARM_POS_PARKING = ARM_POS_DELTA + 2050;
-    int ARM_POS_OBS_ZONE = ARM_POS_DELTA + 3500;
+    int ARM_POS_OBS_ZONE = -430;
     int ARM_POS_BACK = ARM_POS_DELTA + 1000;
-    int ARM_POS_BEFORE_HANG = ARM_POS_HIGH_CHAMBER_TELEOP - 200;
-    int ARM_POS_GRAB_SPECIMEN = ARM_POS_DELTA + 3250; //3300;
+    int ARM_POS_BEFORE_HANG = ARM_POS_HIGH_CHAMBER_TELEOP - 175;
+    int ARM_POS_GRAB_SPECIMEN = -540; //3300;
     int ARM_POS_SUB = ARM_POS_DELTA + 2925;
     int ARM_POS_HANGING = ARM_POS_DELTA + 1820;
     int ARM_POS_DOWN_HANGING = ARM_POS_DELTA + 4150;
@@ -117,7 +117,7 @@ public class intakeUnit
         armMotor = hardwareMap.get(DcMotor.class, armServoName);
         armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
-        //setArmModeRunToPosition(0);
+        setArmModeRunToPosition(getArmPosition());
 
         //resetArmPositions(Params.armIntakeCount_InitFront);
     }
