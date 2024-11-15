@@ -103,7 +103,7 @@ public class TeleopRR extends LinearOpMode {
 
         //preset positions used for teleop commands
         Pose2d pickUpSpecimenPos = new Pose2d(- 4.5 * Params.HALF_MAT, - 6 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH, Math.toRadians(179.9998));
-        Vector2d hangSpecimenPos = new Vector2d(- 4.65 * Params.HALF_MAT, - Params.CHASSIS_HALF_WIDTH);
+        Vector2d hangSpecimenPos = new Vector2d(- 4.8 * Params.HALF_MAT, - Params.CHASSIS_HALF_WIDTH);
         Vector2d outOfSubPose = new Vector2d(- 5 * Params.HALF_MAT, - 3 * Params.HALF_MAT);
         Vector2d pickupSamplePos = new Vector2d(- Params.HALF_MAT, - 4 * Params.HALF_MAT);
 

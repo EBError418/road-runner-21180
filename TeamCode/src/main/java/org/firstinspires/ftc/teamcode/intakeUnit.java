@@ -82,7 +82,7 @@ public class intakeUnit
     //arm
     int ARM_POS_DELTA = -3920;
     int ARM_POS_GRAB_SAMPLE = -255;
-    int ARM_POS_HIGH_CHAMBER = -1130;//-1190;//2490;
+    int ARM_POS_HIGH_CHAMBER = -1110;//-1190;//2490;
     int ARM_POS_HIGH_CHAMBER_TELEOP = ARM_POS_HIGH_CHAMBER;
     int ARM_POS_LOW_BUCKET = -2020;
     int ARM_POS_PARKING = ARM_POS_DELTA + 2050;
