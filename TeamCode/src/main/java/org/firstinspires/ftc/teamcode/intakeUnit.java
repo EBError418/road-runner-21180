@@ -76,12 +76,13 @@ public class intakeUnit
 
     //finger
     final double FINGER_CLOSE = 0.01; // must bigger than 0 for action builder working
+    final double FINGER_SPECIMEN_CLOSE = 0.1;
     final double FINGER_OPEN = 0.5;
 
     //arm
     int ARM_POS_DELTA = -3920;
     int ARM_POS_GRAB_SAMPLE = -255;
-    int ARM_POS_HIGH_CHAMBER = -1190;//2490;
+    int ARM_POS_HIGH_CHAMBER = -1130;//-1190;//2490;
     int ARM_POS_HIGH_CHAMBER_TELEOP = ARM_POS_HIGH_CHAMBER;
     int ARM_POS_LOW_BUCKET = -2020;
     int ARM_POS_PARKING = ARM_POS_DELTA + 2050;

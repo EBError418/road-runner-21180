@@ -162,10 +162,10 @@ public class AutoRightHanging2 extends LinearOpMode {
         Vector2d driveForwardToPickup = new Vector2d(- 3.5 * Params.HALF_MAT, - leftOrRight * 2.7 * Params.HALF_MAT);
         Vector2d obsZone = new Vector2d(- 3.3 * Params.HALF_MAT, - 3.8 * Params.HALF_MAT);
         Vector2d hangSpecimenPos = new Vector2d(armFlip.x - 0.06 * Params.HALF_MAT, 0);
-        Pose2d pickUpSpecimenPos = new Pose2d(- 6 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH, - 3.96 * Params.HALF_MAT, Math.toRadians(-90.0));
+        Pose2d pickUpSpecimenPos = new Pose2d(- 6.2 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH, - 3.96 * Params.HALF_MAT, Math.toRadians(-90.0));
         Vector2d splineThirdSample = new Vector2d(-2.35 * Params.HALF_MAT, - leftOrRight * 3.4 * Params.HALF_MAT);
         //Vector2d newSpecimenPos = new Vector2d(pickUpSpecimenPos.position.x, pickUpSpecimenPos.position.y - 0.07 * Params.HALF_MAT);
-        Pose2d specimenLineUpPos = new Pose2d(pickUpSpecimenPos.position.x + 0.3 * Params.HALF_MAT, pickUpSpecimenPos.position.y + Params.HALF_MAT, Math.toRadians(179.9998));
+        Pose2d specimenLineUpPos = new Pose2d(pickUpSpecimenPos.position.x + 0.2 * Params.HALF_MAT, pickUpSpecimenPos.position.y + Params.HALF_MAT, Math.toRadians(-90.0));
 
         //ascent level 1
         Vector2d parkObz = new Vector2d(-5.0 * Params.HALF_MAT,-4.0 * Params.HALF_MAT);
@@ -204,8 +204,8 @@ public class AutoRightHanging2 extends LinearOpMode {
 
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
-                            .afterTime(0.4, new armToPickUpPos())
-                            .strafeToLinearHeading(new Vector2d(changeHeadingForPickup.x + 0.2 * Params.HALF_MAT, changeHeadingForPickup.y - 0.85 * Params.HALF_MAT), Math.toRadians(-65))
+                            .afterTime(0.4, new armToPickUpPos()) // pickup second sample
+                            .strafeToLinearHeading(new Vector2d(changeHeadingForPickup.x + 0.3 * Params.HALF_MAT, changeHeadingForPickup.y - 0.85 * Params.HALF_MAT), Math.toRadians(-65))
                             .afterTime(0.35, new fingerCloseEnRouteAct())
                             .strafeTo(new Vector2d(driveForwardToPickup.x + 0.45 * Params.HALF_MAT, driveForwardToPickup.y - 0.8 * Params.HALF_MAT))
                             .afterTime(0.01, new intakeAct(intake.ARM_POS_OBS_ZONE, 0 /*intake.WRIST_POS_OBS_ZONE*/, 0)) // lift arm a little bit
@@ -217,10 +217,10 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .afterTime(0.7, new intakeAct(intake.ARM_POS_OBS_ZONE, 0, 0)) // lift arm a little bit
                             .strafeToConstantHeading(new Vector2d(splineThirdSample.x + 0.1 * Params.HALF_MAT, splineThirdSample.y - 0.5 * Params.HALF_MAT))
                             .setReversed(true) // to avoid hitting wall during strafe
-                            .strafeToLinearHeading(specimenLineUpPos.position, Math.toRadians(-90.0)) // spline to side wall
+                            .strafeToConstantHeading(specimenLineUpPos.position) // spline to side wall
                             .afterTime(0.01, new intakeAct(intake.ARM_POS_OBS_ZONE - 100, 0, intake.FINGER_OPEN)) // drop off 3rd sample. lift arm a little bit
                             .afterTime(0.2, new armToPickupSpecimen()) // get arm ready for first specimen pick up
-                            .strafeToLinearHeading(pickUpSpecimenPos.position, Math.toRadians(-90.0)) // spline to side wall
+                            .strafeToConstantHeading(pickUpSpecimenPos.position) // spline pick up pos
                             //.strafeToConstantHeading(pickUpSpecimenPos.position)
                             .build()
             );
@@ -274,7 +274,7 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .afterTime(1.9, new intakeAct(intake.ARM_POS_HIGH_CHAMBER, intake.WRIST_POS_HIGH_CHAMBER, 0)) // forward arm to hang first specimen
                             //.strafeToLinearHeading(hangSpecimenPos, 0)
                             //.strafeToLinearHeading(new Vector2d(hangSpecimenPos.x - 0.1 * Params.HALF_MAT, hangSpecimenPos.y + Params.CHASSIS_HALF_WIDTH), 0)
-                            .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x + 0.1 * Params.HALF_MAT, hangSpecimenPos.y - Params.CHASSIS_HALF_WIDTH - 3.0), 0)
+                            .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x + 0.01 * Params.HALF_MAT, hangSpecimenPos.y - Params.CHASSIS_HALF_WIDTH + 4.0), 0)
                             .build()
             );
 
@@ -291,6 +291,9 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .strafeTo(parkObz)
                             .build()
             );
+            intake.setFingerPosition(intake.FINGER_SPECIMEN_CLOSE);
+            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+
         }
         Logging.log("X position = %2f, Y position = %2f", drive.pose.position.x, drive.pose.position.y);
     }
