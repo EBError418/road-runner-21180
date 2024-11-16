@@ -68,7 +68,7 @@ public final class MecanumDrive {
         public boolean useDeadWheel = true;
         public double inPerTick = useDeadWheel? 0.00294 : 0.02208155454144; // WHEEL_RADIUS(1.8898) * 2 * Math.PI / TICKS_PER_REV(537.6)
         public double lateralInPerTick = useDeadWheel? 0.002622 : 0.019/0.9786;
-        public double trackWidthTicks = useDeadWheel? 3542.133 : 1033.694878742297;
+        public double trackWidthTicks = useDeadWheel? 3365.026 : 1033.694878742297; //3542.133
 
         // feedforward parameters (in tick units)
         public double kS = useDeadWheel? 0.239 : 0.3626963142056274;

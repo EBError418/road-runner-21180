@@ -165,7 +165,7 @@ public class AutoRightHanging2 extends LinearOpMode {
         Pose2d pickUpSpecimenPos = new Pose2d(- 5.5 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH, - 3.96 * Params.HALF_MAT, Math.toRadians(-90.0));
         Vector2d splineThirdSample = new Vector2d(-2.2 * Params.HALF_MAT, - leftOrRight * 2.9 * Params.HALF_MAT);
         //Vector2d newSpecimenPos = new Vector2d(pickUpSpecimenPos.position.x, pickUpSpecimenPos.position.y - 0.07 * Params.HALF_MAT);
-        Pose2d specimenLineUpPos = new Pose2d(pickUpSpecimenPos.position.x + 0.1 * Params.HALF_MAT, pickUpSpecimenPos.position.y + Params.HALF_MAT, Math.toRadians(-90.0));
+        Pose2d specimenLineUpPos = new Pose2d(pickUpSpecimenPos.position.x + 0.0 * Params.HALF_MAT, pickUpSpecimenPos.position.y + Params.HALF_MAT, Math.toRadians(-90.0));
 
         //ascent level 1
         Vector2d parkObz = new Vector2d(-5.0 * Params.HALF_MAT,-4.0 * Params.HALF_MAT);
@@ -206,24 +206,27 @@ public class AutoRightHanging2 extends LinearOpMode {
                     drive.actionBuilder(drive.pose)
                             .afterTime(0.4, new armToPickUpPos()) // pickup second sample
                             .strafeToLinearHeading(new Vector2d(changeHeadingForPickup.x + 0.4 * Params.HALF_MAT, changeHeadingForPickup.y - 0.85 * Params.HALF_MAT), Math.toRadians(-65))
-                            .afterTime(0.35, new fingerCloseEnRouteAct())
+                            .afterTime(0.35, new fingerCloseEnRouteAct()) // second sample
                             .strafeTo(new Vector2d(driveForwardToPickup.x + 0.45 * Params.HALF_MAT, driveForwardToPickup.y - 0.75 * Params.HALF_MAT))
                             .afterTime(0.01, new intakeAct(intake.ARM_POS_OBS_ZONE, 0 /*intake.WRIST_POS_OBS_ZONE*/, 0)) // lift arm a little bit
                             .strafeToLinearHeading(new Vector2d(obsZone.x - 5.0, obsZone.y), Math.toRadians(-160))
                             .afterTime(0.01, new intakeAct(intake.ARM_POS_OBS_ZONE - 100,0,intake.FINGER_OPEN)) // drop off second sample
                             .afterTime(0.4, new armToPickUpPos()) // start for third sample
+                            .setReversed(true) // move back to pick up 3rd sample
                             .splineToLinearHeading(new Pose2d(splineThirdSample, Math.toRadians(-90)), Math.toRadians(90)) // move back for picking 3rd sample
                             .afterTime(0.72, new fingerCloseEnRouteAct())
                             .afterTime(0.74, new intakeAct(intake.ARM_POS_OBS_ZONE, 0, 0)) // lift arm a little bit
                             .strafeToConstantHeading(new Vector2d(splineThirdSample.x, splineThirdSample.y - 0.99 * Params.HALF_MAT))
                             .setReversed(true) // to avoid hitting wall during strafe
-                            .strafeToConstantHeading(specimenLineUpPos.position) // spline to side wall
+                            .strafeToLinearHeading(specimenLineUpPos.position, specimenLineUpPos.heading) // spline to side wall
                             .afterTime(0.01, new intakeAct(intake.ARM_POS_OBS_ZONE - 100, 0, intake.FINGER_OPEN)) // drop off 3rd sample. lift arm a little bit
                             .afterTime(0.2, new armToPickupSpecimen()) // get arm ready for first specimen pick up
+                            //.turnTo(pickUpSpecimenPos.heading) // fine turn heading before pickup first specimen
                             .strafeToConstantHeading(pickUpSpecimenPos.position) // spline pick up pos
                             //.strafeToConstantHeading(pickUpSpecimenPos.position)
                             .build()
             );
+            Logging.log("after 1st specimen pick up heading: %2f", Math.toDegrees(drive.pose.heading.log()));
 
             updateProfileAccel(false);
 
@@ -257,9 +260,11 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .setReversed(true)
                             .afterTime(1.0, new armToPickupSpecimen()) // get arm ready for second specimen pick up
                             .strafeToLinearHeading(specimenLineUpPos.position, pickUpSpecimenPos.heading) // spline to side wall for second specimen
-                            .strafeToConstantHeading(pickUpSpecimenPos.position)
+                            .turnTo(pickUpSpecimenPos.heading) // fine turn heading before pickup first specimen
+                            .strafeToLinearHeading(pickUpSpecimenPos.position, pickUpSpecimenPos.heading)
                             .build()
             );
+            Logging.log("after 2nd specimen pick up heading: %2f", Math.toDegrees(drive.pose.heading.log()));
             //pickup second specimen
             intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.038);
             sleep(100); //200
