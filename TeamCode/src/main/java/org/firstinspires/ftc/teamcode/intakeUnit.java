@@ -65,7 +65,7 @@ public class intakeUnit
 
     //new stuff
     final double WRIST_POS_DELTA = 0.0;
-    final double WRIST_POS_GRAB_SAMPLE = WRIST_POS_DELTA + 0.380;
+    final double WRIST_POS_GRAB_SAMPLE = WRIST_POS_DELTA + 0.36;
     final double WRIST_POS_HIGH_CHAMBER = WRIST_POS_DELTA + 0.454;
     final double WRIST_POS_LOW_BUCKET = WRIST_POS_DELTA + 0.626;
     final double WRIST_POS_PARKING = WRIST_POS_DELTA + 0.1;
