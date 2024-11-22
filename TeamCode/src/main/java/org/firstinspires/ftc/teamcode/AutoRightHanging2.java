@@ -162,7 +162,7 @@ public class AutoRightHanging2 extends LinearOpMode {
         Vector2d driveForwardToPickup = new Vector2d(- 3.5 * Params.HALF_MAT, - leftOrRight * 2.7 * Params.HALF_MAT);
         Vector2d obsZone = new Vector2d(- 3.3 * Params.HALF_MAT, - 3.8 * Params.HALF_MAT);
         Vector2d hangSpecimenPos = new Vector2d(armFlip.x - 0.09 * Params.HALF_MAT, 0);
-        Pose2d pickUpSpecimenPos = new Pose2d(- 6.1 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH, - 4.1 * Params.HALF_MAT, Math.toRadians(-85.0));
+        Pose2d pickUpSpecimenPos = new Pose2d(- 6.1 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH, - 4.15 * Params.HALF_MAT, Math.toRadians(-85.0));
         Vector2d splineThirdSample = new Vector2d(-2.2 * Params.HALF_MAT, - leftOrRight * 2.9 * Params.HALF_MAT);
         //Vector2d newSpecimenPos = new Vector2d(pickUpSpecimenPos.position.x, pickUpSpecimenPos.position.y - 0.07 * Params.HALF_MAT);
         Pose2d specimenLineUpPos = new Pose2d(pickUpSpecimenPos.position.x +1.5, pickUpSpecimenPos.position.y + Params.HALF_MAT, Math.toRadians(-81.0));
@@ -233,7 +233,7 @@ public class AutoRightHanging2 extends LinearOpMode {
             updateProfileAccel(false);
 
             //put specimen on high chamber
-            intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.038);
+            intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.032);
             sleep(100); //200
             intake.setFingerPosition(intake.FINGER_CLOSE);
             sleep(100); // 200
@@ -269,7 +269,7 @@ public class AutoRightHanging2 extends LinearOpMode {
             );
             Logging.log("after 2nd specimen pick up heading: %2f", Math.toDegrees(drive.pose.heading.log()));
             //pickup second specimen
-            intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.038);
+            intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.032);
             sleep(100); //200
             intake.setFingerPosition(intake.FINGER_CLOSE);
             sleep(100); // 200
