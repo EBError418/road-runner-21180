@@ -43,7 +43,10 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.List;
 
@@ -91,6 +94,7 @@ public class AutoRightHanging2 extends LinearOpMode {
         // road runner variables
         newStartPose = new Pose2d((-6 * Params.HALF_MAT + Params.CHASSIS_LENGTH / 2),(-leftRight * Params.CHASSIS_HALF_WIDTH),0.0);
     }
+    private DistanceSensor distSensor;
 
     @Override
     public void runOpMode() {
@@ -108,9 +112,21 @@ public class AutoRightHanging2 extends LinearOpMode {
 
         intake.setFingerPosition(intake.FINGER_CLOSE);
 
+        // you can use this as a regular DistanceSensor.
+        distSensor = hardwareMap.get(DistanceSensor.class, "distance");
+
+        // you can also cast this to a Rev2mDistanceSensor if you want to use added
+        // methods associated with the Rev2mDistanceSensor class.
+        //Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor) sensorDistance;
+
+
         while (!isStarted()) {
             sleep(10);
             telemetry.addData( "FTC 2024 - ", "Wait for starting ");
+
+            telemetry.addData("deviceName", distSensor.getDeviceName() );
+
+            telemetry.addData("range", String.format("%.01f in", distSensor.getDistance(DistanceUnit.INCH)));
 
             telemetry.addData("Arm", "position = %d", intake.getArmPosition());
 
@@ -166,6 +182,7 @@ public class AutoRightHanging2 extends LinearOpMode {
         Vector2d splineThirdSample = new Vector2d(-2.2 * Params.HALF_MAT, - leftOrRight * 2.9 * Params.HALF_MAT);
         //Vector2d newSpecimenPos = new Vector2d(pickUpSpecimenPos.position.x, pickUpSpecimenPos.position.y - 0.07 * Params.HALF_MAT);
         Pose2d specimenLineUpPos = new Pose2d(pickUpSpecimenPos.position.x +1.5, pickUpSpecimenPos.position.y + Params.HALF_MAT, Math.toRadians(-81.0));
+
 
         //ascent level 1
         Vector2d parkObz = new Vector2d(-5.0 * Params.HALF_MAT,-4.0 * Params.HALF_MAT);
@@ -288,6 +305,12 @@ public class AutoRightHanging2 extends LinearOpMode {
             );
 
             // back arm after hanging the second specimen
+            double sensorDist = distSensor.getDistance(DistanceUnit.INCH);
+            Actions.runBlocking(
+                    drive.actionBuilder(drive.pose)
+                            .strafeToConstantHeading(new Vector2d(hangSpecimenPos.x - , hangSpecimenPos.y))
+                            .build()
+            );
             sleep(900);
             intake.setFingerPosition(intake.FINGER_OPEN);
             intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 700);

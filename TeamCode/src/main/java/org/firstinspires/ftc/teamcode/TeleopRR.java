@@ -37,8 +37,11 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.List;
 
@@ -77,6 +80,7 @@ public class TeleopRR extends LinearOpMode {
     // debug flags, turn it off for formal version to save time of logging
     boolean debugFlag = true;
 
+    private DistanceSensor sensorDistance;
 
     @Override
     public void runOpMode() {
@@ -94,6 +98,14 @@ public class TeleopRR extends LinearOpMode {
 
         //intake.setArmModeRunToPosition(intake.getArmPosition());
         //intake.resetArmEncoder();
+
+        // you can use this as a regular DistanceSensor.
+        sensorDistance = hardwareMap.get(DistanceSensor.class, "distance");
+
+        // you can also cast this to a Rev2mDistanceSensor if you want to use added
+        // methods associated with the Rev2mDistanceSensor class.
+        //Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor) sensorDistance;
+
 
         // bulk reading setting - auto refresh mode
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
@@ -254,6 +266,10 @@ public class TeleopRR extends LinearOpMode {
                 telemetry.addData("heading", " %.3f", Math.toDegrees(drive.pose.heading.log()));
 
                 telemetry.addData("location", " %s", drive.pose.position.toString());
+                telemetry.addData(" --- ", " --- ");
+
+                telemetry.addData("range", String.format("%.01f in", sensorDistance.getDistance(DistanceUnit.INCH)));
+
 
                 telemetry.update(); // update message at the end of while loop
             }
