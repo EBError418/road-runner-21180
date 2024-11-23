@@ -114,7 +114,7 @@ public class TeleopRR extends LinearOpMode {
 
         //preset positions used for teleop commands
         Pose2d pickUpSpecimenPos = new Pose2d(- 4.5 * Params.HALF_MAT, - 6 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH, Math.toRadians(179.9998));
-        Vector2d hangSpecimenPos = new Vector2d(- 4.8 * Params.HALF_MAT,  2.0);
+        Vector2d hangSpecimenPos = new Vector2d(- 4.8 * Params.HALF_MAT,  - Params.CHASSIS_HALF_WIDTH + 10.0);
         Vector2d outOfSubPose = new Vector2d(- 5 * Params.HALF_MAT, - 3 * Params.HALF_MAT);
         Vector2d pickupSamplePos = new Vector2d(- Params.HALF_MAT, - 4 * Params.HALF_MAT);
 
@@ -257,11 +257,13 @@ public class TeleopRR extends LinearOpMode {
                 Logging.log("after adjust X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
 
                 sleep(700);
+
+                // moving specimen
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_TELEOP - 200);
 
                 Actions.runBlocking(
                         drive.actionBuilder(drive.pose)
-                                .strafeToConstantHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y + 8.0))
+                                .strafeToConstantHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y - 8.0))
                                 .build()
                 );
 

@@ -262,7 +262,7 @@ public class AutoRightHanging2 extends LinearOpMode {
                     drive.actionBuilder(drive.pose)
                             //.turnTo(Math.toRadians(-179.99)) // TODO : check if we need this fine heading adjust
                             .afterTime(1.8, new intakeAct(intake.ARM_POS_HIGH_CHAMBER + 50, intake.WRIST_POS_HIGH_CHAMBER, 0)) // forward arm to hang first specimen
-                            .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x - 0.1 * Params.HALF_MAT, hangSpecimenPos.y + 0.5 * Params.HALF_MAT), 0) //adjustment for error en route
+                            .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x - 0.1 * Params.HALF_MAT, hangSpecimenPos.y - Params.CHASSIS_HALF_WIDTH + 4.0), 0) //adjustment for error en route
                             .build()
             );
 
@@ -314,7 +314,7 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .afterTime(1.9, new intakeAct(intake.ARM_POS_HIGH_CHAMBER, intake.WRIST_POS_HIGH_CHAMBER, 0)) // forward arm to hang first specimen
                             //.strafeToLinearHeading(hangSpecimenPos, 0)
                             //.strafeToLinearHeading(new Vector2d(hangSpecimenPos.x - 0.1 * Params.HALF_MAT, hangSpecimenPos.y + Params.CHASSIS_HALF_WIDTH), 0)
-                            .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x - 0.05 * Params.HALF_MAT, hangSpecimenPos.y - Params.CHASSIS_HALF_WIDTH + 4.0), 0)
+                            .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x - 0.05 * Params.HALF_MAT, hangSpecimenPos.y - Params.CHASSIS_HALF_WIDTH + 8.0), 0)
                             .build()
             );
 
