@@ -39,6 +39,7 @@ import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
@@ -221,7 +222,8 @@ public class TeleopRR extends LinearOpMode {
                 );
                 double sensorDist = distSensor.getDistance(DistanceUnit.INCH);
                 double shiftDelta = sensorDist - Params.HIGH_CHAMBER_DIST;
-                shiftDelta = (shiftDelta > 2)? 2 : ((shiftDelta < -2)? -2 : shiftDelta);
+                //shiftDelta = (shiftDelta > 6)? 6 : ((shiftDelta < -6)? -6 : shiftDelta);
+                shiftDelta = Range.clip(shiftDelta, -7.0, 7.0);
                 Logging.log("drive pose before distance");
                 Logging.log(" X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
                 Logging.log("tele Y sensor dist = %2f, shift delta = %2f", sensorDist, shiftDelta);
@@ -256,7 +258,7 @@ public class TeleopRR extends LinearOpMode {
 
                 double sensorDist = distSensor.getDistance(DistanceUnit.INCH);
                 double shiftDelta = sensorDist - Params.HIGH_CHAMBER_DIST;
-                shiftDelta = (shiftDelta > 2)? 2 : ((shiftDelta < -2)? -2 : shiftDelta);
+                shiftDelta = Range.clip(shiftDelta, -7.0, 7.0);
                 Logging.log("drive pose before distance");
                 Logging.log(" X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
                 Logging.log(" teleop sensor back  dist = %2f, shift delta = %2f", sensorDist, shiftDelta);
