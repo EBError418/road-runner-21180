@@ -265,7 +265,21 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x - 0.1 * Params.HALF_MAT, hangSpecimenPos.y + 0.5 * Params.HALF_MAT), 0) //adjustment for error en route
                             .build()
             );
-            sleep(700);
+
+            double sensorDist = distSensor.getDistance(DistanceUnit.INCH);
+            double shiftDelta = sensorDist - Params.DISTANCE;
+            Logging.log("drive pose before distance");
+            Logging.log(" X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
+            Logging.log("sensor dist = %2f, shift delta = %2f", sensorDist, shiftDelta);
+
+            Actions.runBlocking(
+                    drive.actionBuilder(drive.pose)
+                            .strafeToConstantHeading(new Vector2d(drive.pose.position.x + shiftDelta , drive.pose.position.y))
+                            .build()
+            );
+            Logging.log("after adjust X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
+
+            sleep(500);
             intake.setFingerPosition(intake.FINGER_OPEN);
 
             /* start for second specimen */
@@ -305,13 +319,20 @@ public class AutoRightHanging2 extends LinearOpMode {
             );
 
             // back arm after hanging the second specimen
-            double sensorDist = distSensor.getDistance(DistanceUnit.INCH);
+            sensorDist = distSensor.getDistance(DistanceUnit.INCH);
+            shiftDelta = sensorDist - Params.DISTANCE;
+            Logging.log("drive pose before distance");
+            Logging.log(" X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
+            Logging.log("sensor dist = %2f, shift delta = %2f", sensorDist, shiftDelta);
+
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
-                            .strafeToConstantHeading(new Vector2d(hangSpecimenPos.x - , hangSpecimenPos.y))
+                            .strafeToConstantHeading(new Vector2d(drive.pose.position.x + shiftDelta , drive.pose.position.y))
                             .build()
             );
-            sleep(900);
+            Logging.log("after adjust X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
+
+            sleep(500);
             intake.setFingerPosition(intake.FINGER_OPEN);
             intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 700);
             intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.20);
