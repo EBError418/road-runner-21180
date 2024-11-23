@@ -196,8 +196,22 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .build()
             );
             Logging.log("After arm flip pos wrist pos: %2f", intake.getWristPosition());
+
             Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
-            sleep(1100); // TODO : optimize sleep time
+            double sensorDist = distSensor.getDistance(DistanceUnit.INCH);
+            double shiftDelta = sensorDist - Params.HIGH_CHAMBER_DIST;
+            shiftDelta = (shiftDelta > 2)? 2 : ((shiftDelta < -2)? -2 : shiftDelta);
+            Logging.log("drive pose before distance");
+            Logging.log(" X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
+            Logging.log("fist specimen sensor dist = %2f, shift delta = %2f", sensorDist, shiftDelta);
+
+            Actions.runBlocking(
+                    drive.actionBuilder(drive.pose)
+                            .strafeToConstantHeading(new Vector2d(drive.pose.position.x + shiftDelta , drive.pose.position.y))
+                            .build()
+            );
+            Logging.log("after adjust X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
+            sleep(900); // TODO : optimize sleep time
 
             updateProfileAccel(true);
             //release specimen and raise arm to clear high chamber
@@ -266,11 +280,12 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .build()
             );
 
-            double sensorDist = distSensor.getDistance(DistanceUnit.INCH);
-            double shiftDelta = sensorDist - Params.DISTANCE;
+            sensorDist = distSensor.getDistance(DistanceUnit.INCH);
+            shiftDelta = sensorDist - Params.HIGH_CHAMBER_DIST;
+            shiftDelta = (shiftDelta > 2)? 2 : ((shiftDelta < -2)? -2 : shiftDelta);
             Logging.log("drive pose before distance");
             Logging.log(" X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
-            Logging.log("sensor dist = %2f, shift delta = %2f", sensorDist, shiftDelta);
+            Logging.log("second specimen sensor dist = %2f, shift delta = %2f", sensorDist, shiftDelta);
 
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
@@ -320,10 +335,11 @@ public class AutoRightHanging2 extends LinearOpMode {
 
             // back arm after hanging the second specimen
             sensorDist = distSensor.getDistance(DistanceUnit.INCH);
-            shiftDelta = sensorDist - Params.DISTANCE;
+            shiftDelta = sensorDist - Params.HIGH_CHAMBER_DIST;
+            shiftDelta = (shiftDelta > 2)? 2 : ((shiftDelta < -2)? -2 : shiftDelta);
             Logging.log("drive pose before distance");
             Logging.log(" X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
-            Logging.log("sensor dist = %2f, shift delta = %2f", sensorDist, shiftDelta);
+            Logging.log("third specimen sensor dist = %2f, shift delta = %2f", sensorDist, shiftDelta);
 
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)

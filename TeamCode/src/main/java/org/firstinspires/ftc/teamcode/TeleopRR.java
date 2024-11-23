@@ -38,7 +38,6 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -114,7 +113,7 @@ public class TeleopRR extends LinearOpMode {
 
         //preset positions used for teleop commands
         Pose2d pickUpSpecimenPos = new Pose2d(- 4.5 * Params.HALF_MAT, - 6 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH, Math.toRadians(179.9998));
-        Vector2d hangSpecimenPos = new Vector2d(- 4.8 * Params.HALF_MAT,  - Params.CHASSIS_HALF_WIDTH + 10.0);
+        Vector2d hangSpecimenPos = new Vector2d(- 4.8 * Params.HALF_MAT,  - Params.CHASSIS_HALF_WIDTH + 12.0);
         Vector2d outOfSubPose = new Vector2d(- 5 * Params.HALF_MAT, - 3 * Params.HALF_MAT);
         Vector2d pickupSamplePos = new Vector2d(- Params.HALF_MAT, - 4 * Params.HALF_MAT);
 
@@ -185,12 +184,23 @@ public class TeleopRR extends LinearOpMode {
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_TELEOP);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
 
+            }
+
+            // hanging specimen action, arm back then forward to hang the specimen
+            if (gamepad1.b) {
+                intake.setArmPosition(intake.ARM_POS_BACK);
+                intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+                sleep(1000); // waiting arm to back position before flip forward to hanging specimen
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_TELEOP);
+                intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+
                 sleep(1000);
-                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_TELEOP - 200);
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_TELEOP - 300);
+                sleep(200);
 
                 Actions.runBlocking(
                         drive.actionBuilder(drive.pose)
-                                .strafeToConstantHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y - 8.0))
+                                .strafeToConstantHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y - 12.0))
                                 .build()
                 );
 
@@ -210,10 +220,11 @@ public class TeleopRR extends LinearOpMode {
                                 .build()
                 );
                 double sensorDist = distSensor.getDistance(DistanceUnit.INCH);
-                double shiftDelta = sensorDist - Params.DISTANCE;
+                double shiftDelta = sensorDist - Params.HIGH_CHAMBER_DIST;
+                shiftDelta = (shiftDelta > 2)? 2 : ((shiftDelta < -2)? -2 : shiftDelta);
                 Logging.log("drive pose before distance");
                 Logging.log(" X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
-                Logging.log("sensor dist = %2f, shift delta = %2f", sensorDist, shiftDelta);
+                Logging.log("tele Y sensor dist = %2f, shift delta = %2f", sensorDist, shiftDelta);
 
                 Actions.runBlocking(
                         drive.actionBuilder(drive.pose)
@@ -244,10 +255,11 @@ public class TeleopRR extends LinearOpMode {
 
 
                 double sensorDist = distSensor.getDistance(DistanceUnit.INCH);
-                double shiftDelta = sensorDist - Params.DISTANCE;
+                double shiftDelta = sensorDist - Params.HIGH_CHAMBER_DIST;
+                shiftDelta = (shiftDelta > 2)? 2 : ((shiftDelta < -2)? -2 : shiftDelta);
                 Logging.log("drive pose before distance");
                 Logging.log(" X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
-                Logging.log("sensor dist = %2f, shift delta = %2f", sensorDist, shiftDelta);
+                Logging.log(" teleop sensor back  dist = %2f, shift delta = %2f", sensorDist, shiftDelta);
 
                 Actions.runBlocking(
                         drive.actionBuilder(drive.pose)
@@ -259,15 +271,28 @@ public class TeleopRR extends LinearOpMode {
                 sleep(700);
 
                 // moving specimen
-                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_TELEOP - 200);
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_TELEOP - 300);
+                sleep(200);
 
                 Actions.runBlocking(
                         drive.actionBuilder(drive.pose)
-                                .strafeToConstantHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y - 8.0))
+                                .strafeToConstantHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y - 12.0))
                                 .build()
                 );
-
             }
+
+            /*
+            if (gamepad1.b) {
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_TELEOP - 200);
+                sleep(200);
+                Actions.runBlocking(
+                        drive.actionBuilder(drive.pose)
+                                .strafeToLinearHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y - 12.0), drive.pose.heading.log() - Math.toRadians(15.0))
+                                .build()
+                );
+            }
+
+             */
 
 
             // set arm, wrist, finger positions before pickup specimen.
