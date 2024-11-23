@@ -114,7 +114,7 @@ public class TeleopRR extends LinearOpMode {
 
         //preset positions used for teleop commands
         Pose2d pickUpSpecimenPos = new Pose2d(- 4.5 * Params.HALF_MAT, - 6 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH, Math.toRadians(179.9998));
-        Vector2d hangSpecimenPos = new Vector2d(- 4.8 * Params.HALF_MAT, - Params.CHASSIS_HALF_WIDTH - 3.0);
+        Vector2d hangSpecimenPos = new Vector2d(- 4.8 * Params.HALF_MAT,  2.0);
         Vector2d outOfSubPose = new Vector2d(- 5 * Params.HALF_MAT, - 3 * Params.HALF_MAT);
         Vector2d pickupSamplePos = new Vector2d(- Params.HALF_MAT, - 4 * Params.HALF_MAT);
 
@@ -184,12 +184,22 @@ public class TeleopRR extends LinearOpMode {
                 sleep(1000); // waiting arm to back position before flip forward to hanging specimen
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_TELEOP);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+
+                sleep(1000);
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_TELEOP - 200);
+
+                Actions.runBlocking(
+                        drive.actionBuilder(drive.pose)
+                                .strafeToConstantHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y - 8.0))
+                                .build()
+                );
+
             }
 
             // pick up specimen from sub and drive to high chamber automatically
             if (gpButtons.SpecimenPickupAction) {
                 drive.pose = pickUpSpecimenPos;
-                intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.038);
+                intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.032);
                 sleep(100);
                 intake.setFingerPosition(intake.FINGER_CLOSE);
                 sleep(100);
@@ -199,14 +209,26 @@ public class TeleopRR extends LinearOpMode {
                                 .strafeToLinearHeading(hangSpecimenPos, 0)
                                 .build()
                 );
+                double sensorDist = distSensor.getDistance(DistanceUnit.INCH);
+                double shiftDelta = sensorDist - Params.DISTANCE;
+                Logging.log("drive pose before distance");
+                Logging.log(" X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
+                Logging.log("sensor dist = %2f, shift delta = %2f", sensorDist, shiftDelta);
+
+                Actions.runBlocking(
+                        drive.actionBuilder(drive.pose)
+                                .strafeToConstantHeading(new Vector2d(drive.pose.position.x + shiftDelta , drive.pose.position.y))
+                                .build()
+                );
                 //sleep(100);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+
             }
 
             if(gamepad1.back)
             {
                 drive.pose = pickUpSpecimenPos;
-                intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.038);
+                intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.032);
                 sleep(100);
                 intake.setFingerPosition(intake.FINGER_CLOSE);
                 sleep(100);
@@ -233,12 +255,16 @@ public class TeleopRR extends LinearOpMode {
                                 .build()
                 );
                 Logging.log("after adjust X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
-                sleep(500);
+
+                sleep(700);
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_TELEOP - 200);
+
                 Actions.runBlocking(
                         drive.actionBuilder(drive.pose)
-                                .strafeToConstantHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y - 4.0))
+                                .strafeToConstantHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y + 8.0))
                                 .build()
                 );
+
             }
 
 

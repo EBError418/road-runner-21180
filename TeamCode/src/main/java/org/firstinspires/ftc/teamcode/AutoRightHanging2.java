@@ -250,7 +250,7 @@ public class AutoRightHanging2 extends LinearOpMode {
             updateProfileAccel(false);
 
             //put specimen on high chamber
-            intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.038);
+            intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.032);
             sleep(100); //200
             intake.setFingerPosition(intake.FINGER_CLOSE);
             sleep(100); // 200
@@ -279,13 +279,13 @@ public class AutoRightHanging2 extends LinearOpMode {
             );
             Logging.log("after adjust X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
 
-            sleep(500);
+            sleep(800);
             intake.setFingerPosition(intake.FINGER_OPEN);
 
             /* start for second specimen */
             //back to observation zone for next specimen
             intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 700);
-            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.2);
+            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.15);
             sleep(300);
             //sleep(300); //arm runs into hanged specimen
             Actions.runBlocking(
@@ -300,7 +300,7 @@ public class AutoRightHanging2 extends LinearOpMode {
             );
             Logging.log("after 2nd specimen pick up heading: %2f", Math.toDegrees(drive.pose.heading.log()));
             //pickup second specimen
-            intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.038);
+            intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.032);
             sleep(100); //200
             intake.setFingerPosition(intake.FINGER_CLOSE);
             sleep(100); // 200
@@ -332,10 +332,10 @@ public class AutoRightHanging2 extends LinearOpMode {
             );
             Logging.log("after adjust X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
 
-            sleep(500);
+            sleep(800);
             intake.setFingerPosition(intake.FINGER_OPEN);
             intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 700);
-            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.20);
+            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.15);
 
             // back to obs zone for parking
             Actions.runBlocking(
