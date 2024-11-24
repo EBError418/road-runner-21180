@@ -37,8 +37,11 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.util.Range;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.List;
 
@@ -77,6 +80,7 @@ public class TeleopRR extends LinearOpMode {
     // debug flags, turn it off for formal version to save time of logging
     boolean debugFlag = true;
 
+    private DistanceSensor distSensor;
 
     @Override
     public void runOpMode() {
@@ -95,6 +99,13 @@ public class TeleopRR extends LinearOpMode {
         //intake.setArmModeRunToPosition(intake.getArmPosition());
         //intake.resetArmEncoder();
 
+        // you can use this as a regular DistanceSensor.
+        distSensor = hardwareMap.get(DistanceSensor.class, "distance");
+
+        // you can also cast this to a Rev2mDistanceSensor if you want to use added
+        // methods associated with the Rev2mDistanceSensor class.
+        //Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor) sensorDistance;
+
         // bulk reading setting - auto refresh mode
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
         for (LynxModule hub : allHubs) {
@@ -103,7 +114,7 @@ public class TeleopRR extends LinearOpMode {
 
         //preset positions used for teleop commands
         Pose2d pickUpSpecimenPos = new Pose2d(- 4.5 * Params.HALF_MAT, - 6 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH, Math.toRadians(179.9998));
-        Vector2d hangSpecimenPos = new Vector2d(- 4.8 * Params.HALF_MAT, - Params.CHASSIS_HALF_WIDTH);
+        Vector2d hangSpecimenPos = new Vector2d(- 4.8 * Params.HALF_MAT,  - Params.CHASSIS_HALF_WIDTH + 12.0);
         Vector2d outOfSubPose = new Vector2d(- 5 * Params.HALF_MAT, - 3 * Params.HALF_MAT);
         Vector2d pickupSamplePos = new Vector2d(- Params.HALF_MAT, - 4 * Params.HALF_MAT);
 
@@ -173,12 +184,33 @@ public class TeleopRR extends LinearOpMode {
                 sleep(1000); // waiting arm to back position before flip forward to hanging specimen
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_TELEOP);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+
+            }
+
+            // hanging specimen action, arm back then forward to hang the specimen
+            if (gamepad1.b) {
+                intake.setArmPosition(intake.ARM_POS_BACK);
+                intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+                sleep(1000); // waiting arm to back position before flip forward to hanging specimen
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_TELEOP);
+                intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+
+                sleep(1000);
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_TELEOP - 300);
+                sleep(200);
+
+                Actions.runBlocking(
+                        drive.actionBuilder(drive.pose)
+                                .strafeToConstantHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y - 12.0))
+                                .build()
+                );
+
             }
 
             // pick up specimen from sub and drive to high chamber automatically
             if (gpButtons.SpecimenPickupAction) {
                 drive.pose = pickUpSpecimenPos;
-                intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.038);
+                intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.032);
                 sleep(100);
                 intake.setFingerPosition(intake.FINGER_CLOSE);
                 sleep(100);
@@ -188,9 +220,82 @@ public class TeleopRR extends LinearOpMode {
                                 .strafeToLinearHeading(hangSpecimenPos, 0)
                                 .build()
                 );
+                double sensorDist = distSensor.getDistance(DistanceUnit.INCH);
+                double shiftDelta = sensorDist - Params.HIGH_CHAMBER_DIST;
+                //shiftDelta = (shiftDelta > 6)? 6 : ((shiftDelta < -6)? -6 : shiftDelta);
+                shiftDelta = Range.clip(shiftDelta, -7.0, 7.0);
+                Logging.log("drive pose before distance");
+                Logging.log(" X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
+                Logging.log("tele Y sensor dist = %2f, shift delta = %2f", sensorDist, shiftDelta);
+
+                Actions.runBlocking(
+                        drive.actionBuilder(drive.pose)
+                                .strafeToConstantHeading(new Vector2d(drive.pose.position.x + shiftDelta , drive.pose.position.y))
+                                .build()
+                );
                 //sleep(100);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+
             }
+
+            if(gamepad1.back)
+            {
+                drive.pose = pickUpSpecimenPos;
+                intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.032);
+                sleep(100);
+                intake.setFingerPosition(intake.FINGER_CLOSE);
+                sleep(100);
+                intake.setArmPosition(intake.ARM_POS_BACK);
+                Actions.runBlocking(
+                        drive.actionBuilder(pickUpSpecimenPos)
+                                .strafeToLinearHeading(hangSpecimenPos, 0)
+                                .build()
+                );
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_TELEOP);
+                //sleep(100);
+                intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+
+
+                double sensorDist = distSensor.getDistance(DistanceUnit.INCH);
+                double shiftDelta = sensorDist - Params.HIGH_CHAMBER_DIST;
+                shiftDelta = Range.clip(shiftDelta, -7.0, 7.0);
+                Logging.log("drive pose before distance");
+                Logging.log(" X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
+                Logging.log(" teleop sensor back  dist = %2f, shift delta = %2f", sensorDist, shiftDelta);
+
+                Actions.runBlocking(
+                        drive.actionBuilder(drive.pose)
+                                .strafeToConstantHeading(new Vector2d(drive.pose.position.x + shiftDelta , drive.pose.position.y))
+                                .build()
+                );
+                Logging.log("after adjust X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
+
+                sleep(700);
+
+                // moving specimen
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_TELEOP - 300);
+                sleep(200);
+
+                Actions.runBlocking(
+                        drive.actionBuilder(drive.pose)
+                                .strafeToConstantHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y - 12.0))
+                                .build()
+                );
+            }
+
+            /*
+            if (gamepad1.b) {
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_TELEOP - 200);
+                sleep(200);
+                Actions.runBlocking(
+                        drive.actionBuilder(drive.pose)
+                                .strafeToLinearHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y - 12.0), drive.pose.heading.log() - Math.toRadians(15.0))
+                                .build()
+                );
+            }
+
+             */
+
 
             // set arm, wrist, finger positions before pickup specimen.
             if (gpButtons.SpecimenPickupAlign) {
@@ -254,6 +359,10 @@ public class TeleopRR extends LinearOpMode {
                 telemetry.addData("heading", " %.3f", Math.toDegrees(drive.pose.heading.log()));
 
                 telemetry.addData("location", " %s", drive.pose.position.toString());
+                telemetry.addData(" --- ", " --- ");
+
+                telemetry.addData("range", String.format("%.01f in", distSensor.getDistance(DistanceUnit.INCH)));
+
 
                 telemetry.update(); // update message at the end of while loop
             }

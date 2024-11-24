@@ -46,6 +46,8 @@ public class Params {
 
     static int armIntakeCount_InitFront = -30;
 
+    static double HIGH_CHAMBER_DIST = 20.5;
+
     //game field parameters
     static final double HALF_MAT = 23.625/2.0;  // 60 cm
 

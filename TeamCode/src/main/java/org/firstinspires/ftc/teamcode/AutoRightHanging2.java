@@ -43,7 +43,10 @@ import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
+
+import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.List;
 
@@ -91,6 +94,7 @@ public class AutoRightHanging2 extends LinearOpMode {
         // road runner variables
         newStartPose = new Pose2d((-6 * Params.HALF_MAT + Params.CHASSIS_LENGTH / 2),(-leftRight * Params.CHASSIS_HALF_WIDTH),0.0);
     }
+    private DistanceSensor distSensor;
 
     @Override
     public void runOpMode() {
@@ -108,9 +112,21 @@ public class AutoRightHanging2 extends LinearOpMode {
 
         intake.setFingerPosition(intake.FINGER_CLOSE);
 
+        // you can use this as a regular DistanceSensor.
+        distSensor = hardwareMap.get(DistanceSensor.class, "distance");
+
+        // you can also cast this to a Rev2mDistanceSensor if you want to use added
+        // methods associated with the Rev2mDistanceSensor class.
+        //Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor) sensorDistance;
+
+
         while (!isStarted()) {
             sleep(10);
             telemetry.addData( "FTC 2024 - ", "Wait for starting ");
+
+            telemetry.addData("deviceName", distSensor.getDeviceName() );
+
+            telemetry.addData("range", String.format("%.01f in", distSensor.getDistance(DistanceUnit.INCH)));
 
             telemetry.addData("Arm", "position = %d", intake.getArmPosition());
 
@@ -167,6 +183,7 @@ public class AutoRightHanging2 extends LinearOpMode {
         //Vector2d newSpecimenPos = new Vector2d(pickUpSpecimenPos.position.x, pickUpSpecimenPos.position.y - 0.07 * Params.HALF_MAT);
         Pose2d specimenLineUpPos = new Pose2d(pickUpSpecimenPos.position.x +1.5, pickUpSpecimenPos.position.y + Params.HALF_MAT, Math.toRadians(-81.0));
 
+
         //ascent level 1
         Vector2d parkObz = new Vector2d(-5.0 * Params.HALF_MAT,-4.0 * Params.HALF_MAT);
         if (leftOrRight == 1) { // right side auto
@@ -179,8 +196,22 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .build()
             );
             Logging.log("After arm flip pos wrist pos: %2f", intake.getWristPosition());
+
             Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
-            sleep(1100); // TODO : optimize sleep time
+            double sensorDist = distSensor.getDistance(DistanceUnit.INCH);
+            double shiftDelta = sensorDist - Params.HIGH_CHAMBER_DIST;
+            shiftDelta = (shiftDelta > 2)? 2 : ((shiftDelta < -2)? -2 : shiftDelta);
+            Logging.log("drive pose before distance");
+            Logging.log(" X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
+            Logging.log("fist specimen sensor dist = %2f, shift delta = %2f", sensorDist, shiftDelta);
+
+            Actions.runBlocking(
+                    drive.actionBuilder(drive.pose)
+                            .strafeToConstantHeading(new Vector2d(drive.pose.position.x + shiftDelta , drive.pose.position.y))
+                            .build()
+            );
+            Logging.log("after adjust X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
+            sleep(900); // TODO : optimize sleep time
 
             updateProfileAccel(true);
             //release specimen and raise arm to clear high chamber
@@ -245,16 +276,31 @@ public class AutoRightHanging2 extends LinearOpMode {
                     drive.actionBuilder(drive.pose)
                             //.turnTo(Math.toRadians(-179.99)) // TODO : check if we need this fine heading adjust
                             .afterTime(1.8, new intakeAct(intake.ARM_POS_HIGH_CHAMBER + 50, intake.WRIST_POS_HIGH_CHAMBER, 0)) // forward arm to hang first specimen
-                            .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x - 0.1 * Params.HALF_MAT, hangSpecimenPos.y + 0.5 * Params.HALF_MAT), 0) //adjustment for error en route
+                            .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x - 0.1 * Params.HALF_MAT, hangSpecimenPos.y - Params.CHASSIS_HALF_WIDTH + 4.0), 0) //adjustment for error en route
                             .build()
             );
-            sleep(700);
+
+            sensorDist = distSensor.getDistance(DistanceUnit.INCH);
+            shiftDelta = sensorDist - Params.HIGH_CHAMBER_DIST;
+            shiftDelta = (shiftDelta > 2)? 2 : ((shiftDelta < -2)? -2 : shiftDelta);
+            Logging.log("drive pose before distance");
+            Logging.log(" X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
+            Logging.log("second specimen sensor dist = %2f, shift delta = %2f", sensorDist, shiftDelta);
+
+            Actions.runBlocking(
+                    drive.actionBuilder(drive.pose)
+                            .strafeToConstantHeading(new Vector2d(drive.pose.position.x + shiftDelta , drive.pose.position.y))
+                            .build()
+            );
+            Logging.log("after adjust X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
+
+            sleep(800);
             intake.setFingerPosition(intake.FINGER_OPEN);
 
             /* start for second specimen */
             //back to observation zone for next specimen
             intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 700);
-            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.2);
+            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.15);
             sleep(300);
             //sleep(300); //arm runs into hanged specimen
             Actions.runBlocking(
@@ -283,15 +329,29 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .afterTime(1.9, new intakeAct(intake.ARM_POS_HIGH_CHAMBER, intake.WRIST_POS_HIGH_CHAMBER, 0)) // forward arm to hang first specimen
                             //.strafeToLinearHeading(hangSpecimenPos, 0)
                             //.strafeToLinearHeading(new Vector2d(hangSpecimenPos.x - 0.1 * Params.HALF_MAT, hangSpecimenPos.y + Params.CHASSIS_HALF_WIDTH), 0)
-                            .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x - 0.05 * Params.HALF_MAT, hangSpecimenPos.y - Params.CHASSIS_HALF_WIDTH + 4.0), 0)
+                            .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x - 0.05 * Params.HALF_MAT, hangSpecimenPos.y - Params.CHASSIS_HALF_WIDTH + 8.0), 0)
                             .build()
             );
 
             // back arm after hanging the second specimen
-            sleep(900);
+            sensorDist = distSensor.getDistance(DistanceUnit.INCH);
+            shiftDelta = sensorDist - Params.HIGH_CHAMBER_DIST;
+            shiftDelta = (shiftDelta > 2)? 2 : ((shiftDelta < -2)? -2 : shiftDelta);
+            Logging.log("drive pose before distance");
+            Logging.log(" X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
+            Logging.log("third specimen sensor dist = %2f, shift delta = %2f", sensorDist, shiftDelta);
+
+            Actions.runBlocking(
+                    drive.actionBuilder(drive.pose)
+                            .strafeToConstantHeading(new Vector2d(drive.pose.position.x + shiftDelta , drive.pose.position.y))
+                            .build()
+            );
+            Logging.log("after adjust X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
+
+            sleep(800);
             intake.setFingerPosition(intake.FINGER_OPEN);
             intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 700);
-            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.20);
+            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.15);
 
             // back to obs zone for parking
             Actions.runBlocking(
