@@ -46,6 +46,11 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import com.qualcomm.hardware.limelightvision.LLResult;
+import com.qualcomm.hardware.limelightvision.LLResultTypes;
+import com.qualcomm.hardware.limelightvision.LLStatus;
+import com.qualcomm.hardware.limelightvision.Limelight3A;
+
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.List;
@@ -96,6 +101,8 @@ public class AutoRightHanging2 extends LinearOpMode {
     }
     private DistanceSensor distSensor;
 
+    private Limelight3A limelight;
+
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -118,6 +125,11 @@ public class AutoRightHanging2 extends LinearOpMode {
         // you can also cast this to a Rev2mDistanceSensor if you want to use added
         // methods associated with the Rev2mDistanceSensor class.
         //Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor) sensorDistance;
+
+        //limelight init
+        limelight = hardwareMap.get(Limelight3A.class, "limelight");
+        telemetry.setMsTransmissionInterval(11);
+        limelight.pipelineSwitch(0);
 
 
         while (!isStarted()) {
@@ -152,6 +164,7 @@ public class AutoRightHanging2 extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         if (opModeIsActive()) {
             if (Params.armCalibrated) {
+                limelight.start();
                 autonomousCore();
 
                 Logging.log("Autonomous time - total Run Time: " + runtime);
