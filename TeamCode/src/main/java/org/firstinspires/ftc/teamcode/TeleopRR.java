@@ -94,7 +94,7 @@ public class TeleopRR extends LinearOpMode {
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
-                "Finger");
+                "Knuckle", "Finger");
 
         //intake.setArmModeRunToPosition(intake.getArmPosition());
         //intake.resetArmEncoder();
@@ -155,12 +155,20 @@ public class TeleopRR extends LinearOpMode {
                 intake.setArmPosition(intake.getArmPosition() - 50);
             }
 
-            if (gpButtons.wristUp) {
-                intake.setWristPosition(intake.getWristPosition() + 0.002);
+            if (gpButtons.wristLeft) {
+                intake.setWristPosition(intake.getWristPosition() + 50);
             }
 
-            if (gpButtons.wristDown) {
-                intake.setWristPosition(intake.getWristPosition() - 0.002);
+            if (gpButtons.wristRight) {
+                intake.setWristPosition(intake.getWristPosition() - 50);
+            }
+
+            if (gpButtons.knuckleUp) {
+                intake.setKnuckleServoPosition(intake.getKnucklePosition() - 0.006);
+            }
+
+            if (gpButtons.knuckleDown) {
+                intake.setKnuckleServoPosition(intake.getKnucklePosition() + 0.006);
             }
 
             if (gpButtons.fingerClose) {
@@ -175,6 +183,7 @@ public class TeleopRR extends LinearOpMode {
             if (gpButtons.SpecimenHangAlign) {
                 intake.setArmPosition(intake.ARM_POS_BEFORE_HANG);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+                intake.setKnuckleServoPosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
             }
 
             // hanging specimen action, arm back then forward to hang the specimen
@@ -210,7 +219,8 @@ public class TeleopRR extends LinearOpMode {
             // pick up specimen from sub and drive to high chamber automatically
             if (gpButtons.SpecimenPickupAction) {
                 drive.pose = pickUpSpecimenPos;
-                intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.032);
+                intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN);
+                intake.setKnuckleServoPosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN + 0.032);
                 sleep(100);
                 intake.setFingerPosition(intake.FINGER_CLOSE);
                 sleep(100);
@@ -241,7 +251,7 @@ public class TeleopRR extends LinearOpMode {
             if(gamepad1.back)
             {
                 drive.pose = pickUpSpecimenPos;
-                intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.032);
+                intake.setKnuckleServoPosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN + 0.032);
                 sleep(100);
                 intake.setFingerPosition(intake.FINGER_CLOSE);
                 sleep(100);
@@ -301,6 +311,7 @@ public class TeleopRR extends LinearOpMode {
             if (gpButtons.SpecimenPickupAlign) {
                 intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN);
                 intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN);
+                intake.setKnuckleServoPosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN);
                 intake.setFingerPosition(intake.FINGER_OPEN);
             }
 
@@ -309,7 +320,7 @@ public class TeleopRR extends LinearOpMode {
                 // TODO : update acting by using arm up, wrist down, moving using spline to directly.
                 drive.pose = new Pose2d(hangSpecimenPos, 0);
                 intake.setFingerPosition(intake.FINGER_OPEN);
-                intake.setWristPosition(0.250);
+                intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
                 sleep(400);
                 Actions.runBlocking(
                         drive.actionBuilder(new Pose2d(hangSpecimenPos, 0))
@@ -324,19 +335,20 @@ public class TeleopRR extends LinearOpMode {
             // right bumper of pad1
             if (gpButtons.ArmPickUpPos) {
                 intake.setArmPosition(intake.ARM_POS_SUB);
-                intake.setWristPosition(intake.WRIST_POS_SUB);
+                intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
             }
 
             // set arm and wrist position for drop off at low bucket.
             if (gpButtons.LowBucketPos) {
                 intake.setArmPosition(intake.ARM_POS_LOW_BUCKET);
-                intake.setWristPosition(intake.WRIST_POS_LOW_BUCKET);
+                intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
+                intake.setKnuckleServoPosition(intake.KNUCKLE_POS_LOW_BUCKET);
             }
 
             // get ready for hanging at end game
             if (gpButtons.EndgameHangingLineup) {
                 intake.setArmPosition(intake.ARM_POS_HANGING);
-                intake.setWristPosition(intake.WRIST_POS_HANGING);
+                intake.setKnuckleServoPosition(intake.KNUCKLE_POS_HANGING);
             }
 
             // hanging robot
@@ -350,7 +362,9 @@ public class TeleopRR extends LinearOpMode {
                 // claw arm servo log
                 telemetry.addData("Finger", "position %.3f", intake.getFingerPosition());
 
-                telemetry.addData("Wrist", "position %.3f", intake.getWristPosition());
+                telemetry.addData("Knuckle", "position = %.3f", intake.getKnucklePosition());
+
+                telemetry.addData("Wrist", "position %s", intake.getWristPosition());
 
                 telemetry.addData("Arm", "position = %.3f", (double)(intake.getArmPosition()));
 
@@ -359,6 +373,7 @@ public class TeleopRR extends LinearOpMode {
                 telemetry.addData("heading", " %.3f", Math.toDegrees(drive.pose.heading.log()));
 
                 telemetry.addData("location", " %s", drive.pose.position.toString());
+
                 telemetry.addData(" --- ", " --- ");
 
                 telemetry.addData("range", String.format("%.01f in", distSensor.getDistance(DistanceUnit.INCH)));
@@ -378,7 +393,7 @@ public class TeleopRR extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_SUB);
-            intake.setWristPosition(intake.WRIST_POS_SUB);
+            intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
             return false;
         }
     }

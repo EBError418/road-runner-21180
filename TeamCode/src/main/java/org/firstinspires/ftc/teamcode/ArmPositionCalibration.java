@@ -51,7 +51,7 @@ public class ArmPositionCalibration extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         Logging.log("Status - Initialized");
 
-        intake = new intakeUnit(hardwareMap, "Arm", "Wrist", "Finger");
+        intake = new intakeUnit(hardwareMap, "Arm", "Wrist", "Knuckle","Finger");
         Params.armCalibrated = true;
 
         waitForStart();
@@ -61,6 +61,8 @@ public class ArmPositionCalibration extends LinearOpMode {
         if (opModeIsActive()) {
 
             intake.resetArmEncoder();
+
+            intake.resetWristEncoder();
 
             intake.fingerServoOpen();
             intake.setArmPosition(intake.ARM_POS_BACK);

@@ -117,7 +117,7 @@ public class AutoRightHanging extends LinearOpMode {
         drive = new MecanumDrive(hardwareMap, newStartPose);
         Params.startPose = newStartPose; // init storage pose.
 
-        intake = new intakeUnit(hardwareMap, "Arm", "Wrist", "Finger");
+        intake = new intakeUnit(hardwareMap, "Arm", "Wrist","Knuckle" ,"Finger");
         //intake.resetArmEncoder();
 
         intake.setFingerPosition(intake.FINGER_CLOSE);
@@ -194,8 +194,8 @@ public class AutoRightHanging extends LinearOpMode {
             updateProfileAccel(true);
             //release specimen and raise arm to clear high chamber
             intake.setFingerPosition(intake.FINGER_OPEN);
-            intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 800);
-            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.25);
+            intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 600);
+            intake.setKnuckleServoPosition(intake.KNUCKLE_POS_HIGH_CHAMBER + 0.15);
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
                             .afterTime(0.75, new armToPickUpPos())
@@ -240,7 +240,7 @@ public class AutoRightHanging extends LinearOpMode {
             updateProfileAccel(false);
 
             //put specimen on high chamber
-            intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.038);
+            intake.setKnuckleServoPosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN - 0.032);
             sleep(100); //200
             intake.setFingerPosition(intake.FINGER_CLOSE);
             sleep(100); // 200
@@ -263,8 +263,8 @@ public class AutoRightHanging extends LinearOpMode {
 
             /* start for second specimen */
             //back to observation zone for next specimen
-            intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 850);
-            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.2);
+            intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 700);
+            intake.setKnuckleServoPosition(intake.KNUCKLE_POS_HIGH_CHAMBER + 0.15);
             sleep(300); //arm runs into hanged specimen
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
@@ -315,7 +315,7 @@ public class AutoRightHanging extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE);
-            intake.setWristPosition(intake.WRIST_POS_GRAB_SAMPLE);
+            intake.setKnuckleServoPosition(intake.KNUCKLE_POS_DRAG_SAMPLE);
             intake.setFingerPosition(intake.FINGER_OPEN);
             return false;
         }
@@ -326,7 +326,7 @@ public class AutoRightHanging extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_PARKING);
-            intake.setWristPosition(intake.WRIST_POS_PARKING);
+            intake.setKnuckleServoPosition(intake.KNUCKLE_POS_HANGING);
             return false;
         }
     }
@@ -336,7 +336,7 @@ public class AutoRightHanging extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_LOW_BUCKET);
-            intake.setWristPosition(intake.WRIST_POS_LOW_BUCKET);
+            intake.setKnuckleServoPosition(intake.KNUCKLE_POS_LOW_BUCKET);
             return false;
         }
     }
@@ -346,7 +346,7 @@ public class AutoRightHanging extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_OBS_ZONE);
-            intake.setWristPosition(intake.WRIST_POS_OBS_ZONE);
+            intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
             return false;
         }
     }
@@ -379,7 +379,7 @@ public class AutoRightHanging extends LinearOpMode {
     private class pickUpSpecimenAct implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.038);
+            intake.setKnuckleServoPosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN - 0.032);
             sleep(250);
             intake.setFingerPosition(intake.FINGER_CLOSE);
             sleep(250);
@@ -399,7 +399,7 @@ public class AutoRightHanging extends LinearOpMode {
     private class wristToBackAct implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.5);
+            intake.setKnuckleServoPosition(0.5);
             return false;
         }
     }

@@ -53,9 +53,11 @@ public class intakeUnit
 
     // arm servo motor variables
     private DcMotor armMotor = null;
+    private DcMotor wristMotor = null;
 
     //wrist servo
     private Servo wristServo = null;
+    private Servo knuckleServo = null;
 
     final double SWITCH_LEFT_CLOSE_POS = 0.21;
     final double WRIST_SNAP_POSITION = 0.03;
@@ -63,16 +65,17 @@ public class intakeUnit
     //finger servo
     public Servo fingerServo = null;
 
-    //new stuff
+    //new stuff: wrist
     final double WRIST_POS_DELTA = 0.0;
     final double WRIST_POS_GRAB_SAMPLE = WRIST_POS_DELTA + 0.36;
-    final double WRIST_POS_HIGH_CHAMBER = WRIST_POS_DELTA + 0.454;
+    final int WRIST_POS_HIGH_CHAMBER = 0;
     final double WRIST_POS_LOW_BUCKET = WRIST_POS_DELTA + 0.626;
     final double WRIST_POS_PARKING = WRIST_POS_DELTA + 0.1;
     final double WRIST_POS_OBS_ZONE = WRIST_POS_DELTA + 0.309;
-    final double WRIST_POS_GRAB_SPECIMEN = WRIST_POS_DELTA + 0.33;//0.302;
+    final int WRIST_POS_GRAB_SPECIMEN = -2500;//0.302;
     final double WRIST_POS_SUB = WRIST_POS_DELTA + 0.583;
     final double WRIST_POS_HANGING = WRIST_POS_DELTA + 0.1;
+    final int WRIST_POS_NEUTRAL = 0;
 
     //finger
     final double FINGER_CLOSE = 0.01; // must bigger than 0 for action builder working
@@ -94,15 +97,22 @@ public class intakeUnit
     int ARM_POS_HANGING = ARM_POS_DELTA + 1820;
     int ARM_POS_DOWN_HANGING = ARM_POS_DELTA + 4150;
 
+    //knuckle
+    final double KNUCKLE_POS_PICKUP_SPECIMEN = 0.500;
+    final double KNUCKLE_POS_HANGING = 0.85;
+    final double KNUCKLE_POS_LOW_BUCKET = 0.500;
+    final double KNUCKLE_POS_HIGH_CHAMBER = 0.454;
+    final double KNUCKLE_POS_DRAG_SAMPLE = 0.350;
+
 
     /**
      * Init slider motors hardware, and set their behaviors.
      * @param hardwareMap the Hardware Mappings.
      *
-     * @param wristServoName the name string for wrist servo motor
+     *
      *
      */
-    public intakeUnit(HardwareMap hardwareMap, String armServoName, String wristServoName,
+    public intakeUnit(HardwareMap hardwareMap, String armServoName, String wristMotorName, String knuckleServoName,
                       String fingerServoName) {
         // Save reference to Hardware map
         this.hardwareMap = hardwareMap;
@@ -111,38 +121,78 @@ public class intakeUnit
 
          fingerServo = hardwareMap.get(Servo.class, fingerServoName);
 
-        wristServo = hardwareMap.get(Servo.class, wristServoName);
-        wristServo.setDirection(Servo.Direction.FORWARD);
+        //wristServo = hardwareMap.get(Servo.class, wristServoName);
+        //wristServo.setDirection(Servo.Direction.FORWARD);
+        knuckleServo = hardwareMap.get(Servo.class, knuckleServoName);
+        knuckleServo.setDirection(Servo.Direction.FORWARD);
+
         sleep(200);
 
         armMotor = hardwareMap.get(DcMotor.class, armServoName);
         armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        wristMotor = hardwareMap.get(DcMotor.class, wristMotorName);
+        wristMotor.setDirection(DcMotorSimple.Direction.FORWARD);
 
         setArmModeRunToPosition(getArmPosition());
+        setWristModeRunToPosition(getWristPosition());
 
         //resetArmPositions(Params.armIntakeCount_InitFront);
     }
 
-    public void setWristServoPosition(double wristPos){
-        wristPos = Range.clip(wristPos, WRIST_SNAP_POSITION, SWITCH_LEFT_CLOSE_POS);
-        wristServo.setPosition(wristPos);
-    }
 
+
+
+    //finger servo
     public void fingerServoOpen() {
         fingerServo.setPosition(FINGER_OPEN);
+    }
+    public void setFingerPosition(double fingerpos){
+        fingerServo.setPosition(fingerpos);
+    }
+
+    /**
+     * set the target position of knuckle servo
+     * @param knucklePos the target position value for knuckle servo
+     */
+    public void setKnuckleServoPosition(double knucklePos){
+        knucklePos = Range.clip(knucklePos, 0.1, 0.85);
+        knuckleServo.setPosition(knucklePos);
     }
 
     /**
      * set the target position of wrist servo motor
      * @param wristPos the target position value for wrist servo motor
      */
+    /*
     public void setWristPosition(double wristPos) {
         wristServo.setPosition(wristPos);
     }
 
-    public void setFingerPosition(double fingerpos){
-        fingerServo.setPosition(fingerpos);
+     */
+
+
+    /**
+     * set the target position of wrist motor
+     * @param wristPos the target position value for wrist motor
+     */
+    public void setWristPosition(int wristPos) {
+        wristPos = Range.clip(wristPos, -250, 250);
+        wristMotor.setTargetPosition(wristPos);
     }
+
+    public void resetWristEncoder() {
+        wristMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        setWristModeRunToPosition(0);
+    }
+
+    public void setWristModeRunToPosition(int wristPos) {
+        setWristPosition(wristPos);
+        wristMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        wristMotor.setPower(0.9);
+    }
+
+
+
 
     /**
      * set the target position of arm servo motor
@@ -184,13 +234,15 @@ public class intakeUnit
      * Get the wrist servo motor current position value
      * @return the current wrist servo motor position value
      */
-    public double getWristPosition() {
-        return wristServo.getPosition();
+    public int getWristPosition() {
+        return wristMotor.getCurrentPosition();
     }
 
     public double getFingerPosition() {
         return fingerServo.getPosition();
     }
+
+    public double getKnucklePosition() { return knuckleServo.getPosition(); }
 
     private void sleep(long milliseconds) {
         try {

@@ -107,7 +107,7 @@ public class AutoRightHanging2 extends LinearOpMode {
         drive = new MecanumDrive(hardwareMap, newStartPose);
         Params.startPose = newStartPose; // init storage pose.
 
-        intake = new intakeUnit(hardwareMap, "Arm", "Wrist", "Finger");
+        intake = new intakeUnit(hardwareMap, "Arm", "Wrist", "Knuckle","Finger");
         //intake.resetArmEncoder();
 
         intake.setFingerPosition(intake.FINGER_CLOSE);
@@ -217,7 +217,7 @@ public class AutoRightHanging2 extends LinearOpMode {
             //release specimen and raise arm to clear high chamber
             intake.setFingerPosition(intake.FINGER_OPEN);
             intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 1200);
-            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.15);
+            intake.setKnuckleServoPosition(intake.KNUCKLE_POS_HIGH_CHAMBER + 0.15);
 
             sleep(300);
             //Go to pick up first sample on mat
@@ -264,7 +264,7 @@ public class AutoRightHanging2 extends LinearOpMode {
             updateProfileAccel(false);
 
             //put specimen on high chamber
-            intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.032);
+            intake.setKnuckleServoPosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN - 0.032);
             sleep(100); //200
             intake.setFingerPosition(intake.FINGER_CLOSE);
             sleep(100); // 200
@@ -300,7 +300,7 @@ public class AutoRightHanging2 extends LinearOpMode {
             /* start for second specimen */
             //back to observation zone for next specimen
             intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 700);
-            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.15);
+            intake.setKnuckleServoPosition(intake.KNUCKLE_POS_HIGH_CHAMBER + 0.15);
             sleep(300);
             //sleep(300); //arm runs into hanged specimen
             Actions.runBlocking(
@@ -315,7 +315,7 @@ public class AutoRightHanging2 extends LinearOpMode {
             );
             Logging.log("after 2nd specimen pick up heading: %2f", Math.toDegrees(drive.pose.heading.log()));
             //pickup second specimen
-            intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN - 0.032);
+            intake.setKnuckleServoPosition(intake.KNUCKLE_POS_HIGH_CHAMBER - 0.032);
             sleep(100); //200
             intake.setFingerPosition(intake.FINGER_CLOSE);
             sleep(100); // 200
@@ -333,8 +333,8 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .build()
             );
 
-            // back arm after hanging the second specimen
-            sensorDist = distSensor.getDistance(DistanceUnit.INCH);
+            // back arm after hanging the second specimen\=
+            // -            sensorDist = distSensor.getDistance(DistanceUnit.INCH);
             shiftDelta = sensorDist - Params.HIGH_CHAMBER_DIST;
             shiftDelta = (shiftDelta > 2)? 2 : ((shiftDelta < -2)? -2 : shiftDelta);
             Logging.log("drive pose before distance");
@@ -351,7 +351,7 @@ public class AutoRightHanging2 extends LinearOpMode {
             sleep(800);
             intake.setFingerPosition(intake.FINGER_OPEN);
             intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 700);
-            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER + 0.15);
+            intake.setKnuckleServoPosition(intake.KNUCKLE_POS_HIGH_CHAMBER + 0.15);
 
             // back to obs zone for parking
             Actions.runBlocking(
@@ -362,7 +362,7 @@ public class AutoRightHanging2 extends LinearOpMode {
             );
             intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE);
             intake.setFingerPosition(intake.FINGER_SPECIMEN_CLOSE);
-            intake.setWristPosition(intake.WRIST_POS_HANGING);
+            intake.setKnuckleServoPosition(intake.KNUCKLE_POS_HANGING);
 
         }
         Logging.log("X position = %2f, Y position = %2f", drive.pose.position.x, drive.pose.position.y);
@@ -383,7 +383,7 @@ public class AutoRightHanging2 extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE);
-            intake.setWristPosition(intake.WRIST_POS_GRAB_SAMPLE);
+            intake.setKnuckleServoPosition(intake.KNUCKLE_POS_DRAG_SAMPLE);
             intake.setFingerPosition(intake.FINGER_OPEN);
             return false;
         }
@@ -426,14 +426,14 @@ public class AutoRightHanging2 extends LinearOpMode {
 
     //action for arm, wrist, finger position control during driving
     private class intakeAct implements Action {
-        public intakeAct(double armPos, double wristPos, double fingerPos) {
+        public intakeAct(double armPos, double knucklePos, double fingerPos) {
             arm = (int)armPos;
-            wrist = wristPos;
+            knuckle = knucklePos;
             finger = fingerPos;
         }
 
         private final int arm;
-        private final double wrist;
+        private final double knuckle;
         private final double finger;
 
         @Override
@@ -443,8 +443,8 @@ public class AutoRightHanging2 extends LinearOpMode {
                 intake.setArmPosition(arm);
             }
 
-            if (wrist > 0) {
-                intake.setWristPosition(wrist);
+            if (knuckle > 0) {
+                intake.setKnuckleServoPosition(knuckle);
             }
 
             if (finger > 0) {

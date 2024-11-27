@@ -51,8 +51,8 @@ public class GamePadButtons {
     public float robotTurn;
     public boolean speedDown;
     public boolean speedUp;
-    public boolean wristUp;
-    public boolean wristDown;
+    public boolean wristLeft;
+    public boolean wristRight;
     public boolean speedCtrl;
 
     public boolean sliderUp;
@@ -61,6 +61,9 @@ public class GamePadButtons {
 
     public boolean armForwards;
     public boolean armBackwards;
+
+    public boolean knuckleUp;
+    public boolean knuckleDown;
 
     public boolean fingerOpen;
     public boolean fingerClose;
@@ -98,9 +101,13 @@ public class GamePadButtons {
         fingerClose = gamepad2.dpad_up;
         fingerOpen = gamepad2.dpad_down;
 
+        //knuckle
+        knuckleUp = gamepad2.left_stick_y < -0.3;
+        knuckleDown = gamepad2.left_stick_y > 0.3;
+
         //wrists
-        wristUp = gamepad2.left_stick_y < 0;
-        wristDown = gamepad2.left_stick_y > 0;
+        wristLeft = gamepad2.left_stick_x < -0.3;
+        wristRight = gamepad2.left_stick_x > 0.3;
 
         //arm
         armForwards = gamepad2.right_stick_y > 0;

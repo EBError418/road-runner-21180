@@ -121,7 +121,7 @@ public class AutoLeft extends LinearOpMode {
         drive = new MecanumDrive(hardwareMap, newStartPose);
         Params.startPose = newStartPose; // init storage pose.
 
-        intake = new intakeUnit(hardwareMap, "Arm", "Wrist", "Finger");
+        intake = new intakeUnit(hardwareMap, "Arm", "Wrist", "Knuckle","Finger");
         //intake.resetArmEncoder();
 
         intake.setFingerPosition(intake.FINGER_CLOSE);
@@ -433,7 +433,7 @@ public class AutoLeft extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE);
-            intake.setWristPosition(intake.WRIST_POS_GRAB_SAMPLE);
+            intake.setKnuckleServoPosition(intake.WRIST_POS_GRAB_SAMPLE);
             intake.setFingerPosition(intake.FINGER_OPEN);
             return false;
         }
@@ -444,7 +444,7 @@ public class AutoLeft extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_PARKING);
-            intake.setWristPosition(intake.WRIST_POS_PARKING);
+            intake.setKnuckleServoPosition(intake.WRIST_POS_PARKING);
             return false;
         }
     }
@@ -454,7 +454,7 @@ public class AutoLeft extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_LOW_BUCKET);
-            intake.setWristPosition(intake.WRIST_POS_LOW_BUCKET);
+            intake.setKnuckleServoPosition(intake.WRIST_POS_LOW_BUCKET);
             return false;
         }
     }
@@ -464,7 +464,7 @@ public class AutoLeft extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_OBS_ZONE);
-            intake.setWristPosition(intake.WRIST_POS_OBS_ZONE);
+            intake.setKnuckleServoPosition(intake.WRIST_POS_OBS_ZONE);
             return false;
         }
     }
