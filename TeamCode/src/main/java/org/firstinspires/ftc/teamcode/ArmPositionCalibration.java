@@ -65,7 +65,7 @@ public class ArmPositionCalibration extends LinearOpMode {
             intake.resetWristEncoder();
 
             intake.fingerServoOpen();
-            intake.setArmPosition(intake.ARM_POS_BACK);
+            intake.setArmPosition(-1500);
 
             sleep(2000);
             telemetry.addData("Arm calibration: ---", "done !");

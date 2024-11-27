@@ -68,11 +68,11 @@ public class intakeUnit
     //new stuff: wrist
     final double WRIST_POS_DELTA = 0.0;
     final double WRIST_POS_GRAB_SAMPLE = WRIST_POS_DELTA + 0.36;
-    final int WRIST_POS_HIGH_CHAMBER = 0;
+    final int WRIST_POS_HIGH_CHAMBER = 270;
     final double WRIST_POS_LOW_BUCKET = WRIST_POS_DELTA + 0.626;
     final double WRIST_POS_PARKING = WRIST_POS_DELTA + 0.1;
     final double WRIST_POS_OBS_ZONE = WRIST_POS_DELTA + 0.309;
-    final int WRIST_POS_GRAB_SPECIMEN = -2500;//0.302;
+    final int WRIST_POS_GRAB_SPECIMEN = 0;//0.302;
     final double WRIST_POS_SUB = WRIST_POS_DELTA + 0.583;
     final double WRIST_POS_HANGING = WRIST_POS_DELTA + 0.1;
     final int WRIST_POS_NEUTRAL = 0;
@@ -85,23 +85,23 @@ public class intakeUnit
     //arm
     int ARM_POS_DELTA = -3920;
     int ARM_POS_GRAB_SAMPLE = -255;
-    int ARM_POS_HIGH_CHAMBER = -1000;//-1190;//2490;
+    int ARM_POS_HIGH_CHAMBER = -3310;//-2967;//2490;
     int ARM_POS_HIGH_CHAMBER_TELEOP = ARM_POS_HIGH_CHAMBER;
     int ARM_POS_LOW_BUCKET = -2020;
     int ARM_POS_PARKING = ARM_POS_DELTA + 2050;
     int ARM_POS_OBS_ZONE = -430;
     int ARM_POS_BACK = ARM_POS_DELTA + 1000;
-    int ARM_POS_BEFORE_HANG = ARM_POS_HIGH_CHAMBER_TELEOP - 300;
-    int ARM_POS_GRAB_SPECIMEN = -540; //3300;
+    int ARM_POS_BEFORE_HANG = -2419;
+    int ARM_POS_GRAB_SPECIMEN = -240; //-540;
     int ARM_POS_SUB = ARM_POS_DELTA + 2925;
     int ARM_POS_HANGING = ARM_POS_DELTA + 1820;
     int ARM_POS_DOWN_HANGING = ARM_POS_DELTA + 4150;
 
     //knuckle
-    final double KNUCKLE_POS_PICKUP_SPECIMEN = 0.500;
+    final double KNUCKLE_POS_PICKUP_SPECIMEN = 0.182;
     final double KNUCKLE_POS_HANGING = 0.85;
     final double KNUCKLE_POS_LOW_BUCKET = 0.500;
-    final double KNUCKLE_POS_HIGH_CHAMBER = 0.454;
+    final double KNUCKLE_POS_HIGH_CHAMBER = 0.383;
     final double KNUCKLE_POS_DRAG_SAMPLE = 0.350;
 
 
@@ -154,7 +154,7 @@ public class intakeUnit
      * set the target position of knuckle servo
      * @param knucklePos the target position value for knuckle servo
      */
-    public void setKnuckleServoPosition(double knucklePos){
+    public void setKnucklePosition(double knucklePos){
         knucklePos = Range.clip(knucklePos, 0.1, 0.85);
         knuckleServo.setPosition(knucklePos);
     }
@@ -176,13 +176,13 @@ public class intakeUnit
      * @param wristPos the target position value for wrist motor
      */
     public void setWristPosition(int wristPos) {
-        wristPos = Range.clip(wristPos, -250, 250);
+        wristPos = Range.clip(wristPos, 0, 270);
         wristMotor.setTargetPosition(wristPos);
     }
 
     public void resetWristEncoder() {
         wristMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        setWristModeRunToPosition(0);
+        setWristModeRunToPosition(getWristPosition());
     }
 
     public void setWristModeRunToPosition(int wristPos) {

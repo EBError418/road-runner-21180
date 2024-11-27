@@ -43,10 +43,7 @@ import com.acmerobotics.roadrunner.Pose2d;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.openftc.easyopencv.OpenCvCamera;
 
 import java.util.List;
 
@@ -433,7 +430,7 @@ public class AutoLeft extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE);
-            intake.setKnuckleServoPosition(intake.WRIST_POS_GRAB_SAMPLE);
+            intake.setKnucklePosition(intake.WRIST_POS_GRAB_SAMPLE);
             intake.setFingerPosition(intake.FINGER_OPEN);
             return false;
         }
@@ -444,7 +441,7 @@ public class AutoLeft extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_PARKING);
-            intake.setKnuckleServoPosition(intake.WRIST_POS_PARKING);
+            intake.setKnucklePosition(intake.WRIST_POS_PARKING);
             return false;
         }
     }
@@ -454,7 +451,7 @@ public class AutoLeft extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_LOW_BUCKET);
-            intake.setKnuckleServoPosition(intake.WRIST_POS_LOW_BUCKET);
+            intake.setKnucklePosition(intake.WRIST_POS_LOW_BUCKET);
             return false;
         }
     }
@@ -464,7 +461,7 @@ public class AutoLeft extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_OBS_ZONE);
-            intake.setKnuckleServoPosition(intake.WRIST_POS_OBS_ZONE);
+            intake.setKnucklePosition(intake.WRIST_POS_OBS_ZONE);
             return false;
         }
     }
