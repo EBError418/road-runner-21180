@@ -56,11 +56,7 @@ public class intakeUnit
     private DcMotor wristMotor = null;
 
     //wrist servo
-    private Servo wristServo = null;
     private Servo knuckleServo = null;
-
-    final double SWITCH_LEFT_CLOSE_POS = 0.21;
-    final double WRIST_SNAP_POSITION = 0.03;
 
     //finger servo
     public Servo fingerServo = null;
@@ -73,8 +69,6 @@ public class intakeUnit
     final double WRIST_POS_PARKING = WRIST_POS_DELTA + 0.1;
     final double WRIST_POS_OBS_ZONE = WRIST_POS_DELTA + 0.309;
     final int WRIST_POS_GRAB_SPECIMEN = 0;//0.302;
-    final double WRIST_POS_SUB = WRIST_POS_DELTA + 0.583;
-    final double WRIST_POS_HANGING = WRIST_POS_DELTA + 0.1;
     final int WRIST_POS_NEUTRAL = 0;
 
     //finger
@@ -86,6 +80,7 @@ public class intakeUnit
     int ARM_POS_DELTA = -3920;
     int ARM_POS_GRAB_SAMPLE = -255;
     int ARM_POS_HIGH_CHAMBER = -3310;//-2967;//2490;
+    int ARM_POS_HIGH_CHAMBER_READY = ARM_POS_HIGH_CHAMBER + 500;
     int ARM_POS_HIGH_CHAMBER_TELEOP = ARM_POS_HIGH_CHAMBER;
     int ARM_POS_LOW_BUCKET = -2020;
     int ARM_POS_PARKING = ARM_POS_DELTA + 2050;
@@ -108,9 +103,6 @@ public class intakeUnit
     /**
      * Init slider motors hardware, and set their behaviors.
      * @param hardwareMap the Hardware Mappings.
-     *
-     *
-     *
      */
     public intakeUnit(HardwareMap hardwareMap, String armServoName, String wristMotorName, String knuckleServoName,
                       String fingerServoName) {
@@ -119,32 +111,29 @@ public class intakeUnit
 
         Logging.log("init motors for finger, wrist and arm.");
 
-         fingerServo = hardwareMap.get(Servo.class, fingerServoName);
-
-        //wristServo = hardwareMap.get(Servo.class, wristServoName);
-        //wristServo.setDirection(Servo.Direction.FORWARD);
+        fingerServo = hardwareMap.get(Servo.class, fingerServoName);
         knuckleServo = hardwareMap.get(Servo.class, knuckleServoName);
         knuckleServo.setDirection(Servo.Direction.FORWARD);
 
-        sleep(200);
+        sleep(100);
 
+        /* init arm motor, set mode to encode mode */
         armMotor = hardwareMap.get(DcMotor.class, armServoName);
         armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        setArmModeRunToPosition(getArmPosition());
+
+        /* init wrist motor, set mode to encode mode */
         wristMotor = hardwareMap.get(DcMotor.class, wristMotorName);
         wristMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-
-        setArmModeRunToPosition(getArmPosition());
         setWristModeRunToPosition(getWristPosition());
-
-        //resetArmPositions(Params.armIntakeCount_InitFront);
     }
-
-
-
 
     //finger servo
     public void fingerServoOpen() {
         fingerServo.setPosition(FINGER_OPEN);
+    }
+    public void fingerServoClose() {
+        fingerServo.setPosition(FINGER_CLOSE);
     }
     public void setFingerPosition(double fingerpos){
         fingerServo.setPosition(fingerpos);
@@ -160,18 +149,6 @@ public class intakeUnit
     }
 
     /**
-     * set the target position of wrist servo motor
-     * @param wristPos the target position value for wrist servo motor
-     */
-    /*
-    public void setWristPosition(double wristPos) {
-        wristServo.setPosition(wristPos);
-    }
-
-     */
-
-
-    /**
      * set the target position of wrist motor
      * @param wristPos the target position value for wrist motor
      */
@@ -180,19 +157,18 @@ public class intakeUnit
         wristMotor.setTargetPosition(wristPos);
     }
 
+    /* Reset wrist motor encode*/
     public void resetWristEncoder() {
         wristMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setWristModeRunToPosition(getWristPosition());
     }
 
+    /* set */
     public void setWristModeRunToPosition(int wristPos) {
         setWristPosition(wristPos);
         wristMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         wristMotor.setPower(0.9);
     }
-
-
-
 
     /**
      * set the target position of arm servo motor
@@ -212,15 +188,6 @@ public class intakeUnit
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setArmModeRunToPosition(0);
     }
-
-    // release arm motor
-    public void releaseArmMotor() {
-        setArmPosition(armMotor.getCurrentPosition());
-        armMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
-        armMotor.setPower(0);
-    }
-
 
     /**
      * Get the arm motor current position value
@@ -251,25 +218,4 @@ public class intakeUnit
             Thread.currentThread().interrupt();
         }
     }
-    /*
-    public void resetArmPositions(int intakePos) {
-        ARM_POS_INTAKE = intakePos;
-        ARM_MIN_COUNT_POS = ARM_POS_INTAKE - 3320; //0;
-        ARM_MAX_COUNT_POS = ARM_POS_INTAKE + 100; //3620;
-        ARM_POS_AUTO = ARM_POS_INTAKE - 3240; //80;
-        ARM_POS_READY_FOR_HANG = ARM_POS_INTAKE - 1760; // 1800
-        ARM_POS_CAMERA_READ = ARM_POS_INTAKE - 1060; //2500;
-        ARM_POS_MOVING_PIXEL_ON_BOARD = ARM_POS_INTAKE - 520;
-        ARM_POS_UNDER_BEAM = ARM_POS_INTAKE - 260; //3100;
-        ARM_POS_DROP_PURPLE = ARM_POS_INTAKE - 130; //3380;
-        ARM_POS_PUSH_PROP = ARM_POS_INTAKE - 100;
-        ARM_POS_INTAKE5 = ARM_POS_INTAKE - 126;
-
-        //NEW STUFF
-        //ARM_POS_GRAB_SAMPLE = 3676;
-        ARM_POS_BEFORE_HANG = 973;
-        ARM_POS_AFTER_HANG = 135;
-        ARM_POS_HIGH_CHAMBER = 2570;
-    }
-    */
 }
