@@ -92,7 +92,7 @@ public class AutoRightHanging2 extends LinearOpMode {
      */
     private void setStartPoses(int leftRight) {
         // road runner variables
-        newStartPose = new Pose2d((-6 * Params.HALF_MAT + Params.CHASSIS_LENGTH / 2),(-leftRight * Params.CHASSIS_HALF_WIDTH),0.0);
+        newStartPose = new Pose2d((-6 * Params.HALF_MAT + Params.CHASSIS_LENGTH / 2),(-leftRight * Params.CHASSIS_HALF_WIDTH),Math.toRadians(179.9998));
     }
     private DistanceSensor distSensor;
 
@@ -143,7 +143,7 @@ public class AutoRightHanging2 extends LinearOpMode {
 
         waitForStart();
 
-        Logging.log("Before start wrist pos: %2f", intake.getWristPosition());
+        Logging.log("Before start wrist pos: %s", intake.getWristPosition());
         Logging.log("Before start finger pos: %2f", intake.getFingerPosition());
         Logging.log("Before start arm pos: %s", intake.getArmPosition());
 
@@ -167,17 +167,19 @@ public class AutoRightHanging2 extends LinearOpMode {
     private void autonomousCore() {
 
         Logging.log("Status - Start auto core");
-        Logging.log("Auto start wrist pos: %2f", intake.getWristPosition());
+        Logging.log("Auto start wrist pos: %s", intake.getWristPosition());
 
         //new stuff for 2024-2025 season
         //hang specimen
-        Vector2d armFlip = new Vector2d(-4.4 * Params.HALF_MAT, newStartPose.position.y);
+        Vector2d firstHighChamberPos = new Vector2d(-3.5 * Params.HALF_MAT, newStartPose.position.y);
 
         //grab
-        Vector2d changeHeadingForPickup = new Vector2d(- 3.5 * Params.HALF_MAT, - leftOrRight * 1.85 * Params.HALF_MAT);
+        Vector2d clearSubForSamples = new Vector2d(- 3.5 * Params.HALF_MAT, - 2.7 * Params.HALF_MAT);
+        Vector2d behindSamplePos = new Vector2d(- 1.1 * Params.HALF_MAT, - 4.1 * Params.HALF_MAT);
+
         Vector2d driveForwardToPickup = new Vector2d(- 3.5 * Params.HALF_MAT, - leftOrRight * 2.7 * Params.HALF_MAT);
         Vector2d obsZone = new Vector2d(- 3.3 * Params.HALF_MAT, - 3.8 * Params.HALF_MAT);
-        Vector2d hangSpecimenPos = new Vector2d(armFlip.x - 0.09 * Params.HALF_MAT, 0);
+        Vector2d hangSpecimenPos = new Vector2d(firstHighChamberPos.x - 0.09 * Params.HALF_MAT, 0);
         Pose2d pickUpSpecimenPos = new Pose2d(- 6.1 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH, - 4.15 * Params.HALF_MAT, Math.toRadians(-85.0));
         Vector2d splineThirdSample = new Vector2d(-2.2 * Params.HALF_MAT, - leftOrRight * 2.9 * Params.HALF_MAT);
         //Vector2d newSpecimenPos = new Vector2d(pickUpSpecimenPos.position.x, pickUpSpecimenPos.position.y - 0.07 * Params.HALF_MAT);
@@ -191,16 +193,16 @@ public class AutoRightHanging2 extends LinearOpMode {
             Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
             Actions.runBlocking(
                     drive.actionBuilder(newStartPose)
-                            .afterTime(0.6, new armFlipToHangAct())
-                            .strafeTo(armFlip)
+                            .afterTime(0.4, new armToReadyHangAct())
+                            .strafeTo(firstHighChamberPos)
                             .build()
             );
-            Logging.log("After arm flip pos wrist pos: %2f", intake.getWristPosition());
+            Logging.log("After ready hang pos wrist pos: %s", intake.getWristPosition());
 
             Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
             double sensorDist = distSensor.getDistance(DistanceUnit.INCH);
             double shiftDelta = sensorDist - Params.HIGH_CHAMBER_DIST;
-            shiftDelta = (shiftDelta > 2)? 2 : ((shiftDelta < -2)? -2 : shiftDelta);
+            shiftDelta = (shiftDelta > 7)? 7 : ((shiftDelta < -7)? -7 : shiftDelta);
             Logging.log("drive pose before distance");
             Logging.log(" X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
             Logging.log("fist specimen sensor dist = %2f, shift delta = %2f", sensorDist, shiftDelta);
@@ -211,32 +213,45 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .build()
             );
             Logging.log("after adjust X position = %2f, Y position = %2f ", drive.pose.position.x, drive.pose.position.y);
-            sleep(900); // TODO : optimize sleep time
+
+            //hanging action
+            sleep(250);
+            intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
+            sleep(450); // TODO : optimize sleep time
 
             updateProfileAccel(true);
             //release specimen and raise arm to clear high chamber
             intake.setFingerPosition(intake.FINGER_OPEN);
-            intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 1200);
+            sleep(150);
+            intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER + 500);
             intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER + 0.15);
+            intake.fingerServoOpen();
 
             sleep(300);
             //Go to pick up first sample on mat
-            Actions.runBlocking(
+            Actions.runBlocking( // TODO: fix motion
                     drive.actionBuilder(drive.pose)
-                            .afterTime(0.3, new armToPickUpPos()) // lower arm during spline moving
-                            .splineToLinearHeading(new Pose2d(changeHeadingForPickup, Math.toRadians(-60)), Math.toRadians(-60))
-                            .afterTime(0.35, new intakeAct(0,0, intake.FINGER_CLOSE)) // close finger during strafe
-                            .strafeTo(new Vector2d(driveForwardToPickup.x + 0.5 * Params.HALF_MAT, driveForwardToPickup.y + 0.1 * Params.HALF_MAT) )
-                            .afterTime(0.01, new intakeAct(intake.ARM_POS_OBS_ZONE, 0, 0)) // lift arm a little bit
-                            .strafeToLinearHeading(new Vector2d(obsZone.x - 1.3 * Params.HALF_MAT, obsZone.y + Params.HALF_MAT), Math.toRadians(-120.0)) // moving to obs zone
-                            .afterTime(0.01, new intakeAct(0,0,intake.FINGER_OPEN)) // drop off first sample after 4 inch strafe
+                            //.afterTime(0.3, new armToPickUpPos()) // lower arm during spline moving
+                            .splineToConstantHeading(clearSubForSamples, Math.toRadians(-60))
+                            //.afterTime(0.35, new intakeAct(0,0, intake.FINGER_CLOSE)) // close finger during strafe
+                            //.strafeTo(new Vector2d(driveForwardToPickup.x + 0.5 * Params.HALF_MAT, driveForwardToPickup.y + 0.1 * Params.HALF_MAT) )
+                            .strafeToConstantHeading(new Vector2d(behindSamplePos.x - 0.5 * Params.HALF_MAT, clearSubForSamples.y - 0.5 * Params.HALF_MAT))
+                            .strafeToConstantHeading(behindSamplePos)
+                            .strafeToConstantHeading(new Vector2d(obsZone.x - 0.2 * Params.HALF_MAT, behindSamplePos.y)) // moving to obs zone
+                            .strafeToConstantHeading(behindSamplePos)//move back
+                            .strafeToConstantHeading(new Vector2d(behindSamplePos.x, - 5 * Params.HALF_MAT))//move behind 2nd sample
+                            .strafeToConstantHeading(new Vector2d(obsZone.x - 1.2 * Params.HALF_MAT, - 5 * Params.HALF_MAT)) // moving to obs zone
+                            .strafeToConstantHeading(new Vector2d(behindSamplePos.x, - 5.1 * Params.HALF_MAT))//move back
+                            .strafeToConstantHeading(new Vector2d(behindSamplePos.x, - 6 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH))//move behind 3rd sample
+                            .strafeToConstantHeading(new Vector2d(obsZone.x - 1.2 * Params.HALF_MAT, - 6 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH)) // moving to obs zone
+                            //.afterTime(0.01, new intakeAct(0,0,intake.FINGER_OPEN)) // drop off first sample after 4 inch strafe
                             .build()
             );
 
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
                             .afterTime(0.4, new armToPickUpPos()) // pickup second sample
-                            .strafeToLinearHeading(new Vector2d(changeHeadingForPickup.x + 0.4 * Params.HALF_MAT, changeHeadingForPickup.y - 0.85 * Params.HALF_MAT), Math.toRadians(-65))
+                            .strafeToLinearHeading(new Vector2d(clearSubForSamples.x + 0.4 * Params.HALF_MAT, clearSubForSamples.y - 0.85 * Params.HALF_MAT), Math.toRadians(-65))
                             .afterTime(0.35, new fingerCloseEnRouteAct()) // second sample
                             .strafeTo(new Vector2d(driveForwardToPickup.x + 0.45 * Params.HALF_MAT, driveForwardToPickup.y - 0.75 * Params.HALF_MAT))
                             .afterTime(0.01, new intakeAct(intake.ARM_POS_OBS_ZONE, 0 /*intake.WRIST_POS_OBS_ZONE*/, 0)) // lift arm a little bit
@@ -369,11 +384,12 @@ public class AutoRightHanging2 extends LinearOpMode {
     }
 
     //action for arm flip to hang
-    private class armFlipToHangAct implements Action {
+    private class armToReadyHangAct implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
-            intake .setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+            intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_READY);
+            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+            intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
             return false;
         }
     }

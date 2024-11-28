@@ -124,7 +124,9 @@ public class intakeUnit
 
         /* init wrist motor, set mode to encode mode */
         wristMotor = hardwareMap.get(DcMotor.class, wristMotorName);
+        Logging.log("before init wrist pos: %s", wristMotor.getCurrentPosition());
         wristMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        wristMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setWristModeRunToPosition(getWristPosition());
     }
 
@@ -160,7 +162,9 @@ public class intakeUnit
     /* Reset wrist motor encode*/
     public void resetWristEncoder() {
         wristMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        setWristModeRunToPosition(getWristPosition());
+        Logging.log("after calibration wrist pos: %s", wristMotor.getCurrentPosition());
+        setWristModeRunToPosition(wristMotor.getCurrentPosition());
+        Logging.log("after movement wrist pos: %s", wristMotor.getCurrentPosition());
     }
 
     /* set */

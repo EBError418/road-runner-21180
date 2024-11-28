@@ -51,10 +51,14 @@ public class ArmPositionCalibration extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.addData("Status", "Please start run to complete calibration.");
 
+
+
         Logging.log("Status - Initialized");
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist", "Knuckle","Finger");
         Params.armCalibrated = true;
+
+        Logging.log("after init wrist pos: %s", intake.getWristPosition());
 
         telemetry.update();
         waitForStart();
@@ -65,7 +69,7 @@ public class ArmPositionCalibration extends LinearOpMode {
 
             intake.resetArmEncoder();
 
-            intake.resetWristEncoder();
+            //intake.resetWristEncoder();
 
             intake.fingerServoOpen();
             sleep(200);
