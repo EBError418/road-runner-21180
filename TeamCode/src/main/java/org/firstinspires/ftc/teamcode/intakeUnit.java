@@ -189,7 +189,7 @@ public class intakeUnit
     public void setArmModeRunToPosition(int armPos) {
         setArmPosition(armPos);
         armMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        armMotor.setPower(0.9);
+        armMotor.setPower(1.2);
     }
 
     public void resetArmEncoder() {

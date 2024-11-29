@@ -74,10 +74,10 @@ public class ChassisWith4Motors {
     final double MAX_CORRECTION_POWER = 0.12;
     final double AUTO_ROTATE_POWER = 0.9;
     double MAX_POWER = 1.0 - MAX_CORRECTION_POWER;
-    final double AUTO_MAX_POWER = 0.8;
-    final double SHORT_DISTANCE_POWER = 0.5;
-    final double RAMP_START_POWER = 0.4;
-    final double RAMP_END_POWER = 0.25;
+    final double AUTO_MAX_POWER = 1.0;
+    final double SHORT_DISTANCE_POWER = 0.8;
+    final double RAMP_START_POWER = 0.7;
+    final double RAMP_END_POWER = 0.7;
     final double MIN_ROTATE_POWER = 0.24;
 
     // Position variables for autonomous
@@ -506,7 +506,7 @@ public class ChassisWith4Motors {
         double tDistanceAbs = Math.abs(tDistance);
 
         if (tDistanceAbs > SHORT_DISTANCE) {
-            speedRampOn = true;
+            //speedRampOn = true;
         }
         correction = 0.0;
         setPowers(RAMP_START_POWER); // p is always positive for RUN_TO_POSITION mode.
