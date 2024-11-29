@@ -64,6 +64,7 @@ public class intakeUnit
     //new stuff: wrist
     final double WRIST_POS_DELTA = 0.0;
     final double WRIST_POS_GRAB_SAMPLE = WRIST_POS_DELTA + 0.36;
+    final int WRIST_POS_GRAB_SAMPLE_BACK = 270;
     final int WRIST_POS_HIGH_CHAMBER = 270;
     final double WRIST_POS_LOW_BUCKET = WRIST_POS_DELTA + 0.626;
     final double WRIST_POS_PARKING = WRIST_POS_DELTA + 0.1;
@@ -79,6 +80,7 @@ public class intakeUnit
     //arm
     int ARM_POS_DELTA = -3920;
     int ARM_POS_GRAB_SAMPLE = -255;
+    int ARM_POS_GRAB_SAMPLE_BACK = -3742;
     int ARM_POS_HIGH_CHAMBER = -3310;//-2967;//2490;
     int ARM_POS_HIGH_CHAMBER_READY = ARM_POS_HIGH_CHAMBER + 500;
     int ARM_POS_HIGH_CHAMBER_TELEOP = ARM_POS_HIGH_CHAMBER;
@@ -91,13 +93,16 @@ public class intakeUnit
     int ARM_POS_SUB = ARM_POS_DELTA + 2925;
     int ARM_POS_HANGING = ARM_POS_DELTA + 1820;
     int ARM_POS_DOWN_HANGING = ARM_POS_DELTA + 4150;
+    int ARM_POS_DROP_SAMPLE = -360;
 
     //knuckle
     final double KNUCKLE_POS_PICKUP_SPECIMEN = 0.182;
     final double KNUCKLE_POS_HANGING = 0.85;
     final double KNUCKLE_POS_LOW_BUCKET = 0.500;
     final double KNUCKLE_POS_HIGH_CHAMBER = 0.383;
-    final double KNUCKLE_POS_DRAG_SAMPLE = 0.350;
+    final double KNUCKLE_POS_PICKUP_SAMPLE = 0.350;
+    final double KNUCKLE_POS_PICKUP_SAMPLE_BACK = 0.514;
+    final double KNUCKLE_POS_DROP_SAMPLE = 0.628;
 
 
     /**
@@ -126,7 +131,6 @@ public class intakeUnit
         wristMotor = hardwareMap.get(DcMotor.class, wristMotorName);
         Logging.log("before init wrist pos: %s", wristMotor.getCurrentPosition());
         wristMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        wristMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setWristModeRunToPosition(getWristPosition());
     }
 
@@ -163,7 +167,7 @@ public class intakeUnit
     public void resetWristEncoder() {
         wristMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         Logging.log("after calibration wrist pos: %s", wristMotor.getCurrentPosition());
-        setWristModeRunToPosition(wristMotor.getCurrentPosition());
+        setWristModeRunToPosition(0);
         Logging.log("after movement wrist pos: %s", wristMotor.getCurrentPosition());
     }
 
@@ -171,7 +175,7 @@ public class intakeUnit
     public void setWristModeRunToPosition(int wristPos) {
         setWristPosition(wristPos);
         wristMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        wristMotor.setPower(0.9);
+        wristMotor.setPower(0.3);
     }
 
     /**
