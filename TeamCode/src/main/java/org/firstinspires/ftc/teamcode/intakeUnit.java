@@ -80,8 +80,8 @@ public class intakeUnit
     //arm
     int ARM_POS_DELTA = -3920;
     int ARM_POS_GRAB_SAMPLE = -255;
-    int ARM_POS_GRAB_SAMPLE_BACK = -3742;
-    int ARM_POS_HIGH_CHAMBER = -3310;//-2967;//2490;
+    int ARM_POS_GRAB_SAMPLE_BACK = -3842;
+    int ARM_POS_HIGH_CHAMBER = -3360;//-2967;//2490;
     int ARM_POS_HIGH_CHAMBER_READY = ARM_POS_HIGH_CHAMBER + 500;
     int ARM_POS_HIGH_CHAMBER_TELEOP = ARM_POS_HIGH_CHAMBER;
     int ARM_POS_LOW_BUCKET = -2020;
@@ -89,14 +89,14 @@ public class intakeUnit
     int ARM_POS_OBS_ZONE = -430;
     int ARM_POS_BACK = ARM_POS_DELTA + 1000;
     int ARM_POS_BEFORE_HANG = -2419;
-    int ARM_POS_GRAB_SPECIMEN = -240; //-540;
+    int ARM_POS_GRAB_SPECIMEN = -143; //-240;
     int ARM_POS_SUB = -1000;
     int ARM_POS_HANGING = -2000;
     int ARM_POS_DOWN_HANGING = 150;
     int ARM_POS_DROP_SAMPLE = -360;
 
     //knuckle
-    final double KNUCKLE_POS_PICKUP_SPECIMEN = 0.182;
+    final double KNUCKLE_POS_PICKUP_SPECIMEN = 0.392; //0.182
     final double KNUCKLE_POS_HANGING = 0.85;
     final double KNUCKLE_POS_LOW_BUCKET = 0.500;
     final double KNUCKLE_POS_HIGH_CHAMBER = 0.383;

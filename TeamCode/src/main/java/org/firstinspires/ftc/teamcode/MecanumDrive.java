@@ -58,9 +58,9 @@ public final class MecanumDrive {
         // TODO: fill in these values based on
         //   see https://ftc-docs.firstinspires.org/en/latest/programming_resources/imu/imu.html?highlight=imu#physical-hub-mounting
         public RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection =
-                RevHubOrientationOnRobot.LogoFacingDirection.LEFT;
+                RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD;
         public RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
-                RevHubOrientationOnRobot.UsbFacingDirection.UP;
+                RevHubOrientationOnRobot.UsbFacingDirection.DOWN;
 
         // drive model parameters
 
@@ -251,7 +251,7 @@ public final class MecanumDrive {
         rightFront.setDirection(DcMotor.Direction.FORWARD);
         rightBack.setDirection(DcMotor.Direction.FORWARD);
 
-        resetEncodes();
+        //resetEncodes();
 
         // TODO: reverse motor directions if needed
         //   leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
