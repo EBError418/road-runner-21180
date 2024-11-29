@@ -85,14 +85,14 @@ public class intakeUnit
     int ARM_POS_HIGH_CHAMBER_READY = ARM_POS_HIGH_CHAMBER + 500;
     int ARM_POS_HIGH_CHAMBER_TELEOP = ARM_POS_HIGH_CHAMBER;
     int ARM_POS_LOW_BUCKET = -2020;
-    int ARM_POS_PARKING = ARM_POS_DELTA + 2050;
+    int ARM_POS_PARKING = -100;
     int ARM_POS_OBS_ZONE = -430;
     int ARM_POS_BACK = ARM_POS_DELTA + 1000;
     int ARM_POS_BEFORE_HANG = -2419;
     int ARM_POS_GRAB_SPECIMEN = -240; //-540;
-    int ARM_POS_SUB = ARM_POS_DELTA + 2925;
-    int ARM_POS_HANGING = ARM_POS_DELTA + 1820;
-    int ARM_POS_DOWN_HANGING = ARM_POS_DELTA + 4150;
+    int ARM_POS_SUB = -1000;
+    int ARM_POS_HANGING = -2000;
+    int ARM_POS_DOWN_HANGING = 150;
     int ARM_POS_DROP_SAMPLE = -360;
 
     //knuckle
@@ -125,13 +125,13 @@ public class intakeUnit
         /* init arm motor, set mode to encode mode */
         armMotor = hardwareMap.get(DcMotor.class, armServoName);
         armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        setArmModeRunToPosition(getArmPosition());
+        //setArmModeRunToPosition(getArmPosition());
 
         /* init wrist motor, set mode to encode mode */
         wristMotor = hardwareMap.get(DcMotor.class, wristMotorName);
         Logging.log("before init wrist pos: %s", wristMotor.getCurrentPosition());
         wristMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        setWristModeRunToPosition(getWristPosition());
+        //setWristModeRunToPosition(getWristPosition());
     }
 
     //finger servo

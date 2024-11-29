@@ -106,9 +106,15 @@ public class AutoRightHanging2 extends LinearOpMode {
         // init drive with road runner
         drive = new MecanumDrive(hardwareMap, newStartPose);
         Params.startPose = newStartPose; // init storage pose.
+        Params.currentPose = newStartPose;; // init storage pose
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist", "Knuckle","Finger");
         //intake.resetArmEncoder();
+
+        // set RunToPosition mode and set power for motors.
+        intake.setWristModeRunToPosition(intake.getWristPosition());
+        intake.setArmModeRunToPosition(intake.getArmPosition());
+
 
         intake.setFingerPosition(intake.FINGER_CLOSE);
 
@@ -160,6 +166,7 @@ public class AutoRightHanging2 extends LinearOpMode {
                 telemetry.update();
                 sleep(4000);
             }
+            Params.currentPose = drive.pose; // save current position
         }
 
     }

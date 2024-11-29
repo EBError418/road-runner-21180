@@ -96,6 +96,11 @@ public class TeleopRR extends LinearOpMode {
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
                 "Knuckle", "Finger");
 
+        // set RunToPosition mode and set power for motors.
+        intake.setWristModeRunToPosition(intake.getWristPosition());
+        intake.setArmModeRunToPosition(intake.getArmPosition());
+
+
         // you can use this as a regular DistanceSensor.
         distSensor = hardwareMap.get(DistanceSensor.class, "distance");
 
