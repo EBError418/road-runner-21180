@@ -97,6 +97,7 @@ public class intakeUnit
 
     //knuckle
     final double KNUCKLE_POS_PICKUP_SPECIMEN = 0.392; //0.182
+    final double KNUCKLE_POS_PICKUP_SPECIMEN_ready = 0.05;
     final double KNUCKLE_POS_HANGING = 0.85;
     final double KNUCKLE_POS_LOW_BUCKET = 0.500;
     final double KNUCKLE_POS_HIGH_CHAMBER = 0.383;
