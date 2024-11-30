@@ -251,8 +251,10 @@ public final class MecanumDrive {
         rightFront.setDirection(DcMotor.Direction.FORWARD);
         rightBack.setDirection(DcMotor.Direction.FORWARD);
 
-        //resetEncodes();
-
+        // use motor encode instead of dead wheel for road runner
+        if (!PARAMS.useDeadWheel) {
+            resetEncodes();
+        }
         // TODO: reverse motor directions if needed
         //   leftFront.setDirection(DcMotorSimple.Direction.REVERSE);
 
@@ -277,15 +279,15 @@ public final class MecanumDrive {
         MecanumKinematics.WheelVelocities<Time> wheelVels = new MecanumKinematics(1).inverse(
                 PoseVelocity2dDual.constant(powers, 1));
 
-        double maxPowerMag = 1.2;
+        double maxPowerMag = 1;
         for (DualNum<Time> power : wheelVels.all()) {
             maxPowerMag = Math.max(maxPowerMag, power.value());
         }
 
-        leftFront.setPower(wheelVels.leftFront.get(0) / maxPowerMag + 0.2);
-        leftBack.setPower(wheelVels.leftBack.get(0) / maxPowerMag + 0.2);
-        rightBack.setPower(wheelVels.rightBack.get(0) / maxPowerMag + 0.2);
-        rightFront.setPower(wheelVels.rightFront.get(0) / maxPowerMag + 0.2);
+        leftFront.setPower(wheelVels.leftFront.get(0) / maxPowerMag);
+        leftBack.setPower(wheelVels.leftBack.get(0) / maxPowerMag);
+        rightBack.setPower(wheelVels.rightBack.get(0) / maxPowerMag);
+        rightFront.setPower(wheelVels.rightFront.get(0) / maxPowerMag);
     }
 
     public final class FollowTrajectoryAction implements Action {

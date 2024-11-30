@@ -121,11 +121,6 @@ public class AutoRightHanging2 extends LinearOpMode {
         // you can use this as a regular DistanceSensor.
         distSensor = hardwareMap.get(DistanceSensor.class, "distance");
 
-        // you can also cast this to a Rev2mDistanceSensor if you want to use added
-        // methods associated with the Rev2mDistanceSensor class.
-        //Rev2mDistanceSensor sensorTimeOfFlight = (Rev2mDistanceSensor) sensorDistance;
-
-
         while (!isStarted()) {
             sleep(10);
             telemetry.addData( "FTC 2024 - ", "Wait for starting ");
@@ -189,20 +184,19 @@ public class AutoRightHanging2 extends LinearOpMode {
         Vector2d hangSpecimenPos = new Vector2d(firstHighChamberPos.x - 0.1 * Params.HALF_MAT, firstHighChamberPos.y);
         Pose2d pickUpSpecimenPos = new Pose2d(- 3.3 * Params.HALF_MAT, - 3.8 * Params.HALF_MAT, Math.toRadians(180));
         Vector2d splineThirdSample = new Vector2d(-2.2 * Params.HALF_MAT, - leftOrRight * 2.9 * Params.HALF_MAT);
-        //Vector2d newSpecimenPos = new Vector2d(pickUpSpecimenPos.position.x, pickUpSpecimenPos.position.y - 0.07 * Params.HALF_MAT);
         Pose2d specimenLineUpPos = new Pose2d(pickUpSpecimenPos.position.x +1.5, pickUpSpecimenPos.position.y + Params.HALF_MAT, Math.toRadians(-81.0));
 
         //TODO: fix power ramp
         //ascent level 1
         Vector2d parkObz = new Vector2d(-5.0 * Params.HALF_MAT,-4.0 * Params.HALF_MAT);
+
         if (leftOrRight == 1) { // right side auto
             //Go to position for arm flip and hang on high chamber
-            updateProfileAccel(false);
-            Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
+            Logging.log(" Start position: X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
             Actions.runBlocking(
                     drive.actionBuilder(newStartPose)
                             .afterTime(0.01, new armToReadyHangAct())
-                            .strafeToLinearHeading(firstHighChamberPos, newStartPose.heading)
+                            .strafeTo(firstHighChamberPos)
                             .build()
             );
             Logging.log("After ready hang pos wrist pos: %s", intake.getWristPosition());
@@ -217,7 +211,6 @@ public class AutoRightHanging2 extends LinearOpMode {
 
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
-                            //.afterTime(0.01, new armToReadyHangAct())
                             .strafeToConstantHeading(new Vector2d(drive.pose.position.x + shiftDelta , drive.pose.position.y))
                             .build()
             );
