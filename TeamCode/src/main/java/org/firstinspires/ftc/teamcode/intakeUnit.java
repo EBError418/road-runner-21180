@@ -81,8 +81,8 @@ public class intakeUnit
     int ARM_POS_DELTA = -3920;
     int ARM_POS_GRAB_SAMPLE = -255;
     int ARM_POS_GRAB_SAMPLE_BACK = -3842;
-    int ARM_POS_HIGH_CHAMBER = -3360;//-2967;//2490;
-    int ARM_POS_HIGH_CHAMBER_READY = ARM_POS_HIGH_CHAMBER + 500;
+    int ARM_POS_HIGH_CHAMBER = -3360 - 100;//-2967;//2490;
+    int ARM_POS_HIGH_CHAMBER_READY = ARM_POS_HIGH_CHAMBER + 600;
     int ARM_POS_HIGH_CHAMBER_TELEOP = ARM_POS_HIGH_CHAMBER;
     int ARM_POS_LOW_BUCKET = -2020;
     int ARM_POS_PARKING = -100;
@@ -93,7 +93,7 @@ public class intakeUnit
     int ARM_POS_SUB = -1000;
     int ARM_POS_HANGING = -2000;
     int ARM_POS_DOWN_HANGING = 150;
-    int ARM_POS_DROP_SAMPLE = -360;
+    int ARM_POS_DROP_SAMPLE = -450; // need adjust to make sure fingers do not touch ground.
 
     //knuckle
     final double KNUCKLE_POS_PICKUP_SPECIMEN = 0.392; //0.182
