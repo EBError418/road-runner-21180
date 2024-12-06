@@ -80,7 +80,8 @@ public class TeleopRR extends LinearOpMode {
     // debug flags, turn it off for formal version to save time of logging
     boolean debugFlag = true;
 
-    private DistanceSensor distSensor;
+    private DistanceSensor distSensorHanging;
+    private DistanceSensor distSensorPickup;
 
     @Override
     public void runOpMode() {
@@ -102,7 +103,8 @@ public class TeleopRR extends LinearOpMode {
 
 
         // you can use this as a regular DistanceSensor.
-        distSensor = hardwareMap.get(DistanceSensor.class, "distance");
+        distSensorHanging = hardwareMap.get(DistanceSensor.class, "distance hanging");
+        distSensorPickup = hardwareMap.get(DistanceSensor.class, "distance pickup");
 
         // bulk reading setting - auto refresh mode
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
@@ -111,8 +113,11 @@ public class TeleopRR extends LinearOpMode {
         }
 
         //preset positions used for teleop commands
-        Pose2d pickUpSpecimenPos = new Pose2d(-3.9 * Params.HALF_MAT, - 6 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH, Math.toRadians(179.9998));
-        Vector2d hangSpecimenPos = new Vector2d(- 3.3 * Params.HALF_MAT,  - Params.CHASSIS_HALF_WIDTH + 12.0);
+
+        int specimenCount = 0;//counter used to update specimen hanging position
+
+        Pose2d pickUpSpecimenPos = new Pose2d(- 3.3 * Params.HALF_MAT, - 3.8 * Params.HALF_MAT, Math.toRadians(180));
+        Vector2d hangSpecimenPos = new Vector2d(- 3.3 * Params.HALF_MAT,  - Params.CHASSIS_HALF_WIDTH + specimenCount * 1.8); //shifts left for every specimen hanged
         Vector2d outOfSubPose = new Vector2d(- 5 * Params.HALF_MAT, - 3 * Params.HALF_MAT);
         Vector2d pickupSamplePos = new Vector2d(- Params.HALF_MAT, - 4 * Params.HALF_MAT);
 
@@ -209,20 +214,18 @@ public class TeleopRR extends LinearOpMode {
                 intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN);
                 intake.setFingerPosition(intake.FINGER_CLOSE);
                 sleep(100);
-                intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN + 0.15);
-                sleep(200); // waiting specimen goes up from wall
 
                 //intake.setArmPosition(intake.ARM_POS_BEFORE_HANG); // lift arm to during strafe to chambers
                 Actions.runBlocking(
                         drive.actionBuilder(pickUpSpecimenPos)
-                                .afterTime(0.8, new armReadyToHangHigh())
+                                .afterTime(0.4, new armReadyToHangHigh())
                                 .strafeToConstantHeading(hangSpecimenPos)
                                 .build()
                 );
 
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_READY);
                 intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
-                double sensorDist = distSensor.getDistance(DistanceUnit.INCH);
+                double sensorDist = distSensorHanging.getDistance(DistanceUnit.INCH);
                 double shiftDelta = sensorDist - Params.HIGH_CHAMBER_DIST;
                 shiftDelta = Range.clip(shiftDelta, -7.0, 7.0);
                 Logging.log("drive pose before distance");
@@ -235,9 +238,23 @@ public class TeleopRR extends LinearOpMode {
                                 .build()
                 );
 
+                specimenCount ++;//update specimen pos
+                hangSpecimenPos = new Vector2d(- 3.3 * Params.HALF_MAT,  - Params.CHASSIS_HALF_WIDTH + specimenCount * 3.5);
+
                 // hanging specimen
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
                 intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+                sleep(400);
+
+                //drag specimen 3 inches to the right
+                intake.fingerServoOpen();
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_READY - 100);
+                sleep(350);
+                Actions.runBlocking(
+                        drive.actionBuilder(drive.pose)
+                                .strafeToConstantHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y - 6.0))
+                                .build()
+                );
             }
 
             // strafe 6 inch to push specimens
@@ -320,9 +337,13 @@ public class TeleopRR extends LinearOpMode {
 
                 telemetry.addData("location", " %s", drive.pose.position.toString());
 
+                telemetry.addData("specimens hanged: %s", specimenCount);
+
                 telemetry.addData(" --- ", " --- ");
 
-                telemetry.addData("range", String.format("%.01f in", distSensor.getDistance(DistanceUnit.INCH)));
+                telemetry.addData("hanging distance range", String.format("%.01f in", distSensorHanging.getDistance(DistanceUnit.INCH)));
+
+                telemetry.addData("pickup distance range", String.format("%.01f in", distSensorPickup.getDistance(DistanceUnit.INCH)));
 
 
                 telemetry.update(); // update message at the end of while loop
@@ -347,8 +368,9 @@ public class TeleopRR extends LinearOpMode {
     private class armReadyToHangHigh implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            intake.setArmPosition(intake.ARM_POS_BEFORE_HANG);
+            intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_READY);
             intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+            intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER - 0.2);
             return false;
         }
     }

@@ -101,6 +101,8 @@ public class AutoRightHanging2 extends LinearOpMode {
     }
     private DistanceSensor distSensor;
 
+    private DistanceSensor distSensorPickup;
+
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -124,7 +126,8 @@ public class AutoRightHanging2 extends LinearOpMode {
         intake.setFingerPosition(intake.FINGER_CLOSE);
 
         // you can use this as a regular DistanceSensor.
-        distSensor = hardwareMap.get(DistanceSensor.class, "distance");
+        distSensor = hardwareMap.get(DistanceSensor.class, "distanceHanging");
+        distSensorPickup = hardwareMap.get(DistanceSensor.class, "distance pickup");
 
         while (!isStarted()) {
             sleep(10);
@@ -431,6 +434,10 @@ public class AutoRightHanging2 extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
+
+            telemetry.addData("pickup distance range = ", String.format("%.01f in", distSensorPickup.getDistance(DistanceUnit.INCH)));
+
+
             return false;
         }
     }
