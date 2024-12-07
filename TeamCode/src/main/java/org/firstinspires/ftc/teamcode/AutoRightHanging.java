@@ -315,7 +315,7 @@ public class AutoRightHanging extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE);
-            intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SAMPLE);
+            intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SAMPLE_READY);
             intake.setFingerPosition(intake.FINGER_OPEN);
             return false;
         }

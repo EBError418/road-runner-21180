@@ -126,7 +126,7 @@ public class AutoRightHanging2 extends LinearOpMode {
         intake.setFingerPosition(intake.FINGER_CLOSE);
 
         // you can use this as a regular DistanceSensor.
-        distSensor = hardwareMap.get(DistanceSensor.class, "distanceHanging");
+        distSensor = hardwareMap.get(DistanceSensor.class, "distance hanging");
         distSensorPickup = hardwareMap.get(DistanceSensor.class, "distance pickup");
 
         while (!isStarted()) {

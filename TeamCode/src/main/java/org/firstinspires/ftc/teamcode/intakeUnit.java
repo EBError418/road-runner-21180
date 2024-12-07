@@ -61,49 +61,55 @@ public class intakeUnit
     //finger servo
     public Servo fingerServo = null;
 
+
+
+    //finger
+    final double FINGER_CLOSE = 0.6; // must bigger than 0 for action builder working
+    final double FINGER_SPECIMEN_CLOSE = 0.1;
+    final double FINGER_OPEN = 0.2;
+
+    //knuckle
+    final double KNUCKLE_POS_PICKUP_SAMPLE_BACK = 0.5; // pickup sample during auto
+
+    final double KNUCKLE_POS_PICKUP_SPECIMEN = 0.358; //0.182
+    final double KNUCKLE_POS_PICKUP_SPECIMEN_ready = 0.3;
+    final double KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE = 0.16;
+    final double KNUCKLE_POS_HANGING = 0.17;
+    final double KNUCKLE_POS_LOW_BUCKET = 0.500;
+    final double KNUCKLE_POS_HIGH_CHAMBER = 0.358;
+    final double KNUCKLE_POS_PICKUP_SAMPLE_READY = 0.408; // approaching submersible
+    final double KNUCKLE_POS_PICKUP_SAMPLE = 0.497; // from submersible
+    final double KNUCKLE_POS_DROP_SAMPLE = 0.628;
+
     //new stuff: wrist
+    final int WRIST_POS_GRAB_SAMPLE_BACK = 270; // pickup sample during auto
+    final int WRIST_POS_NEUTRAL = 0;
+
     final double WRIST_POS_DELTA = 0.0;
     final double WRIST_POS_GRAB_SAMPLE = WRIST_POS_DELTA + 0.36;
-    final int WRIST_POS_GRAB_SAMPLE_BACK = 270;
     final int WRIST_POS_HIGH_CHAMBER = 270;
     final double WRIST_POS_LOW_BUCKET = WRIST_POS_DELTA + 0.626;
     final double WRIST_POS_PARKING = WRIST_POS_DELTA + 0.1;
     final double WRIST_POS_OBS_ZONE = WRIST_POS_DELTA + 0.309;
     final int WRIST_POS_GRAB_SPECIMEN = 0;//0.302;
-    final int WRIST_POS_NEUTRAL = 0;
-
-    //finger
-    final double FINGER_CLOSE = 0.5; // must bigger than 0 for action builder working
-    final double FINGER_SPECIMEN_CLOSE = 0.1;
-    final double FINGER_OPEN = 0.01;
 
     //arm
-    int ARM_POS_DELTA = -3920;
-    int ARM_POS_GRAB_SAMPLE = -255;
-    int ARM_POS_GRAB_SAMPLE_BACK = -3842;
-    int ARM_POS_HIGH_CHAMBER = -3360 - 100;//-2967;//2490;
-    int ARM_POS_HIGH_CHAMBER_READY = ARM_POS_HIGH_CHAMBER + 600;
-    int ARM_POS_HIGH_CHAMBER_TELEOP = ARM_POS_HIGH_CHAMBER;
-    int ARM_POS_LOW_BUCKET = -2020;
-    int ARM_POS_PARKING = -100;
-    int ARM_POS_OBS_ZONE = -430;
-    int ARM_POS_BACK = ARM_POS_DELTA + 1000;
-    int ARM_POS_BEFORE_HANG = -2419;
-    int ARM_POS_GRAB_SPECIMEN = -143; //-240;
-    int ARM_POS_SUB = -1000;
-    int ARM_POS_HANGING = -2000;
-    int ARM_POS_DOWN_HANGING = 150;
-    int ARM_POS_DROP_SAMPLE = -450; // need adjust to make sure fingers do not touch ground.
+    int ARM_POS_GRAB_SAMPLE_BACK = -3860;
+    int ARM_POS_DROP_SAMPLE = -590; // drop off sample during during auto. Need adjust to make sure fingers do not touch ground.
+    int ARM_POS_HIGH_CHAMBER_READY = -2940;
+    int ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN = -3150; // moving specimen left/right
 
-    //knuckle
-    final double KNUCKLE_POS_PICKUP_SPECIMEN = 0.392; //0.182
-    final double KNUCKLE_POS_PICKUP_SPECIMEN_ready = 0.05;
-    final double KNUCKLE_POS_HANGING = 0.85;
-    final double KNUCKLE_POS_LOW_BUCKET = 0.500;
-    final double KNUCKLE_POS_HIGH_CHAMBER = 0.383;
-    final double KNUCKLE_POS_PICKUP_SAMPLE = 0.350;
-    final double KNUCKLE_POS_PICKUP_SAMPLE_BACK = 0.514;
-    final double KNUCKLE_POS_DROP_SAMPLE = 0.628;
+    int ARM_POS_GRAB_SAMPLE = -500; // pickup sample during teleop
+    int ARM_POS_HIGH_CHAMBER = -3500;//-2967;//2490;
+    int ARM_POS_HIGH_CHAMBER_TELEOP = ARM_POS_HIGH_CHAMBER;
+    int ARM_POS_LOW_BUCKET = -2120;
+    int ARM_POS_PARKING = -500;
+    int ARM_POS_OBS_ZONE = -430;
+    int ARM_POS_BACK = -3000;
+    int ARM_POS_BEFORE_HANG = -2230; // ready for hanging robot during end game
+    int ARM_POS_GRAB_SPECIMEN = -185; //-240;
+    int ARM_POS_SUB = -405;
+    int ARM_POS_DOWN_HANGING = -150;
 
 
     /**
@@ -118,6 +124,7 @@ public class intakeUnit
         Logging.log("init motors for finger, wrist and arm.");
 
         fingerServo = hardwareMap.get(Servo.class, fingerServoName);
+        //fingerServo.setDirection(Servo.Direction.REVERSE);
         knuckleServo = hardwareMap.get(Servo.class, knuckleServoName);
         knuckleServo.setDirection(Servo.Direction.FORWARD);
 
@@ -126,13 +133,15 @@ public class intakeUnit
         /* init arm motor, set mode to encode mode */
         armMotor = hardwareMap.get(DcMotor.class, armServoName);
         armMotor.setDirection(DcMotorSimple.Direction.FORWARD);
+        armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
         //setArmModeRunToPosition(getArmPosition());
 
         /* init wrist motor, set mode to encode mode */
         wristMotor = hardwareMap.get(DcMotor.class, wristMotorName);
         Logging.log("before init wrist pos: %s", wristMotor.getCurrentPosition());
         wristMotor.setDirection(DcMotorSimple.Direction.FORWARD);
-        //setWristModeRunToPosition(getWristPosition());
+        wristMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
     }
 
     //finger servo
