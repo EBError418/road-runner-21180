@@ -176,12 +176,20 @@ public class TeleopRR extends LinearOpMode {
                 intake.setKnucklePosition(intake.getKnucklePosition() + 0.006);
             }
 
+            if (gpButtons.wristFront) {
+                intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
+            }
+
+            if (gpButtons.wristBack) {
+                intake.setWristPosition(intake.WRIST_POS_GRAB_SAMPLE_BACK);
+            }
+
             if (gpButtons.fingerClose) {
                 intake.setFingerPosition(intake.FINGER_CLOSE);
             }
 
             if (gpButtons.fingerOpen) {
-                intake.setFingerPosition(intake.FINGER_OPEN);
+                intake.setFingerPosition(intake.FINGER_OPEN_SUB);
             }
 
             // Align specimen to the high chamber, get ready for hanging.
@@ -315,7 +323,7 @@ public class TeleopRR extends LinearOpMode {
                 intake.setArmPosition(intake.ARM_POS_SUB);
                 intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
                 intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SAMPLE_READY);
-                intake.fingerServoOpen();
+                intake.setFingerPosition(intake.FINGER_OPEN_SUB);
             }
 
             // set arm and wrist position for drop off at low bucket.

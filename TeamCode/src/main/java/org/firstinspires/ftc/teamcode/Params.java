@@ -47,7 +47,7 @@ public class Params {
     static int armIntakeCount_InitFront = -30;
 
     //distances for dist sensor
-    static double HIGH_CHAMBER_DIST = 5.2;
+    static double HIGH_CHAMBER_DIST = 5.5;
     static double SPECIMEN_PICKUP_DIST = 15;
 
     //game field parameters

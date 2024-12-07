@@ -122,8 +122,8 @@ public class AutoRightHanging2 extends LinearOpMode {
         intake.setWristModeRunToPosition(intake.getWristPosition());
         intake.setArmModeRunToPosition(intake.getArmPosition());
 
-
         intake.setFingerPosition(intake.FINGER_CLOSE);
+        intake.setKnucklePosition(intake.KNUCKLE_POS_AUTO_INIT); // init knuckle position
 
         // you can use this as a regular DistanceSensor.
         distSensor = hardwareMap.get(DistanceSensor.class, "distance hanging");
@@ -187,7 +187,7 @@ public class AutoRightHanging2 extends LinearOpMode {
         Vector2d firstSamplePosition = new Vector2d(- 3.2 * Params.HALF_MAT, - 4.1 * Params.HALF_MAT);
         Vector2d secondSamplePosition = new Vector2d(- 3.2 * Params.HALF_MAT, firstSamplePosition.y - 10.5);
 
-        Vector2d obsZone = new Vector2d(- 4 * Params.HALF_MAT, - 3 * Params.HALF_MAT);
+        Vector2d obsZone = new Vector2d(- 4.2 * Params.HALF_MAT, - 3.5 * Params.HALF_MAT);
         Vector2d hangSpecimenPos = new Vector2d(-3.2 * Params.HALF_MAT, firstHighChamberPos.y);
         Pose2d pickUpSpecimenPos = new Pose2d(- 3.3 * Params.HALF_MAT, - 3.8 * Params.HALF_MAT, Math.toRadians(180));
         Vector2d pickUpSpecimenPos1 = new Vector2d(- 3.3 * Params.HALF_MAT, - 3.8 * Params.HALF_MAT);
@@ -231,9 +231,9 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .afterTime(1.6, new armToPickUpPos()) // lower arm during spline moving
                             .strafeToLinearHeading(firstSamplePosition, newStartPose.heading)//go to first sample position
                             //.turnTo(newStartPose.heading) // fine adjust heading
-                            .afterTime(0.05, new fingerCloseEnRouteAct())//grab first sample
-                            .afterTime(0.2, new intakeAct(intake.ARM_POS_DROP_SAMPLE, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_POS_DROP_SAMPLE, true))//go back for drop sample
-                            .waitSeconds(0.2) // wait finger close before moving to second sample
+                            .afterTime(0.25, new fingerCloseEnRouteAct())//grab first sample
+                            .afterTime(0.4, new intakeAct(intake.ARM_POS_DROP_SAMPLE, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_POS_DROP_SAMPLE, true))//go back for drop sample
+                            .waitSeconds(0.4) // wait finger close before moving to second sample
                             .strafeToLinearHeading(secondSamplePosition, newStartPose.heading)//go to second sample position
                             .waitSeconds(0.45) // waiting arm reaching position to drop off first sample.
                             .afterTime(0.01, new armToPickUpPos()) //arm to grab second sample when open finger
@@ -241,9 +241,10 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .afterTime(1.9, new intakeAct(intake.ARM_POS_DROP_SAMPLE, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_POS_DROP_SAMPLE, true))
                             // 3.0s is the total time for arm flipping from obz to pickup second sample,
                             // then flipping back to obz to drop off second sample.
-                            .afterTime(3.0, new fingerOpenEnRouteAct())
+                            .afterTime(3.4, new fingerOpenEnRouteAct())
                             //.afterTime(3.1, new intakeAct(intake.ARM_POS_DROP_SAMPLE, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_POS_PICKUP_SPECIMEN_ready, false))
-                            .waitSeconds(2.5) // may need adjust according test results. increase it if the second sample hit the first specimen
+                            .waitSeconds(2.9) // may need adjust according test results. increase it if the second sample hit the first specimen
+                            .afterTime(0.01, new intakeAct(intake.ARM_POS_GRAB_SPECIMEN, intake.WRIST_POS_GRAB_SPECIMEN, intake.KNUCKLE_POS_PICKUP_SPECIMEN_ready, false))
                             .build()
             );
 
@@ -266,8 +267,8 @@ public class AutoRightHanging2 extends LinearOpMode {
                                 //.turnTo(newStartPose.heading)
                                 .afterTime(0.001, new logPos()) // log drive position when pickup specimen
                                 .afterTime(0.01, new intakeAct(intake.ARM_POS_GRAB_SPECIMEN, intake.WRIST_POS_GRAB_SPECIMEN, intake.KNUCKLE_POS_PICKUP_SPECIMEN, false))
-                                .afterTime(0.3, new fingerCloseEnRouteAct())//grab specimen
-                                .afterTime(0.5, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_POS_HIGH_CHAMBER, intake.KNUCKLE_POS_HIGH_CHAMBER - 0.2, true)) //specimen will hit submersible
+                                .afterTime(0.4, new fingerCloseEnRouteAct())//grab specimen
+                                .afterTime(0.6, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_POS_HIGH_CHAMBER, intake.KNUCKLE_POS_HIGH_CHAMBER - 0.2, true)) //specimen will hit submersible
                                 .waitSeconds(1.1)
                                 .afterTime(1.4, new armToReadyHangAct())//get arm in position ready for hanging specimen
                                 .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x, hangSpecimenPos.y - 1.2 * j), newStartPose.heading) // shift 1.2 inch for each specimen on high chamber
@@ -289,7 +290,7 @@ public class AutoRightHanging2 extends LinearOpMode {
 
                 //put specimen on high chamber
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
-                sleep(200);
+                sleep(350);
 
                 //release specimen and lower arm to clear high chamber
                 intake.setFingerPosition(intake.FINGER_OPEN);
@@ -503,7 +504,7 @@ public class AutoRightHanging2 extends LinearOpMode {
 
     private void adjustPosByDistanceSensor(double aimDistance, int distSensorID) { //distSensorID: 1 for hanging sensor, 2 for pickup sensor
         double sensorDist = 0.0;
-        int repeatTimes = 2;
+        int repeatTimes = 5;
 
         //DistanceSensor usedDistSensor = (distSensorID == 1)? distSensor : distSensorPickup ;
 

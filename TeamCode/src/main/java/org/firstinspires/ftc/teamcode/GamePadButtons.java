@@ -54,6 +54,8 @@ public class GamePadButtons {
     public boolean wristLeft;
     public boolean wristRight;
     public boolean speedCtrl;
+    public boolean wristFront;
+    public boolean wristBack;
 
     public boolean sliderUp;
     public float sliderUpDown;
@@ -108,6 +110,8 @@ public class GamePadButtons {
         //wrists
         wristLeft = gamepad2.left_stick_x < -0.3;
         wristRight = gamepad2.left_stick_x > 0.3;
+        wristBack = gamepad2.dpad_left;
+        wristFront = gamepad2.dpad_right;
 
         //arm
         armForwards = gamepad2.right_stick_y > 0;

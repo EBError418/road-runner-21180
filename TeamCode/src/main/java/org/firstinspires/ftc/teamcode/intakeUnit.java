@@ -61,25 +61,27 @@ public class intakeUnit
     //finger servo
     public Servo fingerServo = null;
 
-
-
     //finger
     final double FINGER_CLOSE = 0.6; // must bigger than 0 for action builder working
     final double FINGER_SPECIMEN_CLOSE = 0.1;
     final double FINGER_OPEN = 0.2;
+    final double FINGER_OPEN_SUB = 0.4;
 
     //knuckle
+    final double KNUCKLE_MIN = 0.165;
+    final double KNUCKLE_MAX = 0.8;
     final double KNUCKLE_POS_PICKUP_SAMPLE_BACK = 0.52; // pickup sample during auto
 
     final double KNUCKLE_POS_PICKUP_SPECIMEN = 0.358; //0.182
     final double KNUCKLE_POS_PICKUP_SPECIMEN_ready = 0.2;
     final double KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE = 0.16;
     final double KNUCKLE_POS_HANGING = 0.17;
+    final double KNUCKLE_POS_AUTO_INIT = 0.17;
     final double KNUCKLE_POS_LOW_BUCKET = 0.500;
     final double KNUCKLE_POS_HIGH_CHAMBER = 0.358;
     final double KNUCKLE_POS_PICKUP_SAMPLE_READY = 0.408; // approaching submersible
     final double KNUCKLE_POS_PICKUP_SAMPLE = 0.497; // from submersible
-    final double KNUCKLE_POS_DROP_SAMPLE = 0.628;
+    final double KNUCKLE_POS_DROP_SAMPLE = 0.45;
 
     //new stuff: wrist
     final int WRIST_POS_GRAB_SAMPLE_BACK = 270; // pickup sample during auto
@@ -160,7 +162,7 @@ public class intakeUnit
      * @param knucklePos the target position value for knuckle servo
      */
     public void setKnucklePosition(double knucklePos){
-        knucklePos = Range.clip(knucklePos, 0.1, 0.85);
+        knucklePos = Range.clip(knucklePos, KNUCKLE_MIN, KNUCKLE_MAX);
         knuckleServo.setPosition(knucklePos);
     }
 
@@ -172,6 +174,7 @@ public class intakeUnit
         wristPos = Range.clip(wristPos, 0, 270);
         wristMotor.setTargetPosition(wristPos);
     }
+
 
     /* Reset wrist motor encode*/
     public void resetWristEncoder() {
