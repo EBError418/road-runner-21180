@@ -85,7 +85,7 @@ public class TeleopRR extends LinearOpMode {
 
     int specimenCount = 0;//counter used to update specimen hanging position
 
-    Pose2d pickUpSpecimenPos = new Pose2d(- 3.3 * Params.HALF_MAT, - 3.8 * Params.HALF_MAT, Math.toRadians(180));
+    Pose2d pickUpSpecimenPos = new Pose2d(- 3.05 * Params.HALF_MAT, - 3.8 * Params.HALF_MAT, Math.toRadians(180));
     Vector2d hangSpecimenPos = new Vector2d(- 3.3 * Params.HALF_MAT,  0 + specimenCount * 2.0); //shifts left for every specimen hanged
     Vector2d outOfSubPose = new Vector2d(- 5 * Params.HALF_MAT, - 3 * Params.HALF_MAT);
     Vector2d pickupSamplePos = new Vector2d(- Params.HALF_MAT, - 4 * Params.HALF_MAT);
@@ -329,7 +329,7 @@ public class TeleopRR extends LinearOpMode {
             // set arm and wrist position for drop off at low bucket.
             if (gpButtons.LowBucketPos) {
                 intake.setArmPosition(intake.ARM_POS_LOW_BUCKET);
-                intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
+                intake.setWristPosition(intake.WRIST_POS_LOW_BUCKET);
                 intake.setKnucklePosition(intake.KNUCKLE_POS_LOW_BUCKET);
             }
 

@@ -77,7 +77,7 @@ public class intakeUnit
     final double KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE = 0.16;
     final double KNUCKLE_POS_HANGING = 0.17;
     final double KNUCKLE_POS_AUTO_INIT = 0.17;
-    final double KNUCKLE_POS_LOW_BUCKET = 0.500;
+    final double KNUCKLE_POS_LOW_BUCKET = 0.581;
     final double KNUCKLE_POS_HIGH_CHAMBER = 0.358;
     final double KNUCKLE_POS_PICKUP_SAMPLE_READY = 0.408; // approaching submersible
     final double KNUCKLE_POS_PICKUP_SAMPLE = 0.497; // from submersible
@@ -90,7 +90,7 @@ public class intakeUnit
     final double WRIST_POS_DELTA = 0.0;
     final double WRIST_POS_GRAB_SAMPLE = WRIST_POS_DELTA + 0.36;
     final int WRIST_POS_HIGH_CHAMBER = 270;
-    final double WRIST_POS_LOW_BUCKET = WRIST_POS_DELTA + 0.626;
+    final int WRIST_POS_LOW_BUCKET = 0;
     final double WRIST_POS_PARKING = WRIST_POS_DELTA + 0.1;
     final double WRIST_POS_OBS_ZONE = WRIST_POS_DELTA + 0.309;
     final int WRIST_POS_GRAB_SPECIMEN = 0;//0.302;
@@ -104,14 +104,14 @@ public class intakeUnit
     int ARM_POS_GRAB_SAMPLE = -500; // pickup sample during teleop
     int ARM_POS_HIGH_CHAMBER = -3500;//-2967;//2490;
     int ARM_POS_HIGH_CHAMBER_TELEOP = ARM_POS_HIGH_CHAMBER;
-    int ARM_POS_LOW_BUCKET = -2120;
+    int ARM_POS_LOW_BUCKET = -1853;
     int ARM_POS_PARKING = -500;
     int ARM_POS_OBS_ZONE = -430;
     int ARM_POS_BACK = -3000;
     int ARM_POS_BEFORE_HANG = -2230; // ready for hanging robot during end game
     int ARM_POS_GRAB_SPECIMEN = -185; //-240;
     int ARM_POS_SUB = -405;
-    int ARM_POS_DOWN_HANGING = -150;
+    int ARM_POS_DOWN_HANGING = 0;
 
 
     /**
