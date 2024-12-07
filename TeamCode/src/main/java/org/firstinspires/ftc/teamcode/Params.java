@@ -48,7 +48,7 @@ public class Params {
 
     //distances for dist sensor
     static double HIGH_CHAMBER_DIST = 5.2;
-    static double SPECIMEN_PICKUP_DIST = 17.5;
+    static double SPECIMEN_PICKUP_DIST = 15;
 
     //game field parameters
     static final double HALF_MAT = 23.625/2.0;  // 60 cm

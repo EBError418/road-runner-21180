@@ -69,10 +69,10 @@ public class intakeUnit
     final double FINGER_OPEN = 0.2;
 
     //knuckle
-    final double KNUCKLE_POS_PICKUP_SAMPLE_BACK = 0.5; // pickup sample during auto
+    final double KNUCKLE_POS_PICKUP_SAMPLE_BACK = 0.52; // pickup sample during auto
 
     final double KNUCKLE_POS_PICKUP_SPECIMEN = 0.358; //0.182
-    final double KNUCKLE_POS_PICKUP_SPECIMEN_ready = 0.3;
+    final double KNUCKLE_POS_PICKUP_SPECIMEN_ready = 0.2;
     final double KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE = 0.16;
     final double KNUCKLE_POS_HANGING = 0.17;
     final double KNUCKLE_POS_LOW_BUCKET = 0.500;
@@ -95,7 +95,7 @@ public class intakeUnit
 
     //arm
     int ARM_POS_GRAB_SAMPLE_BACK = -3860;
-    int ARM_POS_DROP_SAMPLE = -590; // drop off sample during during auto. Need adjust to make sure fingers do not touch ground.
+    int ARM_POS_DROP_SAMPLE = -650; // drop off sample during during auto. Need adjust to make sure fingers do not touch ground.
     int ARM_POS_HIGH_CHAMBER_READY = -2940;
     int ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN = -3150; // moving specimen left/right
 
