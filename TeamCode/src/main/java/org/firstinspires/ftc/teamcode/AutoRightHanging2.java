@@ -73,7 +73,7 @@ import java.util.List;
  *          "Webcam 1"
  */
 
-@Autonomous(name="Right v2", group="Concept")
+@Autonomous(name="Right v2 floor", group="Concept")
 //@Disabled
 public class AutoRightHanging2 extends LinearOpMode {
     /**

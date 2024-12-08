@@ -91,12 +91,8 @@ public class intakeUnit
     final int WRIST_MAX= 300;
     final int WRIST_POS_GRAB_SAMPLE_BACK = 270; // pickup sample during auto
     final int WRIST_POS_NEUTRAL = 0;
-    final double WRIST_POS_DELTA = 0.0;
-    final double WRIST_POS_GRAB_SAMPLE = WRIST_POS_DELTA + 0.36;
     final int WRIST_POS_HIGH_CHAMBER = 270;
     final int WRIST_POS_LOW_BUCKET = 0;
-    final double WRIST_POS_PARKING = WRIST_POS_DELTA + 0.1;
-    final double WRIST_POS_OBS_ZONE = WRIST_POS_DELTA + 0.309;
     final int WRIST_POS_GRAB_SPECIMEN = 0;//0.302;
 
     //arm
