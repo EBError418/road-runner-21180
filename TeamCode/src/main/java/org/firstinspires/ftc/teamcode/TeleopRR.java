@@ -81,14 +81,16 @@ public class TeleopRR extends LinearOpMode {
     boolean debugFlag = true;
 
     private DistanceSensor distSensorHanging;
-    private DistanceSensor distSensorPickup;
+    private DistanceSensor distSensorF;
+
 
     int specimenCount = 0;//counter used to update specimen hanging position
 
     Pose2d pickUpSpecimenPos = new Pose2d(- 3.05 * Params.HALF_MAT, - 3.8 * Params.HALF_MAT, Math.toRadians(180));
     Vector2d hangSpecimenPos = new Vector2d(- 3.3 * Params.HALF_MAT,  0 + specimenCount * 2.0); //shifts left for every specimen hanged
-    Vector2d outOfSubPose = new Vector2d(- 5 * Params.HALF_MAT, - 3 * Params.HALF_MAT);
+    Vector2d clearHighChamberPos = new Vector2d(- 4.5 * Params.HALF_MAT, - 3.5 * Params.HALF_MAT);
     Vector2d pickupSamplePos = new Vector2d(- Params.HALF_MAT, - 4 * Params.HALF_MAT);
+    Vector2d LowRungPos = new Vector2d(- 1.5 * Params.HALF_MAT, 4 * Params.HALF_MAT);
 
     @Override
     public void runOpMode() {
@@ -110,8 +112,8 @@ public class TeleopRR extends LinearOpMode {
 
 
         // you can use this as a regular DistanceSensor.
-        distSensorHanging = hardwareMap.get(DistanceSensor.class, "distance hanging");
-        distSensorPickup = hardwareMap.get(DistanceSensor.class, "distance pickup");
+        distSensorHanging = hardwareMap.get(DistanceSensor.class, "distanceB");
+        distSensorF = hardwareMap.get(DistanceSensor.class, "distanceF");
 
         // bulk reading setting - auto refresh mode
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
@@ -152,12 +154,25 @@ public class TeleopRR extends LinearOpMode {
                     -gpButtons.robotTurn * maxDrivePower
             ));
 
+            double storedKnucklePos = intake.getKnucklePosition();//store knuckle position before constraint is applied
             if (gpButtons.armBackwards) {
                 intake.setArmPosition(intake.getArmPosition() + 50);
+
+
+                if (- 300 < intake.getArmPosition() && intake.getArmPosition() < -700) {
+                    intake.setKnucklePosition(0.2);
+                } else {
+                    intake.setKnucklePosition(storedKnucklePos);
+                }
             }
 
             if (gpButtons.armForwards) {
                 intake.setArmPosition(intake.getArmPosition() - 50);
+                if (- 300 < intake.getArmPosition() && intake.getArmPosition() < -700) {
+                    intake.setKnucklePosition(0.2);
+                } else {
+                    intake.setKnucklePosition(storedKnucklePos);
+                }
             }
 
             if (gpButtons.wristLeft) {
@@ -184,12 +199,12 @@ public class TeleopRR extends LinearOpMode {
                 intake.setWristPosition(intake.WRIST_POS_GRAB_SAMPLE_BACK);
             }
 
-            if (gpButtons.fingerClose) {
-                intake.setFingerPosition(intake.FINGER_CLOSE);
+            if (gpButtons.fingerOpenClose) {
+                intake.setFingerPosition((intake.getFingerPosition() > 0.35)? intake.FINGER_OPEN_SUB : intake.FINGER_CLOSE );
             }
 
-            if (gpButtons.fingerOpen) {
-                intake.setFingerPosition(intake.FINGER_OPEN_SUB);
+            if (gpButtons.fingerOpenCloseBack) {
+                intake.setFingerPosition((intake.getFingerPosition() > 0.55)? intake.FINGER_CLOSE_BACK : intake.FINGER_OPEN_BACK );
             }
 
             // Align specimen to the high chamber, get ready for hanging.
@@ -236,7 +251,7 @@ public class TeleopRR extends LinearOpMode {
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_READY);
                 intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
 
-                adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, 1);
+                adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
 
                 if (specimenCount <= 8) {
                     specimenCount ++;//update specimen pos
@@ -280,12 +295,152 @@ public class TeleopRR extends LinearOpMode {
             }
 
             // strafe 6 inch to push specimens
-            if (gamepad1.b) {
+            if (gpButtons.SpecimenHangToSub) {
+                drive.pose = pickUpSpecimenPos;
+                intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN);
+                intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN);
+                intake.setFingerPosition(intake.FINGER_CLOSE);
+                sleep(100);
+
+                //intake.setArmPosition(intake.ARM_POS_BEFORE_HANG); // lift arm to during strafe to chambers
+                Actions.runBlocking(
+                        drive.actionBuilder(pickUpSpecimenPos)
+                                .afterTime(0.4, new armReadyToHangHigh())
+                                .strafeToLinearHeading(hangSpecimenPos, pickUpSpecimenPos.heading)
+                                .build()
+                );
+
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_READY);
+                intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
+
+                adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
+
+                if (specimenCount <= 8) {
+                    specimenCount ++;//update specimen pos
+                }
+
+                hangSpecimenPos = new Vector2d(- 3.3 * Params.HALF_MAT,  specimenCount * 2);
+
+                // hanging specimen
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
+                intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+                sleep(400);
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN);
                 sleep(200);
                 Actions.runBlocking(
                         drive.actionBuilder(drive.pose)
-                                .strafeToConstantHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y - 6.0))
+                                //.afterTime(0.05, new armToPickUpPos())
+                                .strafeToLinearHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y - 5.0), pickUpSpecimenPos.heading)
+                                .build()
+                );
+
+                //go to submersible pick up pos
+                intake.fingerServoOpen();
+                sleep(150);
+                Actions.runBlocking(
+                        drive.actionBuilder(drive.pose)
+                                .strafeToLinearHeading(clearHighChamberPos, Math.toRadians(90))
+                                .afterTime(0.15, new armReadyToPickupSample())
+                                .strafeToConstantHeading(pickupSamplePos)
+                                .build()
+                );
+            }
+
+            if (gpButtons.SpecimenHangToAscent) {
+                drive.pose = pickUpSpecimenPos;
+                intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN);
+                intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN);
+                intake.setFingerPosition(intake.FINGER_CLOSE);
+                sleep(100);
+
+                //intake.setArmPosition(intake.ARM_POS_BEFORE_HANG); // lift arm to during strafe to chambers
+                Actions.runBlocking(
+                        drive.actionBuilder(pickUpSpecimenPos)
+                                .afterTime(0.4, new armReadyToHangHigh())
+                                .strafeToLinearHeading(hangSpecimenPos, pickUpSpecimenPos.heading)
+                                .build()
+                );
+
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_READY);
+                intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
+
+                adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
+
+                if (specimenCount <= 8) {
+                    specimenCount ++;//update specimen pos
+                }
+
+                hangSpecimenPos = new Vector2d(- 3.3 * Params.HALF_MAT,  specimenCount * 2);
+
+                // hanging specimen
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
+                intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+                sleep(400);
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN);
+                sleep(200);
+                Actions.runBlocking(
+                        drive.actionBuilder(drive.pose)
+                                //.afterTime(0.05, new armToPickUpPos())
+                                .strafeToLinearHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y - 5.0), pickUpSpecimenPos.heading)
+                                .build()
+                );
+
+                //go to ascent level 2
+                intake.fingerServoOpen();
+                sleep(150);
+                Actions.runBlocking(
+                        drive.actionBuilder(drive.pose)
+                                .afterTime(0.15, new armReadyToAscent())
+                                .splineToLinearHeading(new Pose2d(LowRungPos, Math.toRadians(-90)), Math.toRadians(0))
+                                .build()
+                );
+            }
+
+            if (gpButtons.SpecimenHangToBack) {
+                drive.pose = pickUpSpecimenPos;
+                intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN);
+                intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN);
+                intake.setFingerPosition(intake.FINGER_CLOSE);
+                sleep(100);
+
+                //intake.setArmPosition(intake.ARM_POS_BEFORE_HANG); // lift arm to during strafe to chambers
+                Actions.runBlocking(
+                        drive.actionBuilder(pickUpSpecimenPos)
+                                .afterTime(0.4, new armReadyToHangHigh())
+                                .strafeToLinearHeading(hangSpecimenPos, pickUpSpecimenPos.heading)
+                                .build()
+                );
+
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_READY);
+                intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
+
+                adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
+
+                if (specimenCount <= 8) {
+                    specimenCount ++;//update specimen pos
+                }
+
+                hangSpecimenPos = new Vector2d(- 3.3 * Params.HALF_MAT,  specimenCount * 2);
+
+                // hanging specimen
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
+                intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+                sleep(400);
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN);
+                sleep(200);
+                Actions.runBlocking(
+                        drive.actionBuilder(drive.pose)
+                                //.afterTime(0.05, new armToPickUpPos())
+                                .strafeToLinearHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y - 5.0), pickUpSpecimenPos.heading)
+                                .build()
+                );
+
+                //go to back
+                intake.fingerServoOpen();
+                sleep(150);
+                Actions.runBlocking(
+                        drive.actionBuilder(drive.pose)
+                                .strafeToConstantHeading(new Vector2d(drive.pose.position.x - 10, drive.pose.position.y))
                                 .build()
                 );
             }
@@ -296,25 +451,6 @@ public class TeleopRR extends LinearOpMode {
                 intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN);
                 intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN);
                 intake.setFingerPosition(intake.FINGER_OPEN);
-            }
-
-            // move robot to pickup element from the center of field
-            //DEPRECATED
-            if (gpButtons.SubPickupPos) {
-                // TODO : need update for new intake
-                /*
-                drive.pose = new Pose2d(hangSpecimenPos, Math.toRadians(-180.0));
-                intake.setFingerPosition(intake.FINGER_OPEN);
-                intake.setArmPosition(intake.ARM_POS_BEFORE_HANG);
-                sleep(400);
-                Actions.runBlocking(
-                        drive.actionBuilder(new Pose2d(hangSpecimenPos, 0))
-                                .strafeToConstantHeading(outOfSubPose)
-                                .splineToLinearHeading(new Pose2d(pickupSamplePos, Math.toRadians(90)), Math.toRadians(60))
-                                .afterTime(0.6, new armPickupFromSub())
-                                .build()
-                );
-                 */
             }
 
             // set arm and wrist position for picking up at the center of field
@@ -370,10 +506,9 @@ public class TeleopRR extends LinearOpMode {
 
                 telemetry.addData(" --- ", " --- ");
 
-                telemetry.addData("hanging distance range", String.format("%.01f in", distSensorHanging.getDistance(DistanceUnit.INCH)));
+                telemetry.addData("back distance range", String.format("%.01f in", distSensorHanging.getDistance(DistanceUnit.INCH)));
 
-                telemetry.addData("pickup distance range", String.format("%.01f in", distSensorPickup.getDistance(DistanceUnit.INCH)));
-
+                telemetry.addData("front distance range", String.format("%.01f in", distSensorF.getDistance(DistanceUnit.INCH)));
 
                 telemetry.update(); // update message at the end of while loop
             }
@@ -406,6 +541,26 @@ public class TeleopRR extends LinearOpMode {
         }
     }
 
+    private class armReadyToPickupSample implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE);
+            intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
+            intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SAMPLE_READY);
+            return false;
+        }
+    }
+
+    private class armReadyToAscent implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            intake.setArmPosition(intake.ARM_POS_BEFORE_HANG);
+            intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
+            intake.setKnucklePosition(intake.KNUCKLE_POS_HANGING);
+            return false;
+        }
+    }
+
     private void updateProfileAccel(boolean fastMode) {
         if (fastMode) {
             MecanumDrive.PARAMS.minProfileAccel = -40;
@@ -413,17 +568,15 @@ public class TeleopRR extends LinearOpMode {
         }
     }
 
-    private void adjustPosByDistanceSensor(double aimDistance, int distSensorID) { //distSensorID: 1 for hanging sensor, 2 for pickup sensor
+    private void adjustPosByDistanceSensor(double aimDistance, DistanceSensor distSensorID) { //distSensorID: 1 for hanging sensor, 2 for pickup sensor
         double sensorDist = 0.0;
         int repeatTimes = 5;
 
-        //DistanceSensor usedDistSensor = (distSensorID == 1)? distSensor : distSensorPickup ;
-
         for (int i = 1; i <= repeatTimes; i++)
         {
-            double sensorReading = (distSensorID == 1)? distSensorHanging.getDistance(DistanceUnit.INCH) : distSensorPickup.getDistance(DistanceUnit.INCH) ;
+            double sensorReading = distSensorID.getDistance(DistanceUnit.INCH) ;
             sensorDist = sensorDist + sensorReading;
-            Logging.log("distance sensor # %s reading repetition # %s reading number = %2f", distSensorID, i, sensorReading);
+            Logging.log("distance sensor reading repetition # %s reading number = %2f", i, sensorReading);
             sleep(2);
         }
         sensorDist = sensorDist / repeatTimes;
@@ -441,6 +594,6 @@ public class TeleopRR extends LinearOpMode {
                         .build()
         );
         Logging.log(" After adjust: X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
-        Logging.log("after adjust, sensor distance = %2f, aim distance = %2f ", (distSensorID == 1)? distSensorHanging.getDistance(DistanceUnit.INCH) : distSensorPickup.getDistance(DistanceUnit.INCH), aimDistance);
+        Logging.log("after adjust, sensor distance = %2f, aim distance = %2f ", distSensorID.getDistance(DistanceUnit.INCH), aimDistance);
     }
 }

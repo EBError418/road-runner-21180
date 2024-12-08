@@ -67,15 +67,18 @@ public class GamePadButtons {
     public boolean knuckleUp;
     public boolean knuckleDown;
 
-    public boolean fingerOpen;
-    public boolean fingerClose;
+    public boolean fingerOpenCloseBack;
+    public boolean fingerOpenClose;
 
     public boolean SpecimenHangAlign;
     public boolean SpecimenHangAction;
+    public boolean SpecimenHangToSub;
+    public boolean SpecimenHangToAscent;
+    public boolean SpecimenHangToBack;
 
     public boolean SpecimenPickupAction;
     public boolean SpecimenPickupAlign;
-    public boolean SubPickupPos;
+    //public boolean SubPickupPos;
     public boolean ArmPickUpPos;
     public boolean LowBucketPos;
     public boolean EndgameHangingLineup;
@@ -100,8 +103,8 @@ public class GamePadButtons {
         speedDown = speedCtrl;
 
         //finger
-        fingerClose = gamepad2.dpad_up;
-        fingerOpen = gamepad2.dpad_down;
+        fingerOpenClose = gamepad2.dpad_up;
+        fingerOpenCloseBack = gamepad2.dpad_down;
 
         //knuckle
         knuckleUp = gamepad2.left_stick_y < -0.3;
@@ -128,8 +131,11 @@ public class GamePadButtons {
         SpecimenPickupAction = gamepad1.left_trigger > 0;// || gamepad2.left_trigger > 0;
         SpecimenPickupAlign = gamepad2.left_trigger > 0;
 
-        //sample presets
-        SubPickupPos = gamepad1.dpad_up;
+        //alternative after hanging procedures
+        SpecimenHangToSub = gamepad1.b;
+        SpecimenHangToAscent = gamepad1.x;
+        SpecimenHangToBack = gamepad1.a;
+
         ArmPickUpPos = gamepad2.right_bumper;
 
         LowBucketPos = gamepad2.left_bumper;

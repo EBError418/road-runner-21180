@@ -7,11 +7,10 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
-@Autonomous(name="Right side auto", group="Concept")
-@Disabled
-public class AutoRight extends AutoLeft {
+@Autonomous(name="Right v2 wall", group="Concept")
+public class AutoRightHangingWall extends AutoRightHanging2 {
     @Override
-    public void setRobotLocation() {
-        leftOrRight = 1;
+    public void setFloor() {
+        floorOrWall = false;
     }
 }

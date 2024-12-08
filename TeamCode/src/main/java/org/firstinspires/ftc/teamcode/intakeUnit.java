@@ -62,13 +62,15 @@ public class intakeUnit
     public Servo fingerServo = null;
 
     //finger
-    final double FINGER_CLOSE = 0.6; // must bigger than 0 for action builder working
-    final double FINGER_SPECIMEN_CLOSE = 0.1;
-    final double FINGER_OPEN = 0.2;
     final double FINGER_OPEN_SUB = 0.4;
+    final double FINGER_OPEN = 0.2;
+    final double FINGER_CLOSE = 0.6; // must bigger than 0 for action builder working
+    final double FINGER_OPEN_BACK = 0.4;
+    final double FINGER_CLOSE_BACK = 0.3;
+    final double FINGER_open_sub = 0.4;
 
     //knuckle
-    final double KNUCKLE_MIN = 0.165;
+    final double KNUCKLE_MIN = 0.17;
     final double KNUCKLE_MAX = 0.8;
     final double KNUCKLE_POS_PICKUP_SAMPLE_BACK = 0.52; // pickup sample during auto
 
@@ -80,13 +82,15 @@ public class intakeUnit
     final double KNUCKLE_POS_LOW_BUCKET = 0.581;
     final double KNUCKLE_POS_HIGH_CHAMBER = 0.358;
     final double KNUCKLE_POS_PICKUP_SAMPLE_READY = 0.408; // approaching submersible
-    final double KNUCKLE_POS_PICKUP_SAMPLE = 0.497; // from submersible
     final double KNUCKLE_POS_DROP_SAMPLE = 0.45;
+    final double KNUCKLE_POS_PICKUP_SPECIMEN_WALL = 0.203;
+    final double KNUCKLE_POS_LIFT_FROM_WALL = 0.17;
 
     //new stuff: wrist
+    final int WRIST_MIN = 0;
+    final int WRIST_MAX= 300;
     final int WRIST_POS_GRAB_SAMPLE_BACK = 270; // pickup sample during auto
     final int WRIST_POS_NEUTRAL = 0;
-
     final double WRIST_POS_DELTA = 0.0;
     final double WRIST_POS_GRAB_SAMPLE = WRIST_POS_DELTA + 0.36;
     final int WRIST_POS_HIGH_CHAMBER = 270;
@@ -112,6 +116,7 @@ public class intakeUnit
     int ARM_POS_GRAB_SPECIMEN = -185; //-240;
     int ARM_POS_SUB = -405;
     int ARM_POS_DOWN_HANGING = 0;
+    int ARM_POS_GRAB_SPECIMEN_WALL = -409;
 
 
     /**
@@ -171,7 +176,7 @@ public class intakeUnit
      * @param wristPos the target position value for wrist motor
      */
     public void setWristPosition(int wristPos) {
-        wristPos = Range.clip(wristPos, 0, 270);
+        wristPos = Range.clip(wristPos, WRIST_MIN, WRIST_MAX);
         wristMotor.setTargetPosition(wristPos);
     }
 
