@@ -47,9 +47,9 @@ public class Params {
     static int armIntakeCount_InitFront = -30;
 
     //distances for dist sensor
-    static double HIGH_CHAMBER_DIST = 6.0;
+    static double HIGH_CHAMBER_DIST = 6.0; // back distance sensor to chamber when hanging specimen
     static double SAMPLE_DIST = 1.3;
-    static double SPECIMEN_PICKUP_DIST = 15;
+    static double SPECIMEN_PICKUP_DIST = 16.5; // front distance sensor to wall when pickup specimen
 
     //game field parameters
     static final double HALF_MAT = 23.625/2.0;  // 60 cm

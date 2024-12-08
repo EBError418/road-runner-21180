@@ -202,7 +202,7 @@ public class AutoRightHanging2 extends LinearOpMode {
         Vector2d pickUpSpecimenPos3 = new Vector2d(- 3.2 * Params.HALF_MAT, - 3.8 * Params.HALF_MAT);
 
         //wall positions
-        Vector2d pickUpSpecimenWall = new Vector2d(- 4.7 * Params.HALF_MAT, - 6 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH);
+        Vector2d pickUpSpecimenWall = new Vector2d(- 4.5 * Params.HALF_MAT, - 6 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH);
         Vector2d specimenWallLineUp = new Vector2d(pickUpSpecimenWall.x + 0.7 * Params.HALF_MAT, pickUpSpecimenWall.y);
 
         List<Vector2d> pickUpSpecimen;
@@ -320,6 +320,8 @@ public class AutoRightHanging2 extends LinearOpMode {
                                     .build()
                     );
 
+                    intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
+
                     //adjust pos using distance sensor
                     adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorB);
 
@@ -327,9 +329,10 @@ public class AutoRightHanging2 extends LinearOpMode {
                     intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
                     sleep(150);
                     intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
-                    sleep(300);
-                    intake.fingerServoOpen();
+                    sleep(400);
+                    intake.fingerServoOpen(); // release specimen
                     sleep(150);
+                    intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE_BACK + 400);
                     intake.setKnucklePosition(intake.KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE);
                 }
             }
@@ -344,7 +347,7 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .build()
             );
         }
-        Logging.log("X position = %2f, Y position = %2f", drive.pose.position.x, drive.pose.position.y);
+        Logging.log("after parking X position = %2f, Y position = %2f", drive.pose.position.x, drive.pose.position.y);
     }
 
     //action for arm flip to hang
@@ -406,10 +409,7 @@ public class AutoRightHanging2 extends LinearOpMode {
             Logging.log("pickup sample distance = %s", String.format("%.01f in", distanceS));
 
             // adjust only when distance sensor detect the sample
-            if (distanceS < 3.0)
-            {
-                adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF);
-            }
+            adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF);
             return false;
         }
     }
@@ -484,8 +484,11 @@ public class AutoRightHanging2 extends LinearOpMode {
         }
         sensorDist = sensorDist / repeatTimes;
 
-
         double shiftDelta = sensorDist - aimDistance;
+        if (aimDistance > 10) // wall distance is bigger than 10, robot need move to -x direction.
+        {
+            shiftDelta = -shiftDelta;
+        }
         shiftDelta = Range.clip(shiftDelta, -7.0, 7.0); // limit adjust distance to +-7.0 inch
         Logging.log("drive pose before distance average number");
         Logging.log("before adjust, sensor distance = %2f, shift delta = %2f", sensorDist, shiftDelta);

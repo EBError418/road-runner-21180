@@ -596,6 +596,11 @@ public class TeleopRR extends LinearOpMode {
 
         double shiftDelta = sensorDist - aimDistance;
         shiftDelta = Range.clip(shiftDelta, -7.0, 7.0); // limit adjust distance to +-7.0 inch
+        if (aimDistance > 10) // wall distance is bigger than 10, robot need move to -x direction.
+        {
+            shiftDelta = -shiftDelta;
+        }
+
         Logging.log("drive pose before distance average number");
         Logging.log("before adjust, sensor distance = %2f, shift delta = %2f", sensorDist, shiftDelta);
         Logging.log(" X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));

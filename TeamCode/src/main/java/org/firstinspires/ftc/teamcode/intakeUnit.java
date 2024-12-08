@@ -100,6 +100,8 @@ public class intakeUnit
     final int WRIST_POS_GRAB_SPECIMEN = 0;//0.302;
 
     //arm
+    int ARM_MIN = -3900;
+    int ARM_MAX = 0;
     int ARM_POS_GRAB_SAMPLE_BACK = -3860;
     int ARM_POS_DROP_SAMPLE = -650; // drop off sample during during auto. Need adjust to make sure fingers do not touch ground.
     int ARM_POS_HIGH_CHAMBER_READY = -2940;
@@ -112,7 +114,7 @@ public class intakeUnit
     int ARM_POS_PARKING = -500;
     int ARM_POS_OBS_ZONE = -430;
     int ARM_POS_BACK = -3000;
-    int ARM_POS_BEFORE_HANG = -2230; // ready for hanging robot during end game
+    int ARM_POS_BEFORE_HANG = -2130; // ready for hanging robot during end game
     int ARM_POS_GRAB_SPECIMEN = -185; //-240;
     int ARM_POS_SUB = -405;
     int ARM_POS_DOWN_HANGING = 0;
@@ -201,6 +203,8 @@ public class intakeUnit
      * @param armPos the target position value for arm servo motor
      */
     public void setArmPosition(double armPos) {
+        armPos = Range.clip(armPos, ARM_MIN, ARM_MAX);
+
         armMotor.setTargetPosition((int)(armPos));
     }
 
