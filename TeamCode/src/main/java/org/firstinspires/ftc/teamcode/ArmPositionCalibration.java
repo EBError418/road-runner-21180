@@ -75,6 +75,8 @@ public class ArmPositionCalibration extends LinearOpMode {
 
             telemetry.addData("Arm calibration: ---", "done !");
             telemetry.update();
+
+            sleep(1000);
         }
     }
 }

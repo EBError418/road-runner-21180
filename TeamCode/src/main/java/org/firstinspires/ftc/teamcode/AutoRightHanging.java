@@ -321,16 +321,6 @@ public class AutoRightHanging extends LinearOpMode {
         }
     }
 
-    //action for arm to reach out for parking
-    private class armToParkingAct implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            intake.setArmPosition(intake.ARM_POS_PARKING);
-            intake.setKnucklePosition(intake.KNUCKLE_POS_HANGING);
-            return false;
-        }
-    }
-
     //action for arm to drop sample in bucket
     private class armToDropSampleAct implements Action {
         @Override

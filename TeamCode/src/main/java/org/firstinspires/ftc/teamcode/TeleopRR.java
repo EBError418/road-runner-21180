@@ -76,15 +76,15 @@ public class TeleopRR extends LinearOpMode {
 
     //claw and arm unit
     private intakeUnit intake;
-
-    // debug flags, turn it off for formal version to save time of logging
-    boolean debugFlag = true;
-
     private DistanceSensor distSensorHanging;
     private DistanceSensor distSensorF;
 
-
     int specimenCount = 0;//counter used to update specimen hanging position
+    int specimenShiftMax = 6; //shift 2 inch for each specimen hanging
+    double specimenShiftInch = -7.0; // shift specimen to 7 inch right (-y) after hanging on high chamber
+
+    // debug flags, turn it off for formal version to save time of logging
+    boolean debugFlag = true;
 
     Pose2d pickUpSpecimenPos = new Pose2d(- 3.05 * Params.HALF_MAT, - 3.8 * Params.HALF_MAT, Math.toRadians(180));
     Vector2d hangSpecimenPos = new Vector2d(- 3.3 * Params.HALF_MAT,  0 + specimenCount * 2.0); //shifts left for every specimen hanged
@@ -95,6 +95,8 @@ public class TeleopRR extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        double storedKnucklePos = 0.5; //store knuckle position before constraint is applied
+
         telemetry.addData("Status", "Initialized");
 
         GamePadButtons gpButtons = new GamePadButtons();
@@ -133,7 +135,6 @@ public class TeleopRR extends LinearOpMode {
         waitForStart();
         runtime.reset();
 
-        double storedKnucklePos = 0.5;//store knuckle position before constraint is applied
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
@@ -157,16 +158,17 @@ public class TeleopRR extends LinearOpMode {
                     -gpButtons.robotTurn * maxDrivePower
             ));
 
-            if ((- 550 < intake.getArmPosition()) || (intake.getArmPosition() < - 1250)) {
+            // store knuckle position
+            if ((intake.getArmPosition() > -650) || (intake.getArmPosition() < -1250)) {
                 storedKnucklePos = intake.getKnucklePosition();
             }
 
+            // moving arm
             if (gpButtons.armBackwards) {
                 intake.setArmPosition(intake.getArmPosition() + 50);
 
-
-                if (- 600 > intake.getArmPosition() && intake.getArmPosition() > -1200) {
-                    intake.setKnucklePosition(0.2);
+                if (-700 > intake.getArmPosition() && intake.getArmPosition() > -1200) {
+                    intake.setKnucklePosition(intake.KNUCKLE_POS_CONSTRAINT);
                 } else {
                     intake.setKnucklePosition(storedKnucklePos);
                 }
@@ -174,8 +176,8 @@ public class TeleopRR extends LinearOpMode {
 
             if (gpButtons.armForwards) {
                 intake.setArmPosition(intake.getArmPosition() - 50);
-                if (- 600 > intake.getArmPosition() && intake.getArmPosition() > -1200) {
-                    intake.setKnucklePosition(0.2);
+                if (-700 > intake.getArmPosition() && intake.getArmPosition() > -1200) {
+                    intake.setKnucklePosition(intake.KNUCKLE_POS_CONSTRAINT);
                 } else {
                     intake.setKnucklePosition(storedKnucklePos);//restore knuckle position
                 }
@@ -239,7 +241,7 @@ public class TeleopRR extends LinearOpMode {
                 // moving left 6 inch
                 Actions.runBlocking(
                         drive.actionBuilder(drive.pose)
-                                .strafeToConstantHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y - 6.0))
+                                .strafeToConstantHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y + specimenShiftInch))
                                 .build()
                 );
             }
@@ -265,7 +267,7 @@ public class TeleopRR extends LinearOpMode {
 
                 adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
 
-                if (specimenCount <= 6) {
+                if (specimenCount <= specimenShiftMax) {
                     specimenCount ++;//update specimen pos
                 }
 
@@ -280,7 +282,7 @@ public class TeleopRR extends LinearOpMode {
                 Actions.runBlocking(
                         drive.actionBuilder(drive.pose)
                                 //.afterTime(0.05, new armToPickUpPos())
-                                .strafeToLinearHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y - 7.0), pickUpSpecimenPos.heading)
+                                .strafeToLinearHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y + specimenShiftInch), pickUpSpecimenPos.heading)
                                 .build()
                 );
 
@@ -327,7 +329,7 @@ public class TeleopRR extends LinearOpMode {
 
                 adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
 
-                if (specimenCount <= 8) {
+                if (specimenCount <= specimenShiftMax) {
                     specimenCount ++;//update specimen pos
                 }
 
@@ -342,7 +344,7 @@ public class TeleopRR extends LinearOpMode {
                 Actions.runBlocking(
                         drive.actionBuilder(drive.pose)
                                 //.afterTime(0.05, new armToPickUpPos())
-                                .strafeToLinearHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y - 5.0), pickUpSpecimenPos.heading)
+                                .strafeToLinearHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y + specimenShiftInch), pickUpSpecimenPos.heading)
                                 .build()
                 );
 
@@ -378,7 +380,7 @@ public class TeleopRR extends LinearOpMode {
 
                 adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
 
-                if (specimenCount <= 8) {
+                if (specimenCount <= specimenShiftMax) {
                     specimenCount ++;//update specimen pos
                 }
 
@@ -393,7 +395,7 @@ public class TeleopRR extends LinearOpMode {
                 Actions.runBlocking(
                         drive.actionBuilder(drive.pose)
                                 //.afterTime(0.05, new armToPickUpPos())
-                                .strafeToLinearHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y - 5.0), pickUpSpecimenPos.heading)
+                                .strafeToLinearHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y + specimenShiftInch), pickUpSpecimenPos.heading)
                                 .build()
                 );
 
@@ -429,7 +431,7 @@ public class TeleopRR extends LinearOpMode {
 
                 adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
 
-                if (specimenCount <= 8) {
+                if (specimenCount <= specimenShiftMax) {
                     specimenCount ++;//update specimen pos
                 }
 
@@ -444,7 +446,7 @@ public class TeleopRR extends LinearOpMode {
                 Actions.runBlocking(
                         drive.actionBuilder(drive.pose)
                                 //.afterTime(0.05, new armToPickUpPos())
-                                .strafeToLinearHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y - 5.0), pickUpSpecimenPos.heading)
+                                .strafeToLinearHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y + specimenShiftInch), pickUpSpecimenPos.heading)
                                 .build()
                 );
 

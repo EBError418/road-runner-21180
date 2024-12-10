@@ -62,33 +62,34 @@ public class intakeUnit
     public Servo fingerServo = null;
 
     //finger
-    final double FINGER_OPEN_SUB = 0.4;
-    final double FINGER_OPEN = 0.2;
-    final double FINGER_CLOSE = 0.6; // must bigger than 0 for action builder working
-    final double FINGER_OPEN_BACK = 0.4;
-    final double FINGER_CLOSE_BACK = 0.3;
-    final double FINGER_open_sub = 0.4;
+    final double FINGER_OPEN_SUB = 0.65;
+    final double FINGER_OPEN = 0.55;
+    final double FINGER_CLOSE = 1.0; // must bigger than 0 for action builder working
+    final double FINGER_OPEN_BACK = 0.66;
+    final double FINGER_CLOSE_BACK = 0.1;
 
     //knuckle
     final double KNUCKLE_MIN = 0.17;
     final double KNUCKLE_MAX = 0.8;
     final double KNUCKLE_POS_PICKUP_SAMPLE_BACK = 0.52; // pickup sample during auto
 
-    final double KNUCKLE_POS_PICKUP_SPECIMEN = 0.358; //0.182
+    final double KNUCKLE_POS_PICKUP_SPECIMEN = 0.358;
     final double KNUCKLE_POS_PICKUP_SPECIMEN_ready = 0.2;
-    final double KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE = 0.16;
-    final double KNUCKLE_POS_HANGING = 0.17;
+    final double KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE = 0.17;
+    final double KNUCKLE_POS_HANGING = 0.20;// 0.17; // end game hanging
     final double KNUCKLE_POS_AUTO_INIT = 0.17;
     final double KNUCKLE_POS_LOW_BUCKET = 0.581;
     final double KNUCKLE_POS_HIGH_CHAMBER = 0.358;
     final double KNUCKLE_POS_PICKUP_SAMPLE_READY = 0.408; // approaching submersible
     final double KNUCKLE_POS_DROP_SAMPLE = 0.45;
     final double KNUCKLE_POS_PICKUP_SPECIMEN_WALL = 0.203;
+    final double KNUCKLE_POS_CONSTRAINT = 0.203;
     final double KNUCKLE_POS_LIFT_FROM_WALL = 0.17;
 
     //new stuff: wrist
-    final int WRIST_MIN = 0;
+    final int WRIST_MIN = -30;
     final int WRIST_MAX= 300;
+    final int WRIST_INIT = 270;
     final int WRIST_POS_GRAB_SAMPLE_BACK = 270; // pickup sample during auto
     final int WRIST_POS_NEUTRAL = 0;
     final int WRIST_POS_HIGH_CHAMBER = 270;
@@ -96,8 +97,9 @@ public class intakeUnit
     final int WRIST_POS_GRAB_SPECIMEN = 0;//0.302;
 
     //arm
-    int ARM_MIN = -3900;
+    int ARM_MIN = -3810;
     int ARM_MAX = 0;
+    int ARM_INIT = -3800;
     int ARM_POS_GRAB_SAMPLE_BACK = -3860;
     int ARM_POS_DROP_SAMPLE = -650; // drop off sample during during auto. Need adjust to make sure fingers do not touch ground.
     int ARM_POS_HIGH_CHAMBER_READY = -2940;
@@ -200,7 +202,6 @@ public class intakeUnit
      */
     public void setArmPosition(double armPos) {
         armPos = Range.clip(armPos, ARM_MIN, ARM_MAX);
-
         armMotor.setTargetPosition((int)(armPos));
     }
 
@@ -213,6 +214,13 @@ public class intakeUnit
     public void resetArmEncoder() {
         armMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         setArmModeRunToPosition(0);
+    }
+
+    public void setIntakeAutoInit() {
+        setArmPosition(ARM_INIT);
+        setWristPosition(WRIST_INIT);
+        setKnucklePosition(KNUCKLE_POS_AUTO_INIT);
+        setFingerPosition(FINGER_CLOSE);
     }
 
     /**

@@ -120,14 +120,12 @@ public class AutoRightHanging2 extends LinearOpMode {
         Params.currentPose = newStartPose;; // init storage pose
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist", "Knuckle","Finger");
-        //intake.resetArmEncoder();
 
         // set RunToPosition mode and set power for motors.
         intake.setWristModeRunToPosition(intake.getWristPosition());
         intake.setArmModeRunToPosition(intake.getArmPosition());
 
-        intake.setFingerPosition(intake.FINGER_CLOSE);
-        intake.setKnucklePosition(intake.KNUCKLE_POS_AUTO_INIT); // init knuckle position
+        intake.setIntakeAutoInit();
 
         // you can use this as a regular DistanceSensor.
         distSensorB = hardwareMap.get(DistanceSensor.class, "distanceB");
