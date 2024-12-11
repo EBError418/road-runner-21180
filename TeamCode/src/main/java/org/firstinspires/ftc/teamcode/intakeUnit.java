@@ -109,7 +109,7 @@ public class intakeUnit
     int ARM_POS_HIGH_CHAMBER = -3500;//-2967;//2490;
     int ARM_POS_HIGH_CHAMBER_TELEOP = ARM_POS_HIGH_CHAMBER;
     int ARM_POS_LOW_BUCKET = -1853;
-    int ARM_POS_PARKING = -500;
+    int ARM_POS_LEFT_PARKING = -500;
     int ARM_POS_OBS_ZONE = -430;
     int ARM_POS_BACK = -3000;
     int ARM_POS_BEFORE_HANG = -2130; // ready for hanging robot during end game
@@ -117,7 +117,7 @@ public class intakeUnit
     int ARM_POS_SUB = -405;
     int ARM_POS_DOWN_HANGING = 0;
     int ARM_POS_GRAB_SPECIMEN_WALL = -409;
-
+    int ARM_POS_OBZ_PARKING = -100;
 
     /**
      * Init slider motors hardware, and set their behaviors.

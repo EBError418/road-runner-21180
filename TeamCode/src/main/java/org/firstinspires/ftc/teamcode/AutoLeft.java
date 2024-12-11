@@ -441,7 +441,7 @@ public class AutoLeft extends LinearOpMode {
     private class armToParkingAct implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            intake.setArmPosition(intake.ARM_POS_PARKING);
+            intake.setArmPosition(intake.ARM_POS_LEFT_PARKING);
             intake.setKnucklePosition(intake.WRIST_POS_NEUTRAL);
             return false;
         }

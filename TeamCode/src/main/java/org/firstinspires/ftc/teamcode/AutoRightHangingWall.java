@@ -7,7 +7,7 @@ package org.firstinspires.ftc.teamcode;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 
-@Autonomous(name="Right v2 wall", group="Concept")
+@Autonomous(name="2 specimens from wall", group="Concept")
 public class AutoRightHangingWall extends AutoRightHanging2 {
     @Override
     public void setFloor() {
