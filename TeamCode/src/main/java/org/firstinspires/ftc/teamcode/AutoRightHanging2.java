@@ -203,8 +203,8 @@ public class AutoRightHanging2 extends LinearOpMode {
         double headingAngleCorrection = Math.toRadians(180.0 - 0.1);
 
         //wall positions
-        Vector2d pickUpSpecimenWall = new Vector2d(- 4.45 * Params.HALF_MAT, - 6 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH);
-        Vector2d specimenWallLineUp = new Vector2d(- 4.3 * Params.HALF_MAT, pickUpSpecimenWall.y);
+        Vector2d pickUpSpecimenWall = new Vector2d(- 4.4 * Params.HALF_MAT, - 4 * Params.HALF_MAT);
+        Vector2d specimenWallLineUp = new Vector2d(- 4.2 * Params.HALF_MAT, pickUpSpecimenWall.y);
 
         List<Vector2d> pickUpSpecimen;
         pickUpSpecimen = Arrays.asList(pickUpSpecimenPos1, pickUpSpecimenPos2, pickUpSpecimenPos3);
@@ -332,7 +332,7 @@ public class AutoRightHanging2 extends LinearOpMode {
 
                     Actions.runBlocking(
                             drive.actionBuilder(drive.pose)
-                                    .afterTime(0.6, new intakeAct(intake.ARM_POS_GRAB_SPECIMEN_WALL, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_POS_PICKUP_SPECIMEN_WALL, false))
+                                    .afterTime(0.2, new intakeAct(intake.ARM_POS_GRAB_SPECIMEN_WALL, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_POS_PICKUP_SPECIMEN_WALL, false))
                                     .strafeToLinearHeading(specimenWallLineUp, newStartPose.heading) // line up
                                     .turnTo(headingAngleCorrection) // fine correct heading
                                     //.strafeToConstantHeading(pickUpSpecimenWall)

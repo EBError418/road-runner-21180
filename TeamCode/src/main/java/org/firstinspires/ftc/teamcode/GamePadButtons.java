@@ -114,8 +114,8 @@ public class GamePadButtons {
         knuckleDown = gamepad2.left_stick_y > 0.3;
 
         //wrists
-        wristLeft = gamepad2.left_stick_x < -0.3;
-        wristRight = gamepad2.left_stick_x > 0.3;
+        //wristLeft = gamepad2.left_stick_x < -0.3;
+        //wristRight = gamepad2.left_stick_x > 0.3;
         wristBack = gamepad2.dpad_left;
         wristFront = gamepad2.dpad_right;
 

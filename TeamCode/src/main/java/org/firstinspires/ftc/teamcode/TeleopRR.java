@@ -86,10 +86,10 @@ public class TeleopRR extends LinearOpMode {
     // debug flags, turn it off for formal version to save time of logging
     boolean debugFlag = true;
 
-    Pose2d pickUpSpecimenWallPos = new Pose2d(- 4.4 * Params.HALF_MAT, - 3.1 * Params.HALF_MAT, Math.toRadians(180));
+    Pose2d pickUpSpecimenWallPos = new Pose2d(- 4.0 * Params.HALF_MAT, - 4.1 * Params.HALF_MAT, Math.toRadians(180));
 
     Pose2d pickUpSpecimenPos = new Pose2d(- 3.05 * Params.HALF_MAT, - 3.8 * Params.HALF_MAT, Math.toRadians(180));
-    Vector2d hangSpecimenPos = new Vector2d(- 3.3 * Params.HALF_MAT,  0 + specimenCount * 2.0); //shifts left for every specimen hanged
+    Vector2d hangSpecimenPos = new Vector2d(- 3.3 * Params.HALF_MAT,  0.0); //shifts left for every specimen hanged
     Vector2d clearHighChamberPos = new Vector2d(- 3.5 * Params.HALF_MAT, - 3.5 * Params.HALF_MAT);
     Vector2d clearHighChamberForHang = new Vector2d(-3.5 * Params.HALF_MAT, 3 * Params.HALF_MAT);
     Vector2d pickupSamplePos = new Vector2d(- Params.HALF_MAT, - 4 * Params.HALF_MAT);
@@ -166,7 +166,7 @@ public class TeleopRR extends LinearOpMode {
             ));
 
             // store knuckle position
-            if ((intake.getArmPosition() > -650) || (intake.getArmPosition() < -1250)) {
+            if ((intake.getArmPosition() > -2150) || (intake.getArmPosition() < -2550)) {
                 storedKnucklePos = intake.getKnucklePosition();
             }
 
@@ -174,7 +174,7 @@ public class TeleopRR extends LinearOpMode {
             if (gpButtons.armBackwards) {
                 intake.setArmPosition(intake.getArmPosition() + 50);
 
-                if (-700 > intake.getArmPosition() && intake.getArmPosition() > -1200) {
+                if (-2200 > intake.getArmPosition() && intake.getArmPosition() > -2500) {
                     intake.setKnucklePosition(intake.KNUCKLE_POS_CONSTRAINT);
                 } else {
                     intake.setKnucklePosition(storedKnucklePos);
@@ -184,7 +184,7 @@ public class TeleopRR extends LinearOpMode {
             // moving arm with constraint
             if (gpButtons.armForwards) {
                 intake.setArmPosition(intake.getArmPosition() - 50);
-                if (-700 > intake.getArmPosition() && intake.getArmPosition() > -1200) {
+                if (-800 > intake.getArmPosition() && intake.getArmPosition() > -1200) {
                     intake.setKnucklePosition(intake.KNUCKLE_POS_CONSTRAINT);
                 } else {
                     intake.setKnucklePosition(storedKnucklePos);//restore knuckle position
@@ -544,15 +544,17 @@ public class TeleopRR extends LinearOpMode {
             // right bumper of pad2
             if (gpButtons.pickupSamplePos) {
                 intake.setArmPosition(intake.ARM_POS_SUB);
-                intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
-                intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SAMPLE_READY);
-                intake.setFingerPosition(intake.FINGER_OPEN_SUB);
+                //intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
+                //intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SAMPLE_READY);
+                intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+                intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SAMPLE);
+                intake.setFingerPosition(intake.FINGER_OPEN_BACK);
             }
 
             // set arm and wrist position for drop off at low bucket. gamepad2.left_bumper
             if (gpButtons.LowBucketPos) {
                 intake.setArmPosition(intake.ARM_POS_LOW_BUCKET);
-                intake.setWristPosition(intake.WRIST_POS_LOW_BUCKET);
+                intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
                 intake.setKnucklePosition(intake.KNUCKLE_POS_LOW_BUCKET);
             }
 
@@ -610,10 +612,13 @@ public class TeleopRR extends LinearOpMode {
     private class armToPickUpPos implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN_READY);
-            intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN);
-            intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN_ready);
             intake.fingerServoOpen();
+
+            intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN_READY);
+            intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN_ready);
+            sleep(200);
+            intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN);
+
             return false;
         }
     }
@@ -622,10 +627,13 @@ public class TeleopRR extends LinearOpMode {
     private class armToPickUpWallPos implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN_WALL);
-            intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN);
-            intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN_WALL);
             intake.fingerServoOpen();
+
+            intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN_WALL);
+            intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN_WALL);
+            sleep(200);
+            intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN);
+
             return false;
         }
     }

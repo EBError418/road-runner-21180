@@ -63,19 +63,19 @@ public class intakeUnit
 
     //finger
     final double FINGER_OPEN_SUB = 0.65;
-    final double FINGER_OPEN = 0.55;
+    final double FINGER_OPEN = 0.5;
     final double FINGER_CLOSE = 1.0; // must bigger than 0 for action builder working
-    final double FINGER_OPEN_BACK = 0.66;
+    final double FINGER_OPEN_BACK = 0.55;
     final double FINGER_CLOSE_BACK = 0.1;
 
     //knuckle
     final double KNUCKLE_MIN = 0.17;
-    final double KNUCKLE_MAX = 0.8;
+    final double KNUCKLE_MAX = 0.85;
     final double KNUCKLE_POS_PICKUP_SAMPLE_BACK = 0.52; // pickup sample during auto
 
     final double KNUCKLE_POS_PICKUP_SPECIMEN = 0.358;
     final double KNUCKLE_POS_PICKUP_SPECIMEN_ready = 0.2;
-    final double KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE = 0.17;
+    final double KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE = 0.19;
     final double KNUCKLE_POS_HANGING = 0.20;// 0.17; // end game hanging
     final double KNUCKLE_POS_AUTO_INIT = 0.17;
     final double KNUCKLE_POS_LOW_BUCKET = 0.581;
@@ -84,8 +84,10 @@ public class intakeUnit
     final double KNUCKLE_POS_PICKUP_SAMPLE_READY = 0.408; // approaching submersible
     final double KNUCKLE_POS_DROP_SAMPLE = 0.45;
     final double KNUCKLE_POS_PICKUP_SPECIMEN_WALL = 0.203;
-    final double KNUCKLE_POS_CONSTRAINT = 0.203;
+    final double KNUCKLE_POS_CONSTRAINT = 0.8;
     final double KNUCKLE_POS_LIFT_FROM_WALL = 0.17;
+    final double KNUCKLE_POS_PICKUP_SAMPLE = 0.73;
+
 
     //new stuff: wrist
     final int WRIST_MIN = -30;
@@ -118,7 +120,7 @@ public class intakeUnit
     int ARM_POS_GRAB_SPECIMEN_READY = -400;
     int ARM_POS_SUB = -405;
     int ARM_POS_DOWN_HANGING = 0;
-    int ARM_POS_GRAB_SPECIMEN_WALL = -409;
+    int ARM_POS_GRAB_SPECIMEN_WALL = -375;
     int ARM_POS_OBZ_PARKING = -100;
 
     /**
