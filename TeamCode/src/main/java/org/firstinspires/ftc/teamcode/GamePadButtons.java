@@ -79,10 +79,13 @@ public class GamePadButtons {
     public boolean SpecimenPickupAction;
     public boolean SpecimenPickupAlign;
     //public boolean SubPickupPos;
-    public boolean ArmPickUpPos;
+    public boolean pickupSamplePos;
     public boolean LowBucketPos;
     public boolean EndgameHangingLineup;
     public boolean EndgameHangingPos;
+
+    public boolean SpecimenPickupWallPos;
+    public boolean SpecimenCycleWall;
 
     public void checkGamepadButtons(@NonNull Gamepad gamepad1, @NonNull Gamepad gamepad2) {
         //game pad 1 buttons
@@ -136,10 +139,13 @@ public class GamePadButtons {
         SpecimenHangToAscent = gamepad1.x;
         SpecimenHangToBack = gamepad1.a;
 
-        ArmPickUpPos = gamepad2.right_bumper;
+        pickupSamplePos = gamepad2.right_bumper;
 
         LowBucketPos = gamepad2.left_bumper;
         EndgameHangingLineup = gamepad2.x;
         EndgameHangingPos = gamepad2.y;
+
+        SpecimenPickupWallPos = gamepad2.right_trigger > 0;
+        SpecimenCycleWall = gamepad1.left_bumper;
     }
 }
