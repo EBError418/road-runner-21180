@@ -203,8 +203,8 @@ public class AutoRightHanging2 extends LinearOpMode {
         double headingAngleCorrection = Math.toRadians(180.0 - 0.1);
 
         //wall positions
-        Vector2d pickUpSpecimenWall = new Vector2d(- 4.5 * Params.HALF_MAT, - 6 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH);
-        Vector2d specimenWallLineUp = new Vector2d(pickUpSpecimenWall.x + 0.7 * Params.HALF_MAT, pickUpSpecimenWall.y);
+        Vector2d pickUpSpecimenWall = new Vector2d(- 4.45 * Params.HALF_MAT, - 6 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH);
+        Vector2d specimenWallLineUp = new Vector2d(- 4.3 * Params.HALF_MAT, pickUpSpecimenWall.y);
 
         List<Vector2d> pickUpSpecimen;
         pickUpSpecimen = Arrays.asList(pickUpSpecimenPos1, pickUpSpecimenPos2, pickUpSpecimenPos3);
@@ -277,7 +277,7 @@ public class AutoRightHanging2 extends LinearOpMode {
                 intake.fingerServoClose();
 
                 // waiting arm flip to front to drop off second specimen
-                sleep(1000);
+                sleep(900);
             }
 
             Logging.log("after 2nd sample drop heading: %2f", Math.toDegrees(drive.pose.heading.log()));
@@ -544,7 +544,7 @@ public class AutoRightHanging2 extends LinearOpMode {
         {
             shiftDelta = -shiftDelta;
         }
-        shiftDelta = Range.clip(shiftDelta, -7.0, 7.0); // limit adjust distance to +-7.0 inch
+        shiftDelta = Range.clip(shiftDelta, -10.0, 10.0); // limit adjust distance to +-10.0 inch
         Logging.log("drive pose before distance average number");
         Logging.log("before adjust, sensor distance = %2f, shift delta = %2f", sensorDist, shiftDelta);
         Logging.log(" X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));

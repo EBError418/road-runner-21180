@@ -98,9 +98,9 @@ public class intakeUnit
     final int WRIST_POS_GRAB_SPECIMEN = 0;//0.302;
 
     //arm
-    int ARM_MIN = -3810;
+    int ARM_MIN = -3870;
     int ARM_MAX = 0;
-    int ARM_INIT = -3800;
+    int ARM_INIT = -3860;
     int ARM_POS_GRAB_SAMPLE_BACK = -3860;
     int ARM_POS_DROP_SAMPLE = -650; // drop off sample during during auto. Need adjust to make sure fingers do not touch ground.
     int ARM_POS_HIGH_CHAMBER_READY = -2940;

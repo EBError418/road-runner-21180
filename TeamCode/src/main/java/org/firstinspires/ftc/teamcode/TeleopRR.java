@@ -86,7 +86,7 @@ public class TeleopRR extends LinearOpMode {
     // debug flags, turn it off for formal version to save time of logging
     boolean debugFlag = true;
 
-    Pose2d pickUpSpecimenWallPos = new Pose2d(- 4.8 * Params.HALF_MAT, - 3.1 * Params.HALF_MAT, Math.toRadians(180));
+    Pose2d pickUpSpecimenWallPos = new Pose2d(- 4.4 * Params.HALF_MAT, - 3.1 * Params.HALF_MAT, Math.toRadians(180));
 
     Pose2d pickUpSpecimenPos = new Pose2d(- 3.05 * Params.HALF_MAT, - 3.8 * Params.HALF_MAT, Math.toRadians(180));
     Vector2d hangSpecimenPos = new Vector2d(- 3.3 * Params.HALF_MAT,  0 + specimenCount * 2.0); //shifts left for every specimen hanged
@@ -264,7 +264,7 @@ public class TeleopRR extends LinearOpMode {
                 sleep(150);
 
                 Actions.runBlocking(
-                        drive.actionBuilder(pickUpSpecimenPos)
+                        drive.actionBuilder(drive.pose)
                                 .afterTime(0.4, new armReadyToHangHigh())
                                 .strafeToLinearHeading(hangSpecimenPos, pickUpSpecimenPos.heading)
                                 .turnTo(headingAngleCorrection) // fine correction heading
@@ -317,7 +317,7 @@ public class TeleopRR extends LinearOpMode {
                 sleep(150);
 
                 Actions.runBlocking(
-                        drive.actionBuilder(pickUpSpecimenPos)
+                        drive.actionBuilder(drive.pose)
                                 .afterTime(0.4, new armReadyToHangHigh())
                                 .strafeToLinearHeading(hangSpecimenPos, pickUpSpecimenPos.heading)
                                 .turnTo(headingAngleCorrection) // fine correction heading
@@ -370,7 +370,7 @@ public class TeleopRR extends LinearOpMode {
                 sleep(100);
 
                 Actions.runBlocking(
-                        drive.actionBuilder(pickUpSpecimenPos)
+                        drive.actionBuilder(drive.pose)
                                 .afterTime(0.4, new armReadyToHangHigh())
                                 .strafeToLinearHeading(hangSpecimenPos, pickUpSpecimenPos.heading)
                                 .turnTo(headingAngleCorrection) // fine correction heading
@@ -423,7 +423,7 @@ public class TeleopRR extends LinearOpMode {
 
                 //intake.setArmPosition(intake.ARM_POS_BEFORE_HANG); // lift arm to during strafe to chambers
                 Actions.runBlocking(
-                        drive.actionBuilder(pickUpSpecimenPos)
+                        drive.actionBuilder(drive.pose)
                                 .afterTime(0.4, new armReadyToHangHigh())
                                 .strafeToLinearHeading(hangSpecimenPos, pickUpSpecimenPos.heading)
                                 .build()
@@ -477,7 +477,7 @@ public class TeleopRR extends LinearOpMode {
                 intake.setKnucklePosition(intake.KNUCKLE_POS_LIFT_FROM_WALL);
 
                 Actions.runBlocking(
-                        drive.actionBuilder(pickUpSpecimenPos)
+                        drive.actionBuilder(drive.pose)
                                 .afterTime(0.4, new armReadyToHangHigh())
                                 .strafeToLinearHeading(hangSpecimenPos, pickUpSpecimenPos.heading)
                                 .turnTo(headingAngleCorrection) // fine correction heading
