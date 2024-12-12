@@ -84,9 +84,10 @@ public class intakeUnit
     final double KNUCKLE_POS_PICKUP_SAMPLE_READY = 0.408; // approaching submersible
     final double KNUCKLE_POS_DROP_SAMPLE = 0.45;
     final double KNUCKLE_POS_PICKUP_SPECIMEN_WALL = 0.203;
-    final double KNUCKLE_POS_CONSTRAINT = 0.8;
+    final double KNUCKLE_POS_CONSTRAINT = 0.35;
     final double KNUCKLE_POS_LIFT_FROM_WALL = 0.17;
     final double KNUCKLE_POS_PICKUP_SAMPLE = 0.73;
+    final double KNUCKLE_POS_NEUTRAL = 0.35;
 
 
     //new stuff: wrist
