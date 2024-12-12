@@ -103,11 +103,11 @@ public class intakeUnit
     int ARM_INIT = -3860;
     int ARM_POS_GRAB_SAMPLE_BACK = -3860;
     int ARM_POS_DROP_SAMPLE = -650; // drop off sample during during auto. Need adjust to make sure fingers do not touch ground.
-    int ARM_POS_HIGH_CHAMBER_READY = -2940;
+    int ARM_POS_HIGH_CHAMBER_READY = -2920;
     int ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN = -3150; // moving specimen left/right
 
     int ARM_POS_GRAB_SAMPLE = -500; // pickup sample during teleop
-    int ARM_POS_HIGH_CHAMBER = -3500;//-2967;//2490;
+    int ARM_POS_HIGH_CHAMBER = -3550;//-2967;//2490;
     int ARM_POS_HIGH_CHAMBER_TELEOP = ARM_POS_HIGH_CHAMBER;
     int ARM_POS_LOW_BUCKET = -1853;
     int ARM_POS_LEFT_PARKING = -500;

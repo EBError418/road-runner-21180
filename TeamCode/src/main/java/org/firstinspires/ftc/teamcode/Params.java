@@ -51,6 +51,7 @@ public class Params {
     static double SAMPLE_DIST = 1.3;
     static double SPECIMEN_PICKUP_DIST = 13.5; // front distance sensor to wall when pickup specimen
 
+    static int NO_CATION = 999999;
     //game field parameters
     static final double HALF_MAT = 23.625/2.0;  // 60 cm
 

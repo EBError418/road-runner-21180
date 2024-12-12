@@ -258,13 +258,13 @@ public class TeleopRR extends LinearOpMode {
             // Align specimen to the high chamber, get ready for hanging. gamepad1.right_trigger
             if (gpButtons.SpecimenHangAlign) {
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_READY);
-                intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
+                intake.setWristPosition(intake.WRIST_BACK);
                 intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
             }
 
             // hanging specimen action, lower arm and shift left several inches. GAMEPAD1.Y
             if (gpButtons.SpecimenHangAction) {
-                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_TELEOP);
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
                 intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
                 intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
                 sleep(sleepTimeForHangingSpecimen); // waiting for hanging success
