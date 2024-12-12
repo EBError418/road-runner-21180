@@ -245,17 +245,17 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .strafeToLinearHeading(firstSamplePosition, newStartPose.heading)//go to first sample position
                             .turnTo(headingAngleCorrection) // fine adjust heading
                             .afterTime(0.25, new fingerCloseEnRouteAct())//grab first sample
-                            .afterTime(0.4, new intakeAct(intake.ARM_POS_DROP_SAMPLE, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_POS_DROP_SAMPLE, true))//go back for drop sample
+                            .afterTime(0.4, new intakeAct(intake.ARM_POS_DROP_SAMPLE, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_SIZE_CONSTRAINT, true))//go back for drop sample
                             .waitSeconds(0.4) // wait finger close before moving to second sample
                             //.strafeToLinearHeading(secondSamplePosition, newStartPose.heading)//go to second sample position
                             .strafeToLinearHeading(dropSamplePosition, newStartPose.heading)//go to place sample position
                             .turnTo(headingAngleCorrection)
                             .build()
             );
-            sleep((floorOrWall)? 150 : 550); // waiting arm reaching position to drop off first sample.
             intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SAMPLE_BACK);
+            sleep((floorOrWall)? 150 : 550); // waiting arm reaching position to drop off first sample.
             intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE_BACK);
-            intake.setWristPosition(intake.WRIST_POS_GRAB_SAMPLE_BACK);
+            intake.setWristPosition(intake.WRIST_BACK);
             intake.fingerServoOpen();
             sleep(200);
             Actions.runBlocking(
@@ -264,21 +264,28 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .turnTo(headingAngleCorrection)
                             .build()
             );
-            sleep(1450); // wait arm flip back to pickup second sample
+            intake.setKnucklePosition(intake.KNUCKLE_SIZE_CONSTRAINT); // flip knuckle before lift arm due to size limitation
+            sleep(1050); // wait arm flip back to pickup second sample
+            intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SAMPLE_BACK); // flip knuckle before lift arm due to size limitation
+            sleep(400);
             intake.fingerServoClose();
             sleep(150); // wait finger close to grab second sample
-
+            intake.setKnucklePosition(intake.KNUCKLE_SIZE_CONSTRAINT); // flip knuckle before lift arm due to size limitation
+            sleep(150);
             if (floorOrWall) { // stand still during arm flip to drop off second sample for floor case
-                sleep(1850); // wait arm flip front to drop off
+                intake.setArmPosition(intake.ARM_POS_DROP_SAMPLE); // flip arm to grab specimen position before drop off second sample
+                intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
+                sleep(850); // wait arm flip front to drop off
+                intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SAMPLE_BACK);
+                sleep(1000);
                 intake.fingerServoOpen(); // drop off sample
             } else { // moving during arm flip for wall case, starting flip arm here
-                intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN_WALL); // flip arm to grading specimen position before drop off second sample
+                intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN_WALL); // flip arm to grab specimen position before drop off second sample
                 intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
+                sleep(850);
                 intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN_WALL);
-                intake.fingerServoClose();
-
                 // waiting arm flip to front to drop off second specimen
-                sleep(900);
+                sleep(50);
             }
 
             Logging.log("after 2nd sample drop heading: %2f", Math.toDegrees(drive.pose.heading.log()));
@@ -298,13 +305,13 @@ public class AutoRightHanging2 extends LinearOpMode {
                     //pickup specimen
                     Actions.runBlocking(
                             drive.actionBuilder(drive.pose)
-                                    .afterTime(0.6, new intakeAct(intake.ARM_POS_GRAB_SPECIMEN, intake.WRIST_POS_GRAB_SPECIMEN, intake.KNUCKLE_POS_PICKUP_SPECIMEN_ready, false))
+                                    .afterTime(0.6, new intakeAct(intake.ARM_POS_GRAB_SPECIMEN, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_POS_PICKUP_SPECIMEN_ready, false))
                                     .strafeToLinearHeading(specimenPos, newStartPose.heading)
                                     .turnTo(headingAngleCorrection)
                                     .afterTime(0.001, new logPos()) // log drive position when pickup specimen
-                                    .afterTime(0.01, new intakeAct(intake.ARM_POS_GRAB_SPECIMEN, intake.WRIST_POS_GRAB_SPECIMEN, intake.KNUCKLE_POS_PICKUP_SPECIMEN, false))
+                                    .afterTime(0.01, new intakeAct(intake.ARM_POS_GRAB_SPECIMEN, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_POS_PICKUP_SPECIMEN, false))
                                     .afterTime(0.4, new fingerCloseEnRouteAct())//grab specimen
-                                    .afterTime(0.6, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_POS_HIGH_CHAMBER, intake.KNUCKLE_POS_HIGH_CHAMBER - 0.2, true)) //specimen will hit submersible
+                                    .afterTime(0.6, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_BACK, intake.KNUCKLE_POS_HIGH_CHAMBER - 0.2, true)) //specimen will hit submersible
                                     .waitSeconds(1.1)
                                     .afterTime(1.4, new armToReadyHangAct())//get arm in position ready for hanging specimen
                                     .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x, hangSpecimenPos.y - 1.2 * j), newStartPose.heading) // shift 1.2 inch for each specimen on high chamber
@@ -353,7 +360,7 @@ public class AutoRightHanging2 extends LinearOpMode {
                     Actions.runBlocking(
                             drive.actionBuilder(drive.pose)
                                     // flip arm to high chamber position, back knuckle to avoid hitting chamber during strafing
-                                    .afterTime(0.6, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_POS_HIGH_CHAMBER, intake.KNUCKLE_POS_LIFT_FROM_WALL, true))
+                                    .afterTime(0.6, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_BACK, intake.KNUCKLE_POS_LIFT_FROM_WALL, true))
                                     // shift 1.5 inch for each specimen on high chamber
                                     .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x, hangSpecimenPos.y - 1.5 * j), newStartPose.heading)
                                     .turnTo(headingAngleCorrection) // fine correct heading
@@ -394,7 +401,7 @@ public class AutoRightHanging2 extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_READY);
-            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+            intake.setWristPosition(intake.WRIST_BACK);
             intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
             return false;
         }
@@ -407,7 +414,7 @@ public class AutoRightHanging2 extends LinearOpMode {
             intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SAMPLE_BACK);
             sleep(100);
             intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE_BACK);
-            intake.setWristPosition(intake.WRIST_POS_GRAB_SAMPLE_BACK);
+            intake.setWristPosition(intake.WRIST_BACK);
             intake.setFingerPosition(intake.FINGER_OPEN);
             return false;
         }
@@ -435,7 +442,7 @@ public class AutoRightHanging2 extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN);
-            intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN);
+            intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
             return false;
         }
     }

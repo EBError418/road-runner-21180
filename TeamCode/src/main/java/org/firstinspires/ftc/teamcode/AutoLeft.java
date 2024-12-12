@@ -421,7 +421,7 @@ public class AutoLeft extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
-            intake .setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+            intake .setWristPosition(intake.WRIST_BACK);
             return false;
         }
     }
@@ -452,7 +452,7 @@ public class AutoLeft extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_LOW_BUCKET);
-            intake.setKnucklePosition(intake.WRIST_POS_LOW_BUCKET);
+            intake.setKnucklePosition(intake.WRIST_POS_NEUTRAL);
             return false;
         }
     }

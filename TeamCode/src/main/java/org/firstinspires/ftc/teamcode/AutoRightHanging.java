@@ -257,7 +257,7 @@ public class AutoRightHanging extends LinearOpMode {
                             .build()
             );
             intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
-            intake .setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+            intake .setWristPosition(intake.WRIST_BACK);
             sleep(1100);
             intake.setFingerPosition(intake.FINGER_OPEN);
 
@@ -305,7 +305,7 @@ public class AutoRightHanging extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
-            intake .setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+            intake .setWristPosition(intake.WRIST_BACK);
             return false;
         }
     }
@@ -361,7 +361,7 @@ public class AutoRightHanging extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN);
-            intake.setWristPosition(intake.WRIST_POS_GRAB_SPECIMEN);
+            intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
             return false;
         }
     }
@@ -382,7 +382,7 @@ public class AutoRightHanging extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_BACK);
-            intake.setWristPosition(intake.WRIST_POS_HIGH_CHAMBER);
+            intake.setWristPosition(intake.WRIST_BACK);
             return false;
         }
     }
