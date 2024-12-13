@@ -195,10 +195,10 @@ public class TeleopRR extends LinearOpMode {
 
             // wrist control: game pad2, left stick
             if (gpButtons.wristLeft) {
-                intake.setWristPosition(intake.getWristPosition() + 50);
+                intake.setWristPosition(intake.getWristPosition() + 25);
             }
             if (gpButtons.wristRight) {
-                intake.setWristPosition(intake.getWristPosition() - 50);
+                intake.setWristPosition(intake.getWristPosition() - 25);
             }
 
             // wrist control: game pad2, dpad left/right button
@@ -240,6 +240,10 @@ public class TeleopRR extends LinearOpMode {
                 intake.setKnucklePosition(intake.getKnucklePosition() + 0.006);
             }
 
+            if (gamepad2.start && gamepad2.right_trigger > 0) {
+                intake.resetWristEncoder();
+            }
+
             // finger control. game pad2 -> dpad up/down
             if (gpButtons.fingerOpenClose) {
                 double tmp = (intake.FINGER_OPEN_SUB + intake.FINGER_CLOSE)/2.0;
@@ -264,7 +268,7 @@ public class TeleopRR extends LinearOpMode {
             // hanging specimen action, lower arm and shift left several inches. GAMEPAD1. left_bumper
             if (gpButtons.SpecimenHangAction) {
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
-                intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
+                intake.setWristPosition(intake.WRIST_BACK);
                 intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
                 sleep(sleepTimeForHangingSpecimen); // waiting for hanging success
 
@@ -459,6 +463,8 @@ public class TeleopRR extends LinearOpMode {
                 sleep(200);
                 Logging.log(" after hanging specimen specimenCount = %s", specimenCount);
                 Logging.log(" before y shift pos: X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
+                Logging.log(" finger position = %2f ", intake.getFingerPosition());
+
                 Actions.runBlocking(
                         drive.actionBuilder(drive.pose)
                                 .strafeToLinearHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y + specimenShiftInch), initHeading)
@@ -481,8 +487,27 @@ public class TeleopRR extends LinearOpMode {
                 );
 
                 // adjust wall distance by distance sensor
-                adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF);
+                //adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF);
 
+            }
+
+            // pickup specimen and move to high chamber
+            if ( gamepad1.right_trigger > 0) {
+                drive.pose = pickUpSpecimenWallPos;
+                intake.setFingerPosition(intake.FINGER_CLOSE);
+                sleep(150);
+
+                //intake.setArmPosition(intake.ARM_POS_BEFORE_HANG); // lift arm to during strafe to chambers
+                Actions.runBlocking(
+                        drive.actionBuilder(drive.pose)
+                                .afterTime(0.4, new armReadyToHangHigh())
+                                .strafeToLinearHeading(hangSpecimenPos, initHeading)
+                                .build()
+                );
+
+                intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
+
+                adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
             }
 
             // pickup specimen from wall positions, gamepad2.right_trigger or left_trigger
@@ -604,8 +629,7 @@ public class TeleopRR extends LinearOpMode {
             intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE);
             intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SAMPLE_READY);
             sleep(knuckleSleepTime);
-            intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
-
+            intake.setWristPosition(intake.WRIST_BACK);
             return false;
         }
     }
@@ -656,6 +680,12 @@ public class TeleopRR extends LinearOpMode {
 
         double shiftDelta = sensorDist - aimDistance;
         shiftDelta = Range.clip(shiftDelta, -10.0, 10.0); // limit adjust distance to +-7.0 inch
+
+
+        if (sensorDist > 300.0 ) {
+            shiftDelta = 3.0;
+        }
+
         if (aimDistance > 10) // wall distance is bigger than 10, robot need move to -x direction.
         {
             shiftDelta = -shiftDelta;

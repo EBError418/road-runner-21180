@@ -69,10 +69,10 @@ public class intakeUnit
     final double FINGER_CLOSE_BACK = 0.1;
 
     //knuckle
-    final double KNUCKLE_MIN = 0.17;
+    final double KNUCKLE_MIN = 0.15;
     final double KNUCKLE_MAX = 0.9;
 
-    final double KNUCKLE_POS_AUTO_INIT = 0.17;
+    final double KNUCKLE_POS_AUTO_INIT = 0.16;
     final double KNUCKLE_POS_HIGH_CHAMBER_READY = 0.17;
     final double KNUCKLE_POS_LIFT_FROM_WALL = 0.17;
     final double KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE = 0.19;
@@ -91,8 +91,8 @@ public class intakeUnit
 
 
     //new stuff: wrist
-    final int WRIST_MIN = -30;
-    final int WRIST_MAX= 300;
+    final int WRIST_MIN = -50;
+    final int WRIST_MAX= 320;
     final int WRIST_INIT = 270;
     final int WRIST_BACK = 270; // pickup sample during auto
     final int WRIST_POS_NEUTRAL = 0;

@@ -112,8 +112,8 @@ public class GamePadButtons {
         knuckleDown = gamepad2.left_stick_y > 0.3;
 
         //wrists
-        //wristLeft = gamepad2.left_stick_x < -0.3;
-        //wristRight = gamepad2.left_stick_x > 0.3;
+        wristLeft = gamepad2.right_trigger > 0  &&  gamepad2.a;
+        wristRight = gamepad2.right_trigger > 0  &&  gamepad2.b;
         wristBack = gamepad2.dpad_left;
         wristFront = gamepad2.dpad_right;
 
@@ -136,13 +136,13 @@ public class GamePadButtons {
         SpecimenHangToAscent = gamepad1.x;
         SpecimenHangToBack = gamepad1.a;
 
-        PickupSampleIntakePos = gamepad2.right_trigger > 0 || gamepad2.right_bumper;
+        PickupSampleIntakePos =  gamepad2.right_bumper;
 
         LowBucketPos = gamepad2.left_bumper;
         EndgameHangingLineup = gamepad2.x;
         EndgameHangingPos = gamepad2.y;
 
-        SpecimenPickupWallPos = gamepad2.right_trigger > 0 || gamepad2.left_trigger > 0;
+        SpecimenPickupWallPos =  gamepad2.left_trigger > 0;
 
     }
 }

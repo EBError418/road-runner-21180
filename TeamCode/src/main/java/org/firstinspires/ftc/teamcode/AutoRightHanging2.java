@@ -344,7 +344,7 @@ public class AutoRightHanging2 extends LinearOpMode {
 
                     Actions.runBlocking(
                             drive.actionBuilder(drive.pose)
-                                    .afterTime(0.2, new intakeAct(intake.ARM_POS_GRAB_SPECIMEN_WALL, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_POS_PICKUP_SPECIMEN_WALL, Params.NO_CATION))
+                                    .afterTime(0.1, new intakeAct(intake.ARM_POS_GRAB_SPECIMEN_WALL, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_POS_PICKUP_SPECIMEN_WALL, Params.NO_CATION))
                                     .strafeToLinearHeading(specimenWallLineUp, newStartPose.heading) // line up
                                     // drop off second sample
                                     .turnTo(headingAngleCorrection) // fine correct heading
@@ -354,8 +354,8 @@ public class AutoRightHanging2 extends LinearOpMode {
                     // using distance sensor to move robot to correct position for pickup specimen from wall
                     adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF);
                     // adjust wall pickup position.x according to distance sensor to speedup next pickup.
-                    specimenWallLineUp = new Vector2d(drive.pose.position.x, - 4 * Params.HALF_MAT);
-                    Logging.log(" After adjust of specimenWallLineUp: X position = %2f, Y position = %2f", specimenWallLineUp.x, specimenWallLineUp.y);
+                    //specimenWallLineUp = new Vector2d(drive.pose.position.x, - 4 * Params.HALF_MAT);
+                    //Logging.log(" After adjust of specimenWallLineUp: X position = %2f, Y position = %2f", specimenWallLineUp.x, specimenWallLineUp.y);
 
                     // start picking up actions
                     intake.fingerServoClose();
@@ -546,10 +546,16 @@ public class AutoRightHanging2 extends LinearOpMode {
         sensorDist = sensorDist / repeatTimes;
 
         double shiftDelta = sensorDist - aimDistance;
+
+        if (sensorDist > 300.0 ) {
+            shiftDelta = 3.0;
+        }
+
         if (aimDistance > 10) // wall distance is bigger than 10, robot need move to -x direction.
         {
             shiftDelta = -shiftDelta;
         }
+
         shiftDelta = Range.clip(shiftDelta, -10.0, 10.0); // limit adjust distance to +-10.0 inch
         Logging.log("drive pose before distance average number");
         Logging.log("before adjust, sensor distance = %2f, shift delta = %2f", sensorDist, shiftDelta);
