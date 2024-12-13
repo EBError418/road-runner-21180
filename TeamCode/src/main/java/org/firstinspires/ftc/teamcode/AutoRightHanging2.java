@@ -43,6 +43,7 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
@@ -74,7 +75,7 @@ import java.util.List;
  */
 
 @Autonomous(name=" B - specimens from floor", group="Concept")
-//@Disabled
+@Disabled
 public class AutoRightHanging2 extends LinearOpMode {
     /**
      * Robot Start location: "1" - right side; "-1" - left side.
@@ -204,8 +205,7 @@ public class AutoRightHanging2 extends LinearOpMode {
         double headingAngleCorrection = Math.toRadians(180.0 - 0.1);
 
         //wall positions
-        Vector2d pickUpSpecimenWall = new Vector2d(- 4.4 * Params.HALF_MAT, - 4 * Params.HALF_MAT);
-        Vector2d specimenWallLineUp = new Vector2d(- 4.1 * Params.HALF_MAT, pickUpSpecimenWall.y);
+        Vector2d specimenWallLineUp = new Vector2d(- 4.1 * Params.HALF_MAT, - 4 * Params.HALF_MAT);
 
         List<Vector2d> pickUpSpecimen;
         pickUpSpecimen = Arrays.asList(pickUpSpecimenPos1, pickUpSpecimenPos2, pickUpSpecimenPos3);
@@ -219,11 +219,15 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .strafeTo(firstHighChamberPos)
                             .build()
             );
-            Logging.log("After ready hang pos wrist pos: %s", intake.getWristPosition());
 
             // adjust robot position by distance sensor. Temp comment out for saving time
             adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorB);
+
+            // Adjust hanging specimen position.x according to the preload specimen hanging position
+            // after adjusted by distance sensor
+            hangSpecimenPos = new Vector2d(drive.pose.position.x, firstHighChamberPos.y);
             Logging.log("Distance sensor reading for hanging preload specimen: %2f", distSensorB.getDistance(DistanceUnit.INCH));
+            Logging.log(" hangSpecimenPos: X position = %2f, Y position = %2f", hangSpecimenPos.x, hangSpecimenPos.y);
 
             //hanging action
             intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
@@ -349,6 +353,9 @@ public class AutoRightHanging2 extends LinearOpMode {
                     intake.fingerServoOpen();
                     // using distance sensor to move robot to correct position for pickup specimen from wall
                     adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF);
+                    // adjust wall pickup position.x according to distance sensor to speedup next pickup.
+                    specimenWallLineUp = new Vector2d(drive.pose.position.x, - 4 * Params.HALF_MAT);
+                    Logging.log(" After adjust of specimenWallLineUp: X position = %2f, Y position = %2f", specimenWallLineUp.x, specimenWallLineUp.y);
 
                     // start picking up actions
                     intake.fingerServoClose();
@@ -548,13 +555,19 @@ public class AutoRightHanging2 extends LinearOpMode {
         Logging.log("before adjust, sensor distance = %2f, shift delta = %2f", sensorDist, shiftDelta);
         Logging.log(" X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
 
-        Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(new Vector2d(drive.pose.position.x + shiftDelta , drive.pose.position.y), newStartPose.heading) // adjust heading also.
-                        .build()
-        );
-        Logging.log(" After adjust: X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
-        Logging.log("after adjust, sensor distance = %2f, aim distance = %2f ", distSensorID.getDistance(DistanceUnit.INCH), aimDistance);
+        // adjust when shiftDelta big enough than 0.2 inch to same some time
+        if (Math.abs(shiftDelta) > 0.2) {
+            Actions.runBlocking(
+                    drive.actionBuilder(drive.pose)
+                            .strafeToLinearHeading(new Vector2d(drive.pose.position.x + shiftDelta, drive.pose.position.y), newStartPose.heading) // adjust heading also.
+                            .build()
+            );
+            Logging.log(" After adjust: X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
+            Logging.log("after adjust, sensor distance = %2f, aim distance = %2f ", distSensorID.getDistance(DistanceUnit.INCH), aimDistance);
+        }
+        else {
+            Logging.log("No adjust by distance sensor ");
+        }
     }
 
     // strafe robot left or right to detect specimen by distance sensor.
