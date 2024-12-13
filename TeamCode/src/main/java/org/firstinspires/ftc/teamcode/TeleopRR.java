@@ -80,9 +80,9 @@ public class TeleopRR extends LinearOpMode {
     private DistanceSensor distSensorF;
 
     int specimenCount = 0;//counter used to update specimen hanging position
-    int specimenShiftMax = 6; //shift 2 inch for each specimen hanging
+    int specimenShiftMax = 7; //shift 2 inch for each specimen hanging
     double specimenShiftInch = -7.0; // shift specimen to 7 inch right (-y) after hanging on high chamber
-
+    double specimenShiftEach = 1.5; // shift hanging place shift in Y direct
     // debug flags, turn it off for formal version to save time of logging
     boolean debugFlag = true;
 
@@ -93,7 +93,6 @@ public class TeleopRR extends LinearOpMode {
 
     Pose2d pickUpSpecimenWallPos = new Pose2d(- 4.0 * Params.HALF_MAT, - 4.0 * Params.HALF_MAT, initHeading);
 
-    Pose2d pickUpSpecimenPos = new Pose2d(- 3.05 * Params.HALF_MAT, - 3.8 * Params.HALF_MAT, initHeading);
     Vector2d hangSpecimenPos = new Vector2d(- 3.3 * Params.HALF_MAT,  0.0); //shifts left for every specimen hanged
     Vector2d clearHighChamberPos = new Vector2d(- 3.5 * Params.HALF_MAT, - 3.5 * Params.HALF_MAT);
     Vector2d clearHighChamberForHang = new Vector2d(-3.5 * Params.HALF_MAT, 3 * Params.HALF_MAT);
@@ -255,14 +254,14 @@ public class TeleopRR extends LinearOpMode {
                 sleep(150);// avoid multi-times hitting
             }
 
-            // Align specimen to the high chamber, get ready for hanging. gamepad1.right_trigger
+            // Align specimen to the high chamber, get ready for hanging. gamepad1.left_trigger
             if (gpButtons.SpecimenHangAlign) {
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_READY);
                 intake.setWristPosition(intake.WRIST_BACK);
                 intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
             }
 
-            // hanging specimen action, lower arm and shift left several inches. GAMEPAD1.Y
+            // hanging specimen action, lower arm and shift left several inches. GAMEPAD1. left_bumper
             if (gpButtons.SpecimenHangAction) {
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
                 intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
@@ -271,67 +270,6 @@ public class TeleopRR extends LinearOpMode {
 
                 // lift arm a little bit before moving left
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN);
-                sleep(200);
-
-                // moving left 6 inch
-                Actions.runBlocking(
-                        drive.actionBuilder(drive.pose)
-                                .strafeToConstantHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y + specimenShiftInch))
-                                .build()
-                );
-            }
-
-            // pick up specimen from floor and drive to high chamber, then back automatically, gamepad1.left_trigger
-            if (gpButtons.SpecimenPickupAction) {
-                drive.pose = pickUpSpecimenPos;
-                intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
-                intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN);
-                intake.setFingerPosition(intake.FINGER_CLOSE);
-                sleep(150);
-
-                Actions.runBlocking(
-                        drive.actionBuilder(drive.pose)
-                                .afterTime(0.4, new armReadyToHangHigh())
-                                .strafeToLinearHeading(hangSpecimenPos, initHeading)
-                                .turnTo(headingAngleCorrection) // fine correction heading
-                                .build()
-                );
-
-                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_READY);
-                intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
-
-                adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
-
-                if (specimenCount <= specimenShiftMax) {
-                    specimenCount ++;//update specimen pos
-                }
-
-                hangSpecimenPos = new Vector2d(- 3.3 * Params.HALF_MAT,  specimenCount * 2);
-
-                // hanging specimen
-                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
-                intake.setWristPosition(intake.WRIST_BACK);
-                sleep(sleepTimeForHangingSpecimen);
-                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN);
-                sleep(200);
-                Actions.runBlocking(
-                        drive.actionBuilder(drive.pose)
-                                .strafeToLinearHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y + specimenShiftInch), initHeading)
-                                .build()
-                );
-
-                //return to observation zone
-                intake.fingerServoOpen();
-                sleep(150);
-                intake.setKnucklePosition(intake.KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE);
-                Actions.runBlocking(
-                        drive.actionBuilder(drive.pose)
-                                .afterTime(0.05, new armToPickUpPos())
-                                .strafeToLinearHeading(pickUpSpecimenPos.position, initHeading)
-                                .turnTo(headingAngleCorrection) // fine correction heading
-                                .build()
-                );
-                intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN);
             }
 
             // move to submarine after hanging specimens, gamepad1.b
@@ -356,7 +294,8 @@ public class TeleopRR extends LinearOpMode {
                     specimenCount ++;//update specimen pos
                 }
 
-                hangSpecimenPos = new Vector2d(- 3.3 * Params.HALF_MAT,  specimenCount * 2);
+                Logging.log(" Adjust hanging position vector values according to current hanging.");
+                hangSpecimenPos = new Vector2d(hangSpecimenPos.x,  specimenCount * specimenShiftEach);
 
                 // hanging specimen
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
@@ -405,7 +344,7 @@ public class TeleopRR extends LinearOpMode {
                     specimenCount ++;//update specimen pos
                 }
 
-                hangSpecimenPos = new Vector2d(- 3.3 * Params.HALF_MAT,  specimenCount * 2);
+                hangSpecimenPos = new Vector2d(hangSpecimenPos.x,  specimenCount * specimenShiftEach);
 
                 // hanging specimen
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
@@ -432,7 +371,7 @@ public class TeleopRR extends LinearOpMode {
                 );
             }
 
-            // release specimen and back a little bit after hanging specimen. gamepad1.a
+            // release specimen and back a little bit after hanging specimen. game pad1.a
             if (gpButtons.SpecimenHangToBack) {
                 drive.pose = pickUpSpecimenWallPos;
                 intake.setFingerPosition(intake.FINGER_CLOSE);
@@ -454,7 +393,7 @@ public class TeleopRR extends LinearOpMode {
                     specimenCount ++;//update specimen pos
                 }
 
-                hangSpecimenPos = new Vector2d(- 3.3 * Params.HALF_MAT,  specimenCount * 2);
+                hangSpecimenPos = new Vector2d(hangSpecimenPos.x,  specimenCount * specimenShiftEach);
 
                 // hanging specimen
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
@@ -480,7 +419,7 @@ public class TeleopRR extends LinearOpMode {
                 );
             }
 
-            // cycling specimen from wall, gamepad1.left_bumper
+            // cycling specimen from wall, gamepad1.y
             if (gpButtons.SpecimenCycleWall) {
                 drive.pose = pickUpSpecimenWallPos;
 
@@ -507,7 +446,7 @@ public class TeleopRR extends LinearOpMode {
                 }
 
                 //adjust hanging place for next specimen: shift left 2 inches for each
-                hangSpecimenPos = new Vector2d(- 3.3 * Params.HALF_MAT,  specimenCount * 2);
+                hangSpecimenPos = new Vector2d(hangSpecimenPos.x,  specimenCount * specimenShiftEach);
 
                 // hanging specimen
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
@@ -542,24 +481,14 @@ public class TeleopRR extends LinearOpMode {
 
             }
 
-            // pickup specimen from wall positions, gamepad2.right_trigger
+            // pickup specimen from wall positions, gamepad2.right_trigger or left_trigger
             if (gpButtons.SpecimenPickupWallPos) {
                 pickupFromWallActions();
             }
 
-            // set arm, wrist, finger positions before pickup specimen. gamepad2.left_trigger
-            if (gpButtons.SpecimenPickupAlign) {
-                intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN);
-                intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN);
-                intake.setFingerPosition(intake.FINGER_OPEN);
-                sleep(knuckleSleepTime); // remove wrist and fingers interference
-                intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
-
-            }
-
             // set arm and wrist position for picking up at the center of field. gamepad2.right_bumper
             // right bumper of pad2
-            if (gpButtons.pickupSamplePos) {
+            if (gpButtons.PickupSampleIntakePos) {
                 intake.setArmPosition(intake.ARM_POS_SUB);
                 intake.setFingerPosition(intake.FINGER_OPEN_BACK);
                 intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SAMPLE);

@@ -76,10 +76,8 @@ public class GamePadButtons {
     public boolean SpecimenHangToAscent;
     public boolean SpecimenHangToBack;
 
-    public boolean SpecimenPickupAction;
-    public boolean SpecimenPickupAlign;
     //public boolean SubPickupPos;
-    public boolean pickupSamplePos;
+    public boolean PickupSampleIntakePos;
     public boolean LowBucketPos;
     public boolean EndgameHangingLineup;
     public boolean EndgameHangingPos;
@@ -129,23 +127,22 @@ public class GamePadButtons {
         sliderUpDown  = gamepad2.right_stick_y;
 
         //specimen presets
-        SpecimenHangAlign = gamepad1.right_trigger > 0;// || gamepad2.right_trigger > 0;
-        SpecimenHangAction = gamepad1.y;
-        SpecimenPickupAction = gamepad1.left_trigger > 0;// || gamepad2.left_trigger > 0;
-        SpecimenPickupAlign = gamepad2.left_trigger > 0;
+        SpecimenHangAlign = gamepad1.left_trigger > 0;
+        SpecimenHangAction = gamepad1.left_bumper;
 
         //alternative after hanging procedures
+        SpecimenCycleWall = gamepad1.y;
         SpecimenHangToSub = gamepad1.b;
         SpecimenHangToAscent = gamepad1.x;
         SpecimenHangToBack = gamepad1.a;
 
-        pickupSamplePos = gamepad2.right_bumper;
+        PickupSampleIntakePos = gamepad2.right_trigger > 0 || gamepad2.right_bumper;
 
         LowBucketPos = gamepad2.left_bumper;
         EndgameHangingLineup = gamepad2.x;
         EndgameHangingPos = gamepad2.y;
 
-        SpecimenPickupWallPos = gamepad2.right_trigger > 0;
-        SpecimenCycleWall = gamepad1.left_bumper;
+        SpecimenPickupWallPos = gamepad2.right_trigger > 0 || gamepad2.left_trigger > 0;
+
     }
 }
