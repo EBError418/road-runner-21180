@@ -205,7 +205,7 @@ public class AutoRightHanging2 extends LinearOpMode {
         double headingAngleCorrection = Math.toRadians(180.0 - 0.1);
 
         //wall positions
-        Vector2d specimenWallLineUp = new Vector2d(- 4.1 * Params.HALF_MAT, - 4 * Params.HALF_MAT);
+        Vector2d specimenWallLineUp = new Vector2d(- 4.1 * Params.HALF_MAT, - 3.9 * Params.HALF_MAT);
 
         List<Vector2d> pickUpSpecimen;
         pickUpSpecimen = Arrays.asList(pickUpSpecimenPos1, pickUpSpecimenPos2, pickUpSpecimenPos3);

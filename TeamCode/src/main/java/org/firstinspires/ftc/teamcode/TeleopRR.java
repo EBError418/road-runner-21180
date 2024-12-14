@@ -458,6 +458,7 @@ public class TeleopRR extends LinearOpMode {
 
                 // hanging specimen
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
+
                 sleep(sleepTimeForHangingSpecimen);
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN);
                 sleep(200);
@@ -465,6 +466,9 @@ public class TeleopRR extends LinearOpMode {
                 Logging.log(" before y shift pos: X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
                 Logging.log(" finger position = %2f ", intake.getFingerPosition());
 
+                sleep(500);
+                intake.fingerServoClose();
+                sleep(100);
                 Actions.runBlocking(
                         drive.actionBuilder(drive.pose)
                                 .strafeToLinearHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y + specimenShiftInch), initHeading)
@@ -488,7 +492,7 @@ public class TeleopRR extends LinearOpMode {
                 );
 
                 // adjust wall distance by distance sensor
-                adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF);
+                //adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF);
 
             }
 
@@ -658,6 +662,7 @@ public class TeleopRR extends LinearOpMode {
      */
     private void pickupFromWallActions() {
         intake.fingerServoOpen();
+        sleep(knuckleSleepTime);
         intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN_WALL);
         intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN_WALL);
         sleep(knuckleSleepTime);
