@@ -63,7 +63,7 @@ public class intakeUnit
 
     //finger
     final double FINGER_OPEN_SUB = 0.65;
-    final double FINGER_OPEN = 0.65;
+    final double FINGER_OPEN = 0.5;
     final double FINGER_CLOSE = 1.0; // must bigger than 0 for action builder working
     final double FINGER_OPEN_BACK = 0.53;
     final double FINGER_CLOSE_BACK = 0.1;
@@ -106,7 +106,7 @@ public class intakeUnit
     int ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN = -3150; // moving specimen left/right
 
     int ARM_POS_GRAB_SAMPLE = -500; // pickup sample during teleop
-    int ARM_POS_HIGH_CHAMBER = -3450;//-2967;//2490;
+    int ARM_POS_HIGH_CHAMBER = -3500;//-2967;//2490;
     int ARM_POS_HIGH_CHAMBER_TELEOP = ARM_POS_HIGH_CHAMBER;
     int ARM_POS_LOW_BUCKET = -1853;
     int ARM_POS_LEFT_PARKING = -500;

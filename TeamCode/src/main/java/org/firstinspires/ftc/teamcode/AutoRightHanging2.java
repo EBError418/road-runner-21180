@@ -205,7 +205,7 @@ public class AutoRightHanging2 extends LinearOpMode {
         double headingAngleCorrection = Math.toRadians(180.0 - 0.1);
 
         //wall positions
-        Vector2d specimenWallLineUp = new Vector2d(- 4.1 * Params.HALF_MAT, - 3.9 * Params.HALF_MAT);
+        Vector2d specimenWallLineUp = new Vector2d(- 4.0 * Params.HALF_MAT, - 3.9 * Params.HALF_MAT);
 
         List<Vector2d> pickUpSpecimen;
         pickUpSpecimen = Arrays.asList(pickUpSpecimenPos1, pickUpSpecimenPos2, pickUpSpecimenPos3);
@@ -354,7 +354,7 @@ public class AutoRightHanging2 extends LinearOpMode {
                     // using distance sensor to move robot to correct position for pickup specimen from wall
                     adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF);
                     // adjust wall pickup position.x according to distance sensor to speedup next pickup.
-                    //specimenWallLineUp = new Vector2d(drive.pose.position.x, - 4 * Params.HALF_MAT);
+                    specimenWallLineUp = new Vector2d(- 4.1 * Params.HALF_MAT, - 3.9 * Params.HALF_MAT);
                     //Logging.log(" After adjust of specimenWallLineUp: X position = %2f, Y position = %2f", specimenWallLineUp.x, specimenWallLineUp.y);
 
                     // start picking up actions

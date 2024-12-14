@@ -91,9 +91,9 @@ public class TeleopRR extends LinearOpMode {
     // avoid program crush when calling turnTo() function for fine heading correction
     double headingAngleCorrection = Math.toRadians(180.0 - 0.1);
 
-    Pose2d pickUpSpecimenWallPos = new Pose2d(- 4.2 * Params.HALF_MAT, - 4.0 * Params.HALF_MAT, initHeading);
+    Pose2d pickUpSpecimenWallPos = new Pose2d(- 4.1 * Params.HALF_MAT, - 4.0 * Params.HALF_MAT, initHeading);
 
-    Vector2d hangSpecimenPos = new Vector2d(- 3.3 * Params.HALF_MAT,  0.0); //shifts left for every specimen hanged
+    Vector2d hangSpecimenPos = new Vector2d(- 3.5 * Params.HALF_MAT,  0.0); //shifts left for every specimen hanged
     Vector2d clearHighChamberPos = new Vector2d(- 3.5 * Params.HALF_MAT, - 3.5 * Params.HALF_MAT);
     Vector2d clearHighChamberForHang = new Vector2d(-3.5 * Params.HALF_MAT, 3 * Params.HALF_MAT);
     Vector2d pickupSamplePos = new Vector2d(- Params.HALF_MAT, - 4 * Params.HALF_MAT);
@@ -101,6 +101,7 @@ public class TeleopRR extends LinearOpMode {
 
     int sleepTimeForHangingSpecimen = 500;
     int knuckleSleepTime = 150;
+    int sleepHighChamber = 400;
 
     @Override
     public void runOpMode() {
@@ -271,9 +272,12 @@ public class TeleopRR extends LinearOpMode {
                 intake.setWristPosition(intake.WRIST_BACK);
                 intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
                 sleep(sleepTimeForHangingSpecimen); // waiting for hanging success
+                intake.setFingerPosition(intake.FINGER_OPEN_SUB);
+                sleep(100);
 
                 // lift arm a little bit before moving left
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN);
+                intake.setKnucklePosition(intake.KNUCKLE_SIZE_CONSTRAINT);
             }
 
             // move to submarine after hanging specimens, gamepad1.b
@@ -281,17 +285,19 @@ public class TeleopRR extends LinearOpMode {
                 drive.pose = pickUpSpecimenWallPos;
                 intake.setFingerPosition(intake.FINGER_CLOSE);
                 sleep(150);
+                intake.setKnucklePosition(intake.KNUCKLE_POS_LIFT_FROM_WALL);
+                sleep(100); // wait knuckle lift the specimen
 
                 Actions.runBlocking(
                         drive.actionBuilder(drive.pose)
-                                .afterTime(0.4, new armReadyToHangHigh())
+                                .afterTime(0.6, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_BACK, intake.KNUCKLE_POS_LIFT_FROM_WALL, intake.FINGER_CLOSE))
                                 .strafeToLinearHeading(hangSpecimenPos, initHeading)
                                 .turnTo(headingAngleCorrection) // fine correction heading
                                 .build()
                 );
 
                 intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
-
+                sleep(sleepHighChamber);
                 adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
 
                 if (specimenCount <= specimenShiftMax) {
@@ -332,17 +338,19 @@ public class TeleopRR extends LinearOpMode {
             if (gpButtons.SpecimenHangToAscent) {
                 drive.pose = pickUpSpecimenWallPos;
                 intake.setFingerPosition(intake.FINGER_CLOSE);
-                sleep(100);
+                sleep(150);
+                intake.setKnucklePosition(intake.KNUCKLE_POS_LIFT_FROM_WALL);
+                sleep(100); // wait knuckle lift the specimen
 
                 Actions.runBlocking(
                         drive.actionBuilder(drive.pose)
-                                .afterTime(0.4, new armReadyToHangHigh())
+                                .afterTime(0.6, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_BACK, intake.KNUCKLE_POS_LIFT_FROM_WALL, intake.FINGER_CLOSE))
                                 .strafeToLinearHeading(hangSpecimenPos, initHeading)
                                 .turnTo(headingAngleCorrection) // fine correction heading
                                 .build()
                 );
                 intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
-
+                sleep(sleepHighChamber);
                 adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
 
                 if (specimenCount <= specimenShiftMax) {
@@ -391,8 +399,8 @@ public class TeleopRR extends LinearOpMode {
                                 .build()
                 );
 
-                intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
-
+                //intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
+                sleep(200);
                 adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
 
                 if (specimenCount <= specimenShiftMax) {
@@ -433,19 +441,22 @@ public class TeleopRR extends LinearOpMode {
                 // close finger
                 intake.setFingerPosition(intake.FINGER_CLOSE);
                 sleep(150);
-
                 intake.setKnucklePosition(intake.KNUCKLE_POS_LIFT_FROM_WALL);
+                sleep(100); // wait knuckle lift the specimen
 
+                // strafe to high chamber for hanging specimen
                 Actions.runBlocking(
                         drive.actionBuilder(drive.pose)
-                                .afterTime(0.4, new armReadyToHangHigh())
+                                // flip arm to high chamber position, back knuckle to avoid hitting chamber during strafing
+                                .afterTime(0.6, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_BACK, intake.KNUCKLE_POS_LIFT_FROM_WALL, intake.FINGER_CLOSE))
+                                // shift 1.5 inch for each specimen on high chamber
                                 .strafeToLinearHeading(hangSpecimenPos, initHeading)
                                 .turnTo(headingAngleCorrection) // fine correction heading
                                 .build()
                 );
-
                 intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
 
+                sleep(sleepHighChamber);
                 adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
 
                 if (specimenCount <= specimenShiftMax) {
@@ -466,9 +477,6 @@ public class TeleopRR extends LinearOpMode {
                 Logging.log(" before y shift pos: X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
                 Logging.log(" finger position = %2f ", intake.getFingerPosition());
 
-                sleep(500);
-                intake.fingerServoClose();
-                sleep(100);
                 Actions.runBlocking(
                         drive.actionBuilder(drive.pose)
                                 .strafeToLinearHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y + specimenShiftInch), initHeading)
@@ -501,17 +509,17 @@ public class TeleopRR extends LinearOpMode {
                 drive.pose = pickUpSpecimenWallPos;
                 intake.setFingerPosition(intake.FINGER_CLOSE);
                 sleep(150);
-
-                //intake.setArmPosition(intake.ARM_POS_BEFORE_HANG); // lift arm to during strafe to chambers
+                intake.setKnucklePosition(intake.KNUCKLE_POS_LIFT_FROM_WALL);
+                sleep(100); // wait knuckle lift the specimen
                 Actions.runBlocking(
                         drive.actionBuilder(drive.pose)
-                                .afterTime(0.4, new armReadyToHangHigh())
+                                .afterTime(0.6, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_BACK, intake.KNUCKLE_POS_LIFT_FROM_WALL, intake.FINGER_CLOSE))
                                 .strafeToLinearHeading(hangSpecimenPos, initHeading)
                                 .build()
                 );
 
                 intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
-
+                sleep(sleepHighChamber);
                 adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
             }
 
@@ -622,7 +630,7 @@ public class TeleopRR extends LinearOpMode {
             sleep(knuckleSleepTime);
             intake.setWristPosition(intake.WRIST_BACK);
             sleep(knuckleSleepTime);
-            intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER_READY);
+            intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
 
             return false;
         }
@@ -649,6 +657,52 @@ public class TeleopRR extends LinearOpMode {
             return false;
         }
     }
+
+    //action for arm, wrist, finger position control during driving
+
+    private class intakeAct implements Action {
+
+        /**
+         *
+         * @param armPos:  the target position for arm motor
+         * @param wristPos: wrist position
+         * @param knucklePos: knuckle position
+         * @param fingerPos: finger position
+         */
+        public intakeAct(int armPos, int wristPos, double knucklePos, double fingerPos) {
+            arm = armPos;
+            wrist = wristPos;
+            knuckle = knucklePos;
+            finger = fingerPos;
+        }
+
+        private final int arm;
+        private final int wrist;
+        private final double knuckle;
+        private final double finger;
+
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+
+            if (Params.NO_CATION != arm) {
+                intake.setArmPosition(arm);
+            }
+
+            if (Params.NO_CATION != wrist) {
+                intake.setWristPosition(wrist);
+            }
+
+            if (Params.NO_CATION != (int)(knuckle)){
+                intake.setKnucklePosition(knuckle);
+            }
+
+            if (Params.NO_CATION != (int)(finger)){
+                intake.setFingerPosition(finger);
+            }
+            return false;
+        }
+    }
+
 
     private void updateProfileAccel(boolean fastMode) {
         if (fastMode) {
