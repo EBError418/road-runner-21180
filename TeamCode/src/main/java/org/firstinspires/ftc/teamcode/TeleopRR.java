@@ -93,7 +93,7 @@ public class TeleopRR extends LinearOpMode {
 
     Pose2d pickUpSpecimenWallPos = new Pose2d(- 4.1 * Params.HALF_MAT, - 4.0 * Params.HALF_MAT, initHeading);
 
-    Vector2d hangSpecimenPos = new Vector2d(- 3.3 * Params.HALF_MAT,  0.0); //shifts left for every specimen hanged
+    Vector2d hangSpecimenPos = new Vector2d(- 3.4 * Params.HALF_MAT,  0.0); //shifts left for every specimen hanged
     Vector2d clearHighChamberPos = new Vector2d(- 3.5 * Params.HALF_MAT, - 3.5 * Params.HALF_MAT);
     Vector2d clearHighChamberForHang = new Vector2d(-3.5 * Params.HALF_MAT, 3 * Params.HALF_MAT);
     Vector2d pickupSamplePos = new Vector2d(- Params.HALF_MAT, - 4 * Params.HALF_MAT);
@@ -304,21 +304,11 @@ public class TeleopRR extends LinearOpMode {
                     specimenCount ++;//update specimen pos
                 }
 
-                Logging.log(" Adjust hanging position vector values according to current hanging.");
-                //hangSpecimenPos = new Vector2d(drive.pose.position.x,  specimenCount * specimenShiftEach);
-
-
                 // hanging specimen
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
                 intake.setWristPosition(intake.WRIST_BACK);
                 sleep(sleepTimeForHangingSpecimen);
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN);
-                sleep(200);
-                Actions.runBlocking(
-                        drive.actionBuilder(drive.pose)
-                                .strafeToLinearHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y + specimenShiftInch), initHeading)
-                                .build()
-                );
 
                 //go to submersible pick up pos
                 intake.fingerServoOpen();
@@ -357,20 +347,11 @@ public class TeleopRR extends LinearOpMode {
                     specimenCount ++;//update specimen pos
                 }
 
-                Logging.log(" Adjust hanging position vector values according to current hanging.");
-                //hangSpecimenPos = new Vector2d(drive.pose.position.x,  specimenCount * specimenShiftEach);
-
                 // hanging specimen
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
                 intake.setWristPosition(intake.WRIST_BACK);
                 sleep(sleepTimeForHangingSpecimen);
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN);
-                sleep(200);
-                Actions.runBlocking(
-                        drive.actionBuilder(drive.pose)
-                                .strafeToLinearHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y + specimenShiftInch), initHeading)
-                                .build()
-                );
 
                 //go to ascent level 2
                 intake.fingerServoOpen();
@@ -407,21 +388,11 @@ public class TeleopRR extends LinearOpMode {
                     specimenCount ++;//update specimen pos
                 }
 
-                Logging.log(" Adjust hanging position vector values according to current hanging.");
-                //hangSpecimenPos = new Vector2d(drive.pose.position.x,  specimenCount * specimenShiftEach);
-
                 // hanging specimen
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
                 intake.setWristPosition(intake.WRIST_BACK);
                 sleep(sleepTimeForHangingSpecimen);
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN);
-                sleep(200);
-                Actions.runBlocking(
-                        drive.actionBuilder(drive.pose)
-                                .strafeToLinearHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y + specimenShiftInch), initHeading)
-                                .turnTo(headingAngleCorrection) // fine correction heading
-                                .build()
-                );
 
                 //go to back
                 intake.fingerServoOpen();
@@ -463,25 +434,12 @@ public class TeleopRR extends LinearOpMode {
                     specimenCount ++;//update specimen pos
                 }
 
-                //adjust hanging place for next specimen: shift left 2 inches for each
-                Logging.log(" Adjust hanging position vector values according to current hanging.");
-                //hangSpecimenPos = new Vector2d(drive.pose.position.x,  specimenCount * specimenShiftEach);
-
                 // hanging specimen
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
 
                 sleep(sleepTimeForHangingSpecimen);
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN);
-                sleep(200);
-                Logging.log(" after hanging specimen specimenCount = %s", specimenCount);
-                Logging.log(" before y shift pos: X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
-                Logging.log(" finger position = %2f ", intake.getFingerPosition());
 
-                Actions.runBlocking(
-                        drive.actionBuilder(drive.pose)
-                                .strafeToLinearHeading(new Vector2d(drive.pose.position.x, drive.pose.position.y + specimenShiftInch), initHeading)
-                                .build()
-                );
                 Logging.log(" after y shift pos: X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
                 Logging.log(" finger position = %2f ", intake.getFingerPosition());
 

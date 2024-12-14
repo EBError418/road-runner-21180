@@ -52,7 +52,7 @@ public class Params {
 
     static int NO_CATION = 999999;
     //game field parameters
-    static final double HALF_MAT = 23.625/2.0;  // 60 cm
+    static final double HALF_MAT = 23.625/2.0;  // 60 cm. 11.8inch
 
     // robot size
     static final double CHASSIS_HALF_WIDTH = 13.5 / 2.0;
