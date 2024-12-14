@@ -547,7 +547,8 @@ public class AutoRightHanging2 extends LinearOpMode {
 
         double shiftDelta = sensorDist - aimDistance;
 
-        if (sensorDist > 300.0 ) {
+        // something wrong when reading distance sensor
+        if (sensorDist > 50.0 ) {
             shiftDelta = 3.0;
         }
 
@@ -555,7 +556,6 @@ public class AutoRightHanging2 extends LinearOpMode {
         {
             shiftDelta = -shiftDelta;
         }
-
         shiftDelta = Range.clip(shiftDelta, -10.0, 10.0); // limit adjust distance to +-10.0 inch
         Logging.log("drive pose before distance average number");
         Logging.log("before adjust, sensor distance = %2f, shift delta = %2f", sensorDist, shiftDelta);

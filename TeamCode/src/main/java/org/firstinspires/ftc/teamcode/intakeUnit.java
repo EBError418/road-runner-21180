@@ -72,9 +72,9 @@ public class intakeUnit
     final double KNUCKLE_MIN = 0.15;
     final double KNUCKLE_MAX = 0.9;
 
-    final double KNUCKLE_POS_AUTO_INIT = 0.16;
+    final double KNUCKLE_POS_AUTO_INIT = 0.155;
+    final double KNUCKLE_POS_LIFT_FROM_WALL = 0.16;
     final double KNUCKLE_POS_HIGH_CHAMBER_READY = 0.17;
-    final double KNUCKLE_POS_LIFT_FROM_WALL = 0.17;
     final double KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE = 0.19;
     final double KNUCKLE_POS_PICKUP_SPECIMEN_ready = 0.2;
     final double KNUCKLE_POS_WRIST_CONSTRAINT = 0.2;
@@ -84,7 +84,6 @@ public class intakeUnit
     final double KNUCKLE_POS_PICKUP_SPECIMEN = 0.358;
     final double KNUCKLE_POS_HIGH_CHAMBER = 0.358;
     final double KNUCKLE_POS_PICKUP_SAMPLE_READY = 0.408; // approaching submersible
-    final double KNUCKLE_POS_DROP_SAMPLE = 0.45;
     final double KNUCKLE_POS_PICKUP_SAMPLE_BACK = 0.52; // pickup sample during auto
     final double KNUCKLE_POS_LOW_BUCKET = 0.581;
     final double KNUCKLE_POS_PICKUP_SAMPLE = 0.73;

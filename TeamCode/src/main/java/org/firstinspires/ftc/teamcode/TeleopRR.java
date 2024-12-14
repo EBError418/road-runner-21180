@@ -471,6 +471,7 @@ public class TeleopRR extends LinearOpMode {
                                 .build()
                 );
                 Logging.log(" after y shift pos: X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
+                Logging.log(" finger position = %2f ", intake.getFingerPosition());
 
                 //return to wall to pickup next specimen
                 intake.fingerServoOpen();
@@ -487,7 +488,7 @@ public class TeleopRR extends LinearOpMode {
                 );
 
                 // adjust wall distance by distance sensor
-                //adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF);
+                adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF);
 
             }
 
