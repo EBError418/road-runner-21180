@@ -62,31 +62,31 @@ public class intakeUnit
     public Servo fingerServo = null;
 
     //finger
-    final double FINGER_OPEN_SUB = 0.65;
-    final double FINGER_OPEN = 0.5;
-    final double FINGER_CLOSE = 1.0; // must bigger than 0 for action builder working
-    final double FINGER_OPEN_BACK = 0.53;
-    final double FINGER_CLOSE_BACK = 0.1;
+    final double FINGER_OPEN_SUB = 0.5;
+    final double FINGER_OPEN = FINGER_OPEN_SUB;
+    final double FINGER_CLOSE = 0.85; // must bigger than 0 for action builder working
+    final double FINGER_OPEN_BACK = 0.4;
+    final double FINGER_CLOSE_BACK = 0.2;
 
     //knuckle
-    final double KNUCKLE_MIN = 0.15;
+    final double KNUCKLE_MIN = 0.11;
     final double KNUCKLE_MAX = 0.9;
 
-    final double KNUCKLE_POS_AUTO_INIT = 0.155;
-    final double KNUCKLE_POS_LIFT_FROM_WALL = 0.16;
-    final double KNUCKLE_POS_HIGH_CHAMBER_READY = 0.17;
-    final double KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE = 0.21;
-    final double KNUCKLE_POS_PICKUP_SPECIMEN_ready = 0.2;
-    final double KNUCKLE_POS_WRIST_CONSTRAINT = 0.35;
-    final double KNUCKLE_POS_HANGING = 0.20;// 0.17; // end game hanging
-    final double KNUCKLE_POS_PICKUP_SPECIMEN_WALL = 0.203;
-    final double KNUCKLE_SIZE_CONSTRAINT = 0.29;  // limit the maximum back reach to 20 inch
-    final double KNUCKLE_POS_PICKUP_SPECIMEN = 0.358;
-    final double KNUCKLE_POS_HIGH_CHAMBER = 0.358;
-    final double KNUCKLE_POS_PICKUP_SAMPLE_READY = 0.408; // approaching submersible
-    final double KNUCKLE_POS_PICKUP_SAMPLE_BACK = 0.52; // pickup sample during auto
-    final double KNUCKLE_POS_LOW_BUCKET = 0.581;
-    final double KNUCKLE_POS_PICKUP_SAMPLE = 0.73;
+    final double KNUCKLE_POS_AUTO_INIT = 0.15 - 0.03;
+    final double KNUCKLE_POS_LIFT_FROM_WALL = 0.16  - 0.03;
+    final double KNUCKLE_POS_HIGH_CHAMBER_READY = 0.17 - 0.03;
+    final double KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE = 0.21 - 0.03;
+    final double KNUCKLE_POS_PICKUP_SPECIMEN_ready = 0.2 - 0.03;
+    final double KNUCKLE_POS_WRIST_CONSTRAINT = 0.3;
+    final double KNUCKLE_POS_HANGING = 0.20  - 0.03; // end game hanging
+    final double KNUCKLE_POS_PICKUP_SPECIMEN_WALL = 0.203  - 0.03;
+    final double KNUCKLE_SIZE_CONSTRAINT = 0.25;  // limit the maximum back reach to 20 inch
+    final double KNUCKLE_POS_PICKUP_SPECIMEN = 0.358 - 0.03;
+    final double KNUCKLE_POS_HIGH_CHAMBER = 0.358 - 0.03;
+    final double KNUCKLE_POS_PICKUP_SAMPLE_READY = 0.408 - 0.03; // approaching submersible
+    final double KNUCKLE_POS_PICKUP_SAMPLE_BACK = 0.52 - 0.03; // pickup sample during auto
+    final double KNUCKLE_POS_LOW_BUCKET = 0.581 - 0.03;
+    final double KNUCKLE_POS_PICKUP_SAMPLE = 0.73 - 0.03;
 
 
     //new stuff: wrist
