@@ -98,7 +98,7 @@ public class intakeUnit
 
     //arm
     int ARM_MIN = -3870;
-    int ARM_MAX = 0;
+    int ARM_MAX = 100;
     int ARM_INIT = -3860;
     int ARM_POS_GRAB_SAMPLE_BACK = -3860;
     int ARM_POS_DROP_SAMPLE = -650; // drop off sample during during auto. Need adjust to make sure fingers do not touch ground.
@@ -116,7 +116,7 @@ public class intakeUnit
     int ARM_POS_GRAB_SPECIMEN = -185; //-240;
     int ARM_POS_GRAB_SPECIMEN_READY = -400;
     int ARM_POS_SUB = -500;
-    int ARM_POS_DOWN_HANGING = 0;
+    int ARM_POS_DOWN_HANGING = 100;
     int ARM_POS_GRAB_SPECIMEN_WALL = -375;
     int ARM_POS_OBZ_PARKING = -100;
 

@@ -191,7 +191,7 @@ public class AutoRightHanging2 extends LinearOpMode {
 
         //grab
         Vector2d firstSamplePosition = new Vector2d(- 3.2 * Params.HALF_MAT, - 4.1 * Params.HALF_MAT);
-        Vector2d secondSamplePosition = new Vector2d(- 3.2 * Params.HALF_MAT, firstSamplePosition.y - 10.5);
+        Vector2d secondSamplePosition = new Vector2d(- 3.2 * Params.HALF_MAT - 1, firstSamplePosition.y - 10.5);
         Vector2d dropSamplePosition = new Vector2d(secondSamplePosition.x - 7.0, firstSamplePosition.y - 10.5); // move to obz
 
         Vector2d obsZone = new Vector2d(- 4.3 * Params.HALF_MAT, - 3.5 * Params.HALF_MAT);
@@ -205,7 +205,7 @@ public class AutoRightHanging2 extends LinearOpMode {
         double headingAngleCorrection = Math.toRadians(180.0 - 0.1);
 
         //wall positions
-        Vector2d specimenWallLineUp = new Vector2d(- 4.0 * Params.HALF_MAT, - 3.9 * Params.HALF_MAT);
+        Vector2d specimenWallLineUp = new Vector2d(- 3.75 * Params.HALF_MAT, - 3.8 * Params.HALF_MAT);
 
         List<Vector2d> pickUpSpecimen;
         pickUpSpecimen = Arrays.asList(pickUpSpecimenPos1, pickUpSpecimenPos2, pickUpSpecimenPos3);
@@ -396,8 +396,8 @@ public class AutoRightHanging2 extends LinearOpMode {
             // parking
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
-                            .afterTime(0.3, new intakeAct(intake.ARM_POS_OBZ_PARKING, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_POS_LIFT_FROM_WALL, intake.FINGER_CLOSE))
-                            .strafeToLinearHeading(obsZone, Math.toRadians(-120))
+                            .afterTime(0.2, new intakeAct(intake.ARM_POS_OBZ_PARKING, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_POS_LIFT_FROM_WALL, intake.FINGER_CLOSE))
+                            .strafeToLinearHeading(obsZone, Math.toRadians(-130))
                             .build()
             );
             intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);

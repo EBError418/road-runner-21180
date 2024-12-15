@@ -91,7 +91,8 @@ public class TeleopRR extends LinearOpMode {
     // avoid program crush when calling turnTo() function for fine heading correction
     double headingAngleCorrection = Math.toRadians(180.0 - 0.1);
 
-    Pose2d pickUpSpecimenWallPos = new Pose2d(- 4.1 * Params.HALF_MAT, - 4.0 * Params.HALF_MAT, initHeading);
+    Pose2d pickUpSpecimenWallPos = new Pose2d(- 3.6 * Params.HALF_MAT, - 4.0 * Params.HALF_MAT, initHeading);
+    Pose2d specimenLineUpPos = new Pose2d(- 3.4 * Params.HALF_MAT, - 4.0 * Params.HALF_MAT, initHeading);
 
     Vector2d hangSpecimenPos = new Vector2d(- 3.4 * Params.HALF_MAT,  0.0); //shifts left for every specimen hanged
     Vector2d clearHighChamberPos = new Vector2d(- 3.5 * Params.HALF_MAT, - 3.5 * Params.HALF_MAT);
@@ -297,6 +298,9 @@ public class TeleopRR extends LinearOpMode {
                 );
 
                 intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
+                intake.setKnucklePosition(intake.getKnucklePosition() + 0.01);//reset position after collision
+                intake.setFingerPosition(intake.getFingerPosition() - 0.01);//reset position after collision
+
                 sleep(sleepHighChamber);
                 adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
 
@@ -306,9 +310,13 @@ public class TeleopRR extends LinearOpMode {
 
                 // hanging specimen
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
-                intake.setWristPosition(intake.WRIST_BACK);
+
                 sleep(sleepTimeForHangingSpecimen);
+
+                intake.setKnucklePosition(intake.getKnucklePosition() + 0.01);//reset position after collision
+
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN);
+
 
                 //go to submersible pick up pos
                 intake.fingerServoOpen();
@@ -340,6 +348,9 @@ public class TeleopRR extends LinearOpMode {
                                 .build()
                 );
                 intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
+                intake.setKnucklePosition(intake.getKnucklePosition() + 0.01);//reset position after collision
+                intake.setFingerPosition(intake.getFingerPosition() - 0.01);//reset position after collision
+
                 sleep(sleepHighChamber);
                 adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
 
@@ -349,8 +360,11 @@ public class TeleopRR extends LinearOpMode {
 
                 // hanging specimen
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
-                intake.setWristPosition(intake.WRIST_BACK);
+
                 sleep(sleepTimeForHangingSpecimen);
+
+                intake.setKnucklePosition(intake.getKnucklePosition() + 0.01);//reset position after collision
+
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN);
 
                 //go to ascent level 2
@@ -381,7 +395,10 @@ public class TeleopRR extends LinearOpMode {
                 );
 
                 //intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
-                sleep(200);
+                intake.setKnucklePosition(intake.getKnucklePosition() + 0.01);//reset position after collision
+                intake.setFingerPosition(intake.getFingerPosition() - 0.01);//reset position after collision
+
+                sleep(sleepHighChamber);
                 adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
 
                 if (specimenCount <= specimenShiftMax) {
@@ -390,8 +407,11 @@ public class TeleopRR extends LinearOpMode {
 
                 // hanging specimen
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
-                intake.setWristPosition(intake.WRIST_BACK);
+
                 sleep(sleepTimeForHangingSpecimen);
+
+                intake.setKnucklePosition(intake.getKnucklePosition() + 0.01);//reset position after collision
+
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN);
 
                 //go to back
@@ -427,6 +447,9 @@ public class TeleopRR extends LinearOpMode {
                 );
                 intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
 
+                intake.setKnucklePosition(intake.getKnucklePosition() + 0.01);//reset position after collision
+                intake.setFingerPosition(intake.getFingerPosition() - 0.01);//reset position after collision
+
                 sleep(sleepHighChamber);
                 adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
 
@@ -438,6 +461,9 @@ public class TeleopRR extends LinearOpMode {
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
 
                 sleep(sleepTimeForHangingSpecimen);
+
+                intake.setKnucklePosition(intake.getKnucklePosition() + 0.01);//reset position after collision
+
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN);
 
                 Logging.log(" after y shift pos: X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
@@ -451,8 +477,8 @@ public class TeleopRR extends LinearOpMode {
                         drive.actionBuilder(drive.pose)
                                 .afterTime(0.15, new armToPickUpWallPos())
                                 // left high chamber
-                                .strafeTo(new Vector2d(drive.pose.position.x - 10, drive.pose.position.y))
-                                .strafeToLinearHeading(pickUpSpecimenWallPos.position, initHeading)
+                                .strafeTo(new Vector2d(drive.pose.position.x - 1, drive.pose.position.y))
+                                .strafeToLinearHeading(specimenLineUpPos.position, initHeading)
                                 .turnTo(headingAngleCorrection) // fine correction heading
                                 .build()
                 );
