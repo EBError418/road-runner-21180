@@ -92,7 +92,7 @@ public class TeleopRR extends LinearOpMode {
     double headingAngleCorrection = Math.toRadians(180.0 - 0.1);
 
     Pose2d pickUpSpecimenWallPos = new Pose2d(- 3.6 * Params.HALF_MAT, - 4.0 * Params.HALF_MAT, initHeading);
-    Pose2d specimenLineUpPos = new Pose2d(- 3.4 * Params.HALF_MAT, - 4.0 * Params.HALF_MAT, initHeading);
+    Pose2d specimenLineUpPos = new Pose2d(- 3.3 * Params.HALF_MAT, - 4.0 * Params.HALF_MAT, initHeading);
 
     Vector2d hangSpecimenPos = new Vector2d(- 3.4 * Params.HALF_MAT,  0.0); //shifts left for every specimen hanged
     Vector2d clearHighChamberPos = new Vector2d(- 3.5 * Params.HALF_MAT, - 3.5 * Params.HALF_MAT);
