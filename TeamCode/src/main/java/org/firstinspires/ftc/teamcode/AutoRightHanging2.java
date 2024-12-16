@@ -74,8 +74,8 @@ import java.util.List;
  *          "Webcam 1"
  */
 
-@Autonomous(name=" B - specimens from floor", group="Concept")
-@Disabled
+@Autonomous(name=" A - 4 specimens", group="Concept")
+//@Disabled
 public class AutoRightHanging2 extends LinearOpMode {
     /**
      * Robot Start location: "1" - right side; "-1" - left side.
@@ -86,11 +86,6 @@ public class AutoRightHanging2 extends LinearOpMode {
     private final ElapsedTime runtime = new ElapsedTime();
     private intakeUnit intake;
     private MecanumDrive drive;
-    public boolean floorOrWall;// toggle between using floor or wall to pickup specimen
-
-    public void setFloor() {
-        floorOrWall = true;
-    }
 
     Pose2d newStartPose;
 
@@ -113,7 +108,6 @@ public class AutoRightHanging2 extends LinearOpMode {
         Logging.log("Status - Initialized");
 
         setStartPoses(leftOrRight);
-        setFloor();
 
         // init drive with road runner
         drive = new MecanumDrive(hardwareMap, newStartPose);
@@ -256,7 +250,7 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .build()
             );
             intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SAMPLE_BACK);
-            sleep((floorOrWall)? 500 : 550); // waiting arm reaching position to drop off first sample.
+            sleep(500); // waiting arm reaching position to drop off first sample.
             intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE_BACK);
             intake.setWristPosition(intake.WRIST_BACK);
             intake.fingerServoOpen();
@@ -278,119 +272,68 @@ public class AutoRightHanging2 extends LinearOpMode {
             sleep(150); // wait finger close to grab second sample
             intake.setKnucklePosition(intake.KNUCKLE_SIZE_CONSTRAINT); // flip knuckle before lift arm due to size limitation
             sleep(150);
-            if (floorOrWall) { // stand still during arm flip to drop off second sample for floor case
-                intake.setArmPosition(intake.ARM_POS_DROP_SAMPLE); // flip arm to grab specimen position before drop off second sample
-                intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
-                sleep(850); // wait arm flip front to drop off
-                intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SAMPLE_BACK);
-                sleep(1000);
-                intake.fingerServoOpen(); // drop off sample
-            } else { // moving during arm flip for wall case, starting flip arm here
-                intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN_WALL); // flip arm to grab specimen position before drop off second sample
-                intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
-                sleep(850);
-                intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN_WALL);
-                // waiting arm flip to front to drop off second specimen
-                sleep(150);
-            }
+           // moving during arm flip for wall case, starting flip arm here
+            intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN_WALL); // flip arm to grab specimen position before drop off second sample
+            intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
+            sleep(850);
+            intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN_WALL);
+            // waiting arm flip to front to drop off second specimen
+            sleep(150);
 
             Logging.log("after 2nd sample drop heading: %2f", Math.toDegrees(drive.pose.heading.log()));
 
+            // pick up specimen from wall
+            //loop to hang specimen
+            for (int j = 1; j < 4; j++) {
 
-            if (floorOrWall){
-                intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN);
-                intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
-                intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN_ready);
+                Logging.log(" Start moving to wall to pickup # %s specimen. ", j);
 
-                //loop for hanging specimen
-                int j = 0;
-                for (Vector2d specimenPos : pickUpSpecimen) {
-                    j++;
-                    Logging.log("Move to pickup specimen # %s from Obz.", j);
+                Actions.runBlocking(
+                        drive.actionBuilder(drive.pose)
+                                .afterTime(0.1, new intakeAct(intake.ARM_POS_GRAB_SPECIMEN_WALL, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_POS_PICKUP_SPECIMEN_WALL, Params.NO_CATION))
+                                .strafeToLinearHeading(specimenWallLineUp, newStartPose.heading) // line up
+                                // drop off second sample
+                                .turnTo(headingAngleCorrection) // fine correct heading
+                                .build()
+                );
+                intake.fingerServoOpen();
+                // using distance sensor to move robot to correct position for pickup specimen from wall
+                adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF);
+                // adjust wall pickup position.x according to distance sensor to speedup next pickup.
+                specimenWallLineUp = new Vector2d(-3.9 * Params.HALF_MAT, -3.9 * Params.HALF_MAT);
+                //Logging.log(" After adjust of specimenWallLineUp: X position = %2f, Y position = %2f", specimenWallLineUp.x, specimenWallLineUp.y);
 
-                    //pickup specimen
-                    Actions.runBlocking(
-                            drive.actionBuilder(drive.pose)
-                                    .afterTime(0.6, new intakeAct(intake.ARM_POS_GRAB_SPECIMEN, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_POS_PICKUP_SPECIMEN_ready, intake.FINGER_OPEN))
-                                    .strafeToLinearHeading(specimenPos, newStartPose.heading)
-                                    .turnTo(headingAngleCorrection)
-                                    .afterTime(0.001, new logPos()) // log drive position when pickup specimen
-                                    .afterTime(0.01, new intakeAct(intake.ARM_POS_GRAB_SPECIMEN, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_POS_PICKUP_SPECIMEN, intake.FINGER_OPEN))
-                                    .afterTime(0.4, new fingerCloseEnRouteAct())//grab specimen
-                                    .afterTime(0.6, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_BACK, intake.KNUCKLE_POS_HIGH_CHAMBER - 0.2, intake.FINGER_CLOSE)) //specimen will hit submersible
-                                    .waitSeconds(1.1)
-                                    .afterTime(1.4, new armToReadyHangAct())//get arm in position ready for hanging specimen
-                                    .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x, hangSpecimenPos.y - 1.2 * j), newStartPose.heading) // shift 1.2 inch for each specimen on high chamber
-                                    .turnTo(headingAngleCorrection)
-                                    .build()
-                    );
+                // start picking up actions
+                intake.fingerServoClose();
+                sleep(150); // waiting finger close
+                intake.setKnucklePosition(intake.KNUCKLE_POS_LIFT_FROM_WALL);
+                sleep(100); // wait knuckle lift the specimen
 
-                    //adjust to sensor dist
-                    adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorB);
+                Logging.log(" Start moving to high chamber to hang # %s specimen. ", j);
+                // strafe to high chamber for hanging specimen
+                Actions.runBlocking(
+                        drive.actionBuilder(drive.pose)
+                                // flip arm to high chamber position, back knuckle to avoid hitting chamber during strafing
+                                .afterTime(0.6, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_BACK, intake.KNUCKLE_POS_LIFT_FROM_WALL, intake.FINGER_CLOSE))
+                                // shift 1.5 inch for each specimen on high chamber
+                                .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x, hangSpecimenPos.y - 1.2 * j), newStartPose.heading)
+                                .turnTo(headingAngleCorrection) // fine correct heading
+                                .build()
+                );
 
-                    //put specimen on high chamber
-                    intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
-                    sleep(350);
+                // get knuckle ready for hanging
+                intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
 
-                    //release specimen and lower arm to clear high chamber
-                    intake.setFingerPosition(intake.FINGER_OPEN);
-                    intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN);
-                    intake.setKnucklePosition(intake.KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE);//move knuckle back a bit as it will hit the submersible during moving
-                    sleep(200);
-                }
-            } else { // pick up specimen from wall
-                //loop to hang specimen
-                for (int j = 1; j < 4; j++){
+                //adjust pos using distance sensor
+                adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorB);
 
-                    Logging.log(" Start moving to wall to pickup # %s specimen. ", j);
-
-                    Actions.runBlocking(
-                            drive.actionBuilder(drive.pose)
-                                    .afterTime(0.1, new intakeAct(intake.ARM_POS_GRAB_SPECIMEN_WALL, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_POS_PICKUP_SPECIMEN_WALL, Params.NO_CATION))
-                                    .strafeToLinearHeading(specimenWallLineUp, newStartPose.heading) // line up
-                                    // drop off second sample
-                                    .turnTo(headingAngleCorrection) // fine correct heading
-                                    .build()
-                    );
-                    intake.fingerServoOpen();
-                    // using distance sensor to move robot to correct position for pickup specimen from wall
-                    adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF);
-                    // adjust wall pickup position.x according to distance sensor to speedup next pickup.
-                    specimenWallLineUp = new Vector2d(- 3.9 * Params.HALF_MAT, - 3.9 * Params.HALF_MAT);
-                    //Logging.log(" After adjust of specimenWallLineUp: X position = %2f, Y position = %2f", specimenWallLineUp.x, specimenWallLineUp.y);
-
-                    // start picking up actions
-                    intake.fingerServoClose();
-                    sleep(150); // waiting finger close
-                    intake.setKnucklePosition(intake.KNUCKLE_POS_LIFT_FROM_WALL);
-                    sleep(100); // wait knuckle lift the specimen
-
-                    Logging.log(" Start moving to high chamber to hang # %s specimen. ", j);
-                    // strafe to high chamber for hanging specimen
-                    Actions.runBlocking(
-                            drive.actionBuilder(drive.pose)
-                                    // flip arm to high chamber position, back knuckle to avoid hitting chamber during strafing
-                                    .afterTime(0.6, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_BACK, intake.KNUCKLE_POS_LIFT_FROM_WALL, intake.FINGER_CLOSE))
-                                    // shift 1.5 inch for each specimen on high chamber
-                                    .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x, hangSpecimenPos.y -1.2 * j), newStartPose.heading)
-                                    .turnTo(headingAngleCorrection) // fine correct heading
-                                    .build()
-                    );
-
-                    // get knuckle ready for hanging
-                    intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
-
-                    //adjust pos using distance sensor
-                    adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorB);
-
-                    //hang specimen
-                    intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
-                    sleep(400);
-                    intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN);
-                    intake.fingerServoOpen(); // release specimen
-                    intake.setKnucklePosition(intake.KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE);
-                    sleep(200);
-                }
+                //hang specimen
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
+                sleep(400);
+                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN);
+                intake.fingerServoOpen(); // release specimen
+                intake.setKnucklePosition(intake.KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE);
+                sleep(200);
             }
 
             Logging.log("hanging specimen complete, start parking");
