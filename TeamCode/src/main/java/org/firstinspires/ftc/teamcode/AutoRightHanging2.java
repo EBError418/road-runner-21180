@@ -80,7 +80,10 @@ public class AutoRightHanging2 extends LinearOpMode {
     /**
      * Robot Start location: "1" - right side; "-1" - left side.
      */
-    public int leftOrRight = 1;
+    public int leftOrRight = 1; // -1: left; 1: right
+    public int sleepTimeForHangingSpecimen = 500;
+    public int knuckleSleepTime = 150;
+    public int sleepHighChamber = 2;
 
     // Declare OpMode members.
     private final ElapsedTime runtime = new ElapsedTime();
@@ -241,7 +244,8 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .afterTime(1.6, new armToPickUpPos()) // lower arm during spline moving
                             .strafeToLinearHeading(firstSamplePosition, newStartPose.heading)//go to first sample position
                             .turnTo(headingAngleCorrection) // fine adjust heading
-                            .afterTime(0.25, new fingerCloseEnRouteAct())//grab first sample
+                            .afterTime(0.25, new intakeAct(intake.FINGER_CLOSE))//grab first sample
+                            // flip arm after 150 ms when finger closed.
                             .afterTime(0.4, new intakeAct(intake.ARM_POS_DROP_SAMPLE, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_SIZE_CONSTRAINT, intake.FINGER_CLOSE))//go back for drop sample
                             .waitSeconds(0.4) // wait finger close before moving to second sample
                             .strafeToLinearHeading(secondSamplePosition, newStartPose.heading)//go to second sample position
@@ -349,7 +353,7 @@ public class AutoRightHanging2 extends LinearOpMode {
         }
     }
 
-    //action for arm flip to hang
+    //action for arm flip to hang specimen on high chamber
     private class armToReadyHangAct implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
@@ -360,7 +364,7 @@ public class AutoRightHanging2 extends LinearOpMode {
         }
     }
 
-    //action for arm to pick up neutral sample
+    //action for arm to pick up neutral sample during auto
     private class armToPickUpPos implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
@@ -369,46 +373,6 @@ public class AutoRightHanging2 extends LinearOpMode {
             intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE_BACK);
             intake.setWristPosition(intake.WRIST_BACK);
             intake.setFingerPosition(intake.FINGER_OPEN);
-            return false;
-        }
-    }
-
-
-    private class fingerOpenEnRouteAct implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            intake.setFingerPosition(intake.FINGER_OPEN);
-            return false;
-        }
-    }
-
-    private class fingerCloseEnRouteAct implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            intake.setFingerPosition(intake.FINGER_CLOSE);
-            return false;
-        }
-    }
-
-    //action for arm to pick up specimen
-    private class armToPickupSpecimen implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN);
-            intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
-            return false;
-        }
-    }
-
-    // adjust distance to wall before pickup specimen
-    private class adjustACT implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            double distanceS = distSensorF.getDistance(DistanceUnit.INCH);
-            Logging.log("pickup sample distance = %2f inch", distanceS);
-
-            // adjust only when distance sensor detect the sample
-            adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF);
             return false;
         }
     }
@@ -423,9 +387,7 @@ public class AutoRightHanging2 extends LinearOpMode {
     }
 
     //action for arm, wrist, finger position control during driving
-
-    private class intakeAct implements Action {
-
+    class intakeAct implements Action {
         /**
          *
          * @param armPos:  the target position for arm motor
@@ -440,10 +402,20 @@ public class AutoRightHanging2 extends LinearOpMode {
             finger = fingerPos;
         }
 
-        private final int arm;
-        private final int wrist;
-        private final double knuckle;
-        private final double finger;
+        // moving arm only with input a integer value.
+        public intakeAct(int armPos) {
+            arm = armPos;
+        }
+
+        // moving finger only with a double value.
+        public intakeAct(double fingerPos) {
+            finger = fingerPos;
+        }
+
+        private int arm = Params.NO_CATION;
+        private int wrist = Params.NO_CATION;
+        private double knuckle = Params.NO_CATION;
+        private double finger = Params.NO_CATION;
 
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
@@ -467,17 +439,17 @@ public class AutoRightHanging2 extends LinearOpMode {
         }
     }
 
-    private void updateProfileAccel(boolean slowMode) {
-        if (slowMode) {
-            MecanumDrive.PARAMS.minProfileAccel = -25;
-            MecanumDrive.PARAMS.maxProfileAccel = 40;
-        } else {
-            MecanumDrive.PARAMS.minProfileAccel = -35;
-            MecanumDrive.PARAMS.maxProfileAccel = 60;
+    //action to set arm and wrist position to pick up from sub
+    class armToPickUpWallPos implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            pickupFromWallActions();
+
+            return false;
         }
     }
 
-    private void adjustPosByDistanceSensor(double aimDistance, DistanceSensor distSensorID) {
+    void adjustPosByDistanceSensor(double aimDistance, DistanceSensor distSensorID) {
         double sensorDist = 0.0;
         int repeatTimes = 5;
 
@@ -521,51 +493,26 @@ public class AutoRightHanging2 extends LinearOpMode {
         }
     }
 
-    // strafe robot left or right to detect specimen by distance sensor.
-    private void strafeToSpecimenPickup(double strafePower, int direction) { //direction: 1 for right, -1 for left
-        double sensorDist = 0.0;
-        double robotPosY = drive.pose.position.y;
-
-        sensorDist = distSensorB.getDistance(DistanceUnit.INCH);
-
-        // continue strafing when sensor does not detect specimen and moving distance less than 6 inch
-        while ((sensorDist > 24) /*&& (Math.abs(drive.pose.position.y - robotPosY) < 4.0)*/)
-        {
-            // give power to strafe left/right
-            drive.setDrivePowers(new PoseVelocity2d(
-                    new Vector2d(
-                            0.0,
-                            direction * strafePower // set strafe power and strafe direction
-                    ),
-                    0.0
-            ));
-            sensorDist = distSensorB.getDistance(DistanceUnit.INCH);
-            Logging.log("distance sensor reading number = %2f", sensorDist);
-            telemetry.addData("distance sensor reading number = %2f", sensorDist);
-        }
-        telemetry.addData("Specimen located! Dist sensor distance: %2f", sensorDist);
-        Logging.log("Specimen located! Dist sensor distance: %2f", sensorDist);
-
-        // stop robot while sensor detect the specimen
-        drive.setDrivePowers(new PoseVelocity2d(
-                new Vector2d(
-                        0.0,
-                        0.0
-                ),
-                0.0
-        ));
-
-        Logging.log("drive pose after strafe.");
-        Logging.log(" X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
-
-        //adjust y position
-        //adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorB);
-        double shiftDelta = sensorDist - Params.SPECIMEN_PICKUP_DIST;
-        shiftDelta = Range.clip(shiftDelta, -7.0, 7.0); // limit adjust distance to +-7.0 inch
-        Logging.log("before adjust, sensor distance = %2f, shift delta = %2f", sensorDist, shiftDelta);
-        Logging.log(" X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
-
-        Logging.log("after adjust, sensor distance = %2f ", distSensorB.getDistance(DistanceUnit.INCH));
+    /**
+     * Set intake positions for picking up specimen from wall
+     */
+    void pickupFromWallActions() {
+        intake.fingerServoOpen();
+        sleep(knuckleSleepTime);
+        intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN_WALL);
+        intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN_WALL);
+        sleep(knuckleSleepTime);
+        sleep(knuckleSleepTime); // double sleep time since we have enough spare time here
+        intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
     }
 
+    void updateProfileAccel(boolean slowMode) {
+        if (slowMode) {
+            MecanumDrive.PARAMS.minProfileAccel = -25;
+            MecanumDrive.PARAMS.maxProfileAccel = 40;
+        } else {
+            MecanumDrive.PARAMS.minProfileAccel = -40;
+            MecanumDrive.PARAMS.maxProfileAccel = 60;
+        }
+    }
 }

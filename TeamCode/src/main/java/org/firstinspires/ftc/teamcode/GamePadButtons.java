@@ -72,9 +72,7 @@ public class GamePadButtons {
 
     public boolean SpecimenHangAlign;
     public boolean SpecimenHangAction;
-    public boolean SpecimenHangToSub;
-    public boolean SpecimenHangToAscent;
-    public boolean SpecimenHangToBack;
+    public boolean quitCycle;
 
     //public boolean SubPickupPos;
     public boolean PickupSampleIntakePos;
@@ -132,9 +130,7 @@ public class GamePadButtons {
 
         //alternative after hanging procedures
         SpecimenCycleWall = gamepad1.y;
-        SpecimenHangToSub = gamepad1.b;
-        SpecimenHangToAscent = gamepad1.x;
-        SpecimenHangToBack = gamepad1.a;
+        quitCycle = gamepad1.x;
 
         PickupSampleIntakePos =  gamepad2.right_bumper;
 
