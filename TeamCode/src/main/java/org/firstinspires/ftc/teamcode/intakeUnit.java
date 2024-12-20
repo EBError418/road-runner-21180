@@ -73,8 +73,7 @@ public class intakeUnit
     final double KNUCKLE_MAX = 0.9;
 
     final double KNUCKLE_POS_AUTO_INIT = 0.15 - 0.03;
-    final double KNUCKLE_POS_LIFT_FROM_WALL = 0.16  - 0.03;
-    final double KNUCKLE_POS_HIGH_CHAMBER_READY = 0.17 - 0.03;
+    final double KNUCKLE_POS_LIFT_FROM_WALL = 0.15  - 0.03;
     final double KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE = 0.21 - 0.03;
     final double KNUCKLE_POS_PICKUP_SPECIMEN_ready = 0.2 - 0.03;
     final double KNUCKLE_POS_WRIST_CONSTRAINT = 0.3;
