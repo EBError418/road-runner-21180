@@ -38,20 +38,19 @@ import androidx.annotation.NonNull;
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -83,12 +82,18 @@ public class AutoRightHanging2 extends LinearOpMode {
     public int leftOrRight = 1; // -1: left; 1: right
     public int sleepTimeForHangingSpecimen = 500;
     public int knuckleSleepTime = 150;
-    public int sleepHighChamber = 2;
+    // avoid program crush when calling turnTo() function for fine heading correction
+    double headingAngleCorrection = Math.toRadians(180.0 - 0.1);
+    Vector2d hangSpecimenPos;
+
+    //wall positions
+    Vector2d pickupSpecimenLineup = new Vector2d(Params.pickupSpecimenLineupX, - 3.8 * Params.HALF_MAT);
 
     // Declare OpMode members.
     private final ElapsedTime runtime = new ElapsedTime();
     private intakeUnit intake;
     private MecanumDrive drive;
+    public IMU imu;
 
     Pose2d newStartPose;
 
@@ -114,6 +119,13 @@ public class AutoRightHanging2 extends LinearOpMode {
 
         // init drive with road runner
         drive = new MecanumDrive(hardwareMap, newStartPose);
+
+        // reset imu at the beginning of autonomous
+        imu = drive.lazyImu.get();
+        imu.resetYaw();
+        double imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
+        telemetry.addData("Status", " IMU heading = %2f", imu_heading + 180.0);
+
         Params.startPose = newStartPose; // init storage pose.
         Params.currentPose = newStartPose;; // init storage pose
 
@@ -193,14 +205,6 @@ public class AutoRightHanging2 extends LinearOpMode {
         Vector2d secondSamplePosition = new Vector2d(- 3.2 * Params.HALF_MAT - 1, firstSamplePosition.y - 10.5);
 
         Vector2d obsZone = new Vector2d(- 4.3 * Params.HALF_MAT, - 3.5 * Params.HALF_MAT);
-        Vector2d hangSpecimenPos;
-
-        // avoid program crush when calling turnTo() function for fine heading correction
-        double headingAngleCorrection = Math.toRadians(180.0 - 0.1);
-
-        //wall positions
-        Vector2d specimenWallLineUp = new Vector2d(Params.pickupSpecimenLineupX, - 3.8 * Params.HALF_MAT);
-
 
         if (leftOrRight == 1) { // right side auto
             //Go to position for arm flip and hang on high chamber
@@ -217,8 +221,8 @@ public class AutoRightHanging2 extends LinearOpMode {
 
             // Adjust hanging specimen position.x according to the preload specimen hanging position
             // after adjusted by distance sensor
-            hangSpecimenPos = new Vector2d(drive.pose.position.x, firstHighChamberPos.y);
             Params.hangingSpecimenX = drive.pose.position.x; // restore hang position for teleop.
+            hangSpecimenPos = new Vector2d(Params.hangingSpecimenX, firstHighChamberPos.y);
             Logging.log("Distance sensor reading for hanging preload specimen: %2f", distSensorB.getDistance(DistanceUnit.INCH));
             Logging.log(" hangSpecimenPos: X position = %2f, Y position = %2f", hangSpecimenPos.x, hangSpecimenPos.y);
 
@@ -290,8 +294,7 @@ public class AutoRightHanging2 extends LinearOpMode {
                 Actions.runBlocking(
                         drive.actionBuilder(drive.pose)
                                 .afterTime(0.1, new intakeAct(intake.ARM_POS_GRAB_SPECIMEN_WALL, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_POS_PICKUP_SPECIMEN_WALL, Params.NO_CATION))
-                                .strafeToLinearHeading(specimenWallLineUp, newStartPose.heading) // line up
-                                // drop off second sample
+                                .strafeToLinearHeading(pickupSpecimenLineup, newStartPose.heading) // line up
                                 .turnTo(headingAngleCorrection) // fine correct heading
                                 .build()
                 );
@@ -302,8 +305,8 @@ public class AutoRightHanging2 extends LinearOpMode {
                     Params.pickupSpecimenX = drive.pose.position.x; // restore X position for teleop.
                     Params.pickupSpecimenLineupX = drive.pose.position.x + 2.5; // leave 2.5 inch gap to avoid hitting the specimen
                     // adjust wall pickup position.x according to distance sensor to speedup next pickup.
-                    specimenWallLineUp = new Vector2d(Params.pickupSpecimenLineupX, -3.8 * Params.HALF_MAT);
-                    Logging.log(" After adjust of specimenWallLineUp: X position = %2f, Y position = %2f", specimenWallLineUp.x, specimenWallLineUp.y);
+                    pickupSpecimenLineup = new Vector2d(Params.pickupSpecimenLineupX, -3.8 * Params.HALF_MAT);
+                    Logging.log(" After adjust of pickupSpecimenLineup: X position = %2f, Y position = %2f", pickupSpecimenLineup.x, pickupSpecimenLineup.y);
                 }
                 // start picking up actions
                 intake.fingerServoClose();

@@ -25,22 +25,17 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import androidx.annotation.NonNull;
-
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.util.ElapsedTime;
-import com.qualcomm.robotcore.util.Range;
 
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.List;
@@ -86,30 +81,25 @@ public class Teleop2024 extends AutoRightHanging2 {
     // debug flags, turn it off for formal version to save time of logging
     boolean debugFlag = true;
 
-    double initHeading = Math.toRadians(180);
-
-    // avoid program crush when calling turnTo() function for fine heading correction
-    double headingAngleCorrection = Math.toRadians(180.0 - 0.1);
-
-    Pose2d pickUpSpecimenWallPos = new Pose2d(- 3.6 * Params.HALF_MAT, - 4.0 * Params.HALF_MAT, initHeading);
-    Pose2d specimenLineUpPos = new Pose2d(- 3.3 * Params.HALF_MAT, - 4.0 * Params.HALF_MAT, initHeading);
-
-    Vector2d hangSpecimenPos = new Vector2d(- 3.4 * Params.HALF_MAT,  0.0); //shifts left for every specimen hanged
-    Vector2d clearHighChamberPos = new Vector2d(- 3.5 * Params.HALF_MAT, - 3.5 * Params.HALF_MAT);
-    Vector2d clearHighChamberForHang = new Vector2d(-3.5 * Params.HALF_MAT, 3 * Params.HALF_MAT);
-    Vector2d pickupSamplePos = new Vector2d(- Params.HALF_MAT, - 4 * Params.HALF_MAT);
-    Vector2d LowRungPos = new Vector2d(- 0.5 * Params.HALF_MAT, 3 * Params.HALF_MAT);
+    double initHeading = Params.startPose.heading.toDouble();
 
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
 
+        double imu_heading;
         GamePadButtons gpButtons = new GamePadButtons();
 
         updateProfileAccel(false);
 
         drive = new MecanumDrive(hardwareMap, Params.currentPose);
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        imu = drive.lazyImu.get();
+
+        Vector2d pickupSpecimen = new Vector2d(Params.pickupSpecimenX, -4.0 * Params.HALF_MAT);
+        pickupSpecimenLineup = new Vector2d(Params.pickupSpecimenLineupX, -4.0 * Params.HALF_MAT);
+        hangSpecimenPos = new Vector2d(Params.hangingSpecimenX, -0.2 * Params.HALF_MAT);
+
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
                 "Knuckle", "Finger");
@@ -271,70 +261,99 @@ public class Teleop2024 extends AutoRightHanging2 {
 
             // cycling specimen from wall, gamepad1.y
             if (gpButtons.SpecimenCycleWall) {
-                drive.pose = pickUpSpecimenWallPos;
+                imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+                drive.pose = new Pose2d(pickupSpecimen, imu_heading - Math.PI); // pickup Position
 
-                // close finger
-                intake.setFingerPosition(intake.FINGER_CLOSE);
-                sleep(150);
-                intake.setKnucklePosition(intake.KNUCKLE_POS_LIFT_FROM_WALL);
-                sleep(100); // wait knuckle lift the specimen
+                for (int i = 0; i < specimenShiftMax; i++) { // cycling specimen
+                    // close finger
+                    intake.setFingerPosition(intake.FINGER_CLOSE);
+                    sleep(150);
+                    if (gpButtons.quitCycle) {
+                        break;
+                    } // quit specimen cycling if gamepad1.x
+                    intake.setKnucklePosition(intake.KNUCKLE_POS_LIFT_FROM_WALL);
+                    sleep(100); // wait knuckle lift the specimen
 
-                // strafe to high chamber for hanging specimen
-                Actions.runBlocking(
-                        drive.actionBuilder(drive.pose)
-                                // flip arm to high chamber position, back knuckle to avoid hitting chamber during strafing
-                                .afterTime(0.6, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_BACK, intake.KNUCKLE_POS_LIFT_FROM_WALL, intake.FINGER_CLOSE))
-                                // shift 1.5 inch for each specimen on high chamber
-                                .strafeToLinearHeading(hangSpecimenPos, initHeading)
-                                .turnTo(headingAngleCorrection) // fine correction heading
-                                .build()
-                );
-                intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
+                    if (gpButtons.quitCycle) {
+                        break;
+                    } // quit specimen cycling if gamepad1.x
 
-                intake.setKnucklePosition(intake.getKnucklePosition() + 0.01);//reset position after collision
-                intake.setFingerPosition(intake.getFingerPosition() - 0.01);//reset position after collision
+                    Actions.runBlocking(
+                            drive.actionBuilder(drive.pose)
+                                    // flip arm to high chamber position, back knuckle to avoid hitting chamber during strafing
+                                    .afterTime(0.6, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_BACK, Params.NO_CATION, Params.NO_CATION))
+                                    // shift 1.5 inch for each specimen on high chamber
+                                    .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x, hangSpecimenPos.y + specimenShiftEach * specimenCount), initHeading)
+                                    // get knuckle ready for hanging
+                                    .afterTime(0.001, new intakeAct(Params.NO_CATION, Params.NO_CATION, intake.KNUCKLE_POS_HIGH_CHAMBER, Params.NO_CATION))
+                                    .turnTo(headingAngleCorrection) // fine correct heading
+                                    .build()
+                    );
+                    if (gpButtons.quitCycle) {
+                        break;
+                    } // quit specimen cycling if gamepad1.x
+                    //adjust pos using distance sensor
+                    adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
 
-                sleep(sleepHighChamber);
-                adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
+                    if (gpButtons.quitCycle) {
+                        break;
+                    } // quit specimen cycling if gamepad1.x
 
-                if (specimenCount <= specimenShiftMax) {
-                    specimenCount ++;//update specimen pos
+                    if (specimenCount <= specimenShiftMax) {
+                        specimenCount++;//update specimen pos
+                    }
+
+                    // hanging specimen
+                    intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
+
+                    sleep(sleepTimeForHangingSpecimen);
+                    if (gpButtons.quitCycle) {
+                        break;
+                    } // quit specimen cycling if gamepad1.x
+
+                    intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN);
+                    sleep(200);
+
+                    //  y shift
+                    Actions.runBlocking(
+                            drive.actionBuilder(drive.pose)
+                                    .strafeTo(new Vector2d(drive.pose.position.x, drive.pose.position.y - specimenShiftInch)) // line up
+                                    .build()
+                    );
+                    Logging.log(" after y shift pos: X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
+                    Logging.log(" finger position = %2f ", intake.getFingerPosition());
+
+                    //return to wall to pickup next specimen
+                    intake.fingerServoOpen();
+                    intake.setKnucklePosition(intake.KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE);
+                    sleep(200);
+                    if (gpButtons.quitCycle) {
+                        break;
+                    } // quit specimen cycling if gamepad1.x
+
+                    Actions.runBlocking(
+                            drive.actionBuilder(drive.pose)
+                                    .afterTime(0.1, new intakeAct(intake.ARM_POS_GRAB_SPECIMEN_WALL, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_POS_PICKUP_SPECIMEN_WALL, Params.NO_CATION))
+                                    .strafeToLinearHeading(pickupSpecimenLineup, initHeading) // line up
+                                    .turnTo(headingAngleCorrection) // fine correct heading
+                                    .build()
+                    );
+                    if (gpButtons.quitCycle) {
+                        break;
+                    } // quit specimen cycling if gamepad1.x
+
+                    // adjust wall distance by distance sensor
+                    adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF);
+                    if (gpButtons.quitCycle) {
+                        break;
+                    } // quit specimen cycling if gamepad1.x
                 }
-
-                // hanging specimen
-                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
-
-                sleep(sleepTimeForHangingSpecimen);
-
-                intake.setKnucklePosition(intake.getKnucklePosition() + 0.01);//reset position after collision
-
-                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN);
-
-                Logging.log(" after y shift pos: X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
-                Logging.log(" finger position = %2f ", intake.getFingerPosition());
-
-                //return to wall to pickup next specimen
-                intake.fingerServoOpen();
-                sleep(150);
-                intake.setKnucklePosition(intake.KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE);
-                Actions.runBlocking(
-                        drive.actionBuilder(drive.pose)
-                                .afterTime(0.15, new armToPickUpWallPos())
-                                // left high chamber
-                                .strafeTo(new Vector2d(drive.pose.position.x - 1, drive.pose.position.y))
-                                .strafeToLinearHeading(specimenLineUpPos.position, initHeading)
-                                .turnTo(headingAngleCorrection) // fine correction heading
-                                .build()
-                );
-
-                // adjust wall distance by distance sensor
-                //adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF);
-
             }
 
             // pickup specimen and move to high chamber
             if ( gamepad1.right_trigger > 0) {
-                drive.pose = pickUpSpecimenWallPos;
+                imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+                drive.pose = new Pose2d(pickupSpecimen, imu_heading - Math.PI);
                 intake.setFingerPosition(intake.FINGER_CLOSE);
                 sleep(150);
                 intake.setKnucklePosition(intake.KNUCKLE_POS_LIFT_FROM_WALL);
@@ -347,7 +366,6 @@ public class Teleop2024 extends AutoRightHanging2 {
                 );
 
                 intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
-                sleep(sleepHighChamber);
                 adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
             }
 
@@ -400,21 +418,23 @@ public class Teleop2024 extends AutoRightHanging2 {
 
                 telemetry.addData("Wrist", "position %s", intake.getWristPosition());
 
-                telemetry.addData("Arm", "position = %.3f", (double)(intake.getArmPosition()));
+                telemetry.addData("Arm", "position = %s", intake.getArmPosition());
 
                 telemetry.addData(" ", " ");
 
                 telemetry.addData("heading", " %.3f", Math.toDegrees(drive.pose.heading.log()));
 
+                telemetry.addData("heading - IMU ", " %.3f", imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) + 180.0);
+
                 telemetry.addData("location", " %s", drive.pose.position.toString());
 
-                telemetry.addData("specimens hanged: %s", specimenCount);
+                telemetry.addData("specimens hanged:", " %s", specimenCount);
 
                 telemetry.addData(" --- ", " --- ");
 
-                telemetry.addData("back distance range", String.format("%.01f in", distSensorHanging.getDistance(DistanceUnit.INCH)));
+                telemetry.addData("back distance range", " %2f", distSensorHanging.getDistance(DistanceUnit.INCH));
 
-                telemetry.addData("front distance range", String.format("%.01f in", distSensorF.getDistance(DistanceUnit.INCH)));
+                telemetry.addData("front distance range", " %2f", distSensorF.getDistance(DistanceUnit.INCH));
 
                 telemetry.update(); // update message at the end of while loop
             }
