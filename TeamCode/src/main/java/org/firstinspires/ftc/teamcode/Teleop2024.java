@@ -67,10 +67,10 @@ public class Teleop2024 extends AutoRightHanging2 {
     private final ElapsedTime runtime = new ElapsedTime();
 
     // chassis
-    MecanumDrive drive;
+    //MecanumDrive drive;
 
     //claw and arm unit
-    private intakeUnit intake;
+    //private intakeUnit intake;
     private DistanceSensor distSensorHanging;
     private DistanceSensor distSensorF;
 
@@ -90,7 +90,7 @@ public class Teleop2024 extends AutoRightHanging2 {
         double imu_heading;
         GamePadButtons gpButtons = new GamePadButtons();
 
-        updateProfileAccel(false);
+        updateProfileAccel(false); //more faster driving
 
         drive = new MecanumDrive(hardwareMap, Params.currentPose);
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -268,13 +268,13 @@ public class Teleop2024 extends AutoRightHanging2 {
                     // close finger
                     intake.setFingerPosition(intake.FINGER_CLOSE);
                     sleep(150);
-                    if (gpButtons.quitCycle) {
+                    if (gamepad1.x) {
                         break;
                     } // quit specimen cycling if gamepad1.x
                     intake.setKnucklePosition(intake.KNUCKLE_POS_LIFT_FROM_WALL);
                     sleep(100); // wait knuckle lift the specimen
 
-                    if (gpButtons.quitCycle) {
+                    if (gamepad1.x) {
                         break;
                     } // quit specimen cycling if gamepad1.x
 
@@ -289,13 +289,13 @@ public class Teleop2024 extends AutoRightHanging2 {
                                     .turnTo(headingAngleCorrection) // fine correct heading
                                     .build()
                     );
-                    if (gpButtons.quitCycle) {
+                    if (gamepad1.x) {
                         break;
                     } // quit specimen cycling if gamepad1.x
                     //adjust pos using distance sensor
-                    adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
+                    adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging, drive);
 
-                    if (gpButtons.quitCycle) {
+                    if (gamepad1.x) {
                         break;
                     } // quit specimen cycling if gamepad1.x
 
@@ -307,7 +307,7 @@ public class Teleop2024 extends AutoRightHanging2 {
                     intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
 
                     sleep(sleepTimeForHangingSpecimen);
-                    if (gpButtons.quitCycle) {
+                    if (gamepad1.x) {
                         break;
                     } // quit specimen cycling if gamepad1.x
 
@@ -317,7 +317,7 @@ public class Teleop2024 extends AutoRightHanging2 {
                     //  y shift
                     Actions.runBlocking(
                             drive.actionBuilder(drive.pose)
-                                    .strafeTo(new Vector2d(drive.pose.position.x, drive.pose.position.y - specimenShiftInch)) // line up
+                                    .strafeTo(new Vector2d(drive.pose.position.x, drive.pose.position.y + specimenShiftInch)) // line up
                                     .build()
                     );
                     Logging.log(" after y shift pos: X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
@@ -327,7 +327,7 @@ public class Teleop2024 extends AutoRightHanging2 {
                     intake.fingerServoOpen();
                     intake.setKnucklePosition(intake.KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE);
                     sleep(200);
-                    if (gpButtons.quitCycle) {
+                    if (gamepad1.x) {
                         break;
                     } // quit specimen cycling if gamepad1.x
 
@@ -338,13 +338,13 @@ public class Teleop2024 extends AutoRightHanging2 {
                                     .turnTo(headingAngleCorrection) // fine correct heading
                                     .build()
                     );
-                    if (gpButtons.quitCycle) {
+                    if (gamepad1.x) {
                         break;
                     } // quit specimen cycling if gamepad1.x
 
                     // adjust wall distance by distance sensor
-                    adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF);
-                    if (gpButtons.quitCycle) {
+                    adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF, drive);
+                    if (gamepad1.x) {
                         break;
                     } // quit specimen cycling if gamepad1.x
                 }
@@ -366,7 +366,7 @@ public class Teleop2024 extends AutoRightHanging2 {
                 );
 
                 intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
-                adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
+                adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging, drive);
             }
 
             // pickup specimen from wall positions, gamepad2.right_trigger

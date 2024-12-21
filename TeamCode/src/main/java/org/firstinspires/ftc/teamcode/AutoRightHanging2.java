@@ -91,8 +91,8 @@ public class AutoRightHanging2 extends LinearOpMode {
 
     // Declare OpMode members.
     private final ElapsedTime runtime = new ElapsedTime();
-    private intakeUnit intake;
-    private MecanumDrive drive;
+    public intakeUnit intake;
+    public MecanumDrive drive;
     public IMU imu;
 
     Pose2d newStartPose;
@@ -124,7 +124,6 @@ public class AutoRightHanging2 extends LinearOpMode {
         imu = drive.lazyImu.get();
         imu.resetYaw();
         double imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
-        telemetry.addData("Status", " IMU heading = %2f", imu_heading + 180.0);
 
         Params.startPose = newStartPose; // init storage pose.
         Params.currentPose = newStartPose;; // init storage pose
@@ -143,6 +142,8 @@ public class AutoRightHanging2 extends LinearOpMode {
 
         while (!isStarted()) {
             sleep(10);
+            telemetry.addData("Status", " IMU heading = %2f", imu_heading + 180.0);
+
             telemetry.addData( "FTC 2024 - ", "Wait for starting ");
 
             telemetry.addData("deviceName", distSensorB.getDeviceName() );
@@ -217,7 +218,7 @@ public class AutoRightHanging2 extends LinearOpMode {
             );
 
             // adjust robot position by distance sensor. Temp comment out for saving time
-            adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorB);
+            adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorB, drive);
 
             // Adjust hanging specimen position.x according to the preload specimen hanging position
             // after adjusted by distance sensor
@@ -300,14 +301,14 @@ public class AutoRightHanging2 extends LinearOpMode {
                 );
                 intake.fingerServoOpen(); // drop off the second sample
                 // using distance sensor to move robot to correct position for pickup specimen from wall
-                adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF);
-                if (j == 1) { // only restore once
-                    Params.pickupSpecimenX = drive.pose.position.x; // restore X position for teleop.
-                    Params.pickupSpecimenLineupX = drive.pose.position.x + 2.5; // leave 2.5 inch gap to avoid hitting the specimen
-                    // adjust wall pickup position.x according to distance sensor to speedup next pickup.
-                    pickupSpecimenLineup = new Vector2d(Params.pickupSpecimenLineupX, -3.8 * Params.HALF_MAT);
-                    Logging.log(" After adjust of pickupSpecimenLineup: X position = %2f, Y position = %2f", pickupSpecimenLineup.x, pickupSpecimenLineup.y);
-                }
+                adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF, drive);
+
+                Params.pickupSpecimenX = drive.pose.position.x; // restore X position for teleop.
+                Params.pickupSpecimenLineupX = drive.pose.position.x + 2.5; // leave 2.5 inch gap to avoid hitting the specimen
+                // adjust wall pickup position.x according to distance sensor to speedup next pickup.
+                pickupSpecimenLineup = new Vector2d(Params.pickupSpecimenLineupX, -3.8 * Params.HALF_MAT);
+                Logging.log(" After adjust of pickupSpecimenLineup: X position = %2f, Y position = %2f", pickupSpecimenLineup.x, pickupSpecimenLineup.y);
+
                 // start picking up actions
                 intake.fingerServoClose();
                 sleep(150); // waiting finger close
@@ -329,8 +330,11 @@ public class AutoRightHanging2 extends LinearOpMode {
                 );
 
                 //adjust pos using distance sensor
-                adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorB);
-
+                adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorB, drive);
+                // restore hang position for teleop.
+                // this one should be more accurate than the preload one, due to the same pathway for teleop.
+                Params.hangingSpecimenX = drive.pose.position.x;
+                hangSpecimenPos = new Vector2d(Params.hangingSpecimenX, firstHighChamberPos.y);
                 //hang specimen
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
                 sleep(400);
@@ -449,7 +453,7 @@ public class AutoRightHanging2 extends LinearOpMode {
         }
     }
 
-    void adjustPosByDistanceSensor(double aimDistance, DistanceSensor distSensorID) {
+    void adjustPosByDistanceSensor(double aimDistance, DistanceSensor distSensorID, MecanumDrive drv) {
         double sensorDist = 0.0;
         int repeatTimes = 5;
 
@@ -476,16 +480,16 @@ public class AutoRightHanging2 extends LinearOpMode {
         shiftDelta = Range.clip(shiftDelta, -10.0, 10.0); // limit adjust distance to +-10.0 inch
         Logging.log("drive pose before distance average number");
         Logging.log("before adjust, sensor distance = %2f, shift delta = %2f", sensorDist, shiftDelta);
-        Logging.log(" X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
+        Logging.log(" X position = %2f, Y position = %2f , heading = %sf", drv.pose.position.x, drv.pose.position.y, Math.toDegrees(drv.pose.heading.log()));
 
         // adjust when shiftDelta big enough than 0.2 inch to same some time
         if (Math.abs(shiftDelta) > 0.2) {
             Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
-                            .strafeToLinearHeading(new Vector2d(drive.pose.position.x + shiftDelta, drive.pose.position.y), newStartPose.heading) // adjust heading also.
+                    drv.actionBuilder(drv.pose)
+                            .strafeToLinearHeading(new Vector2d(drv.pose.position.x + shiftDelta, drv.pose.position.y), Params.startPose.heading) // adjust heading also.
                             .build()
             );
-            Logging.log(" After adjust: X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
+            Logging.log(" After adjust: X position = %2f, Y position = %2f , heading = %sf", drv.pose.position.x, drv.pose.position.y, Math.toDegrees(drv.pose.heading.log()));
             Logging.log("after adjust, sensor distance = %2f, aim distance = %2f ", distSensorID.getDistance(DistanceUnit.INCH), aimDistance);
         }
         else {
