@@ -90,7 +90,7 @@ public class AutoRightHanging2 extends LinearOpMode {
     Vector2d pickupSpecimenLineup = new Vector2d(Params.pickupSpecimenLineupX, - 3.8 * Params.HALF_MAT);
 
     // Declare OpMode members.
-    private final ElapsedTime runtime = new ElapsedTime();
+    public ElapsedTime runtime = new ElapsedTime();
     public intakeUnit intake;
     public MecanumDrive drive;
     public IMU imu;
@@ -106,8 +106,8 @@ public class AutoRightHanging2 extends LinearOpMode {
         // road runner variables
         newStartPose = new Pose2d((-6 * Params.HALF_MAT + Params.CHASSIS_LENGTH / 2), (-leftRight * (Params.CHASSIS_HALF_WIDTH - 2.0)), Math.toRadians(180));
     }
-    private DistanceSensor distSensorB;
-    private DistanceSensor distSensorF;
+    DistanceSensor distSensorB;
+    DistanceSensor distSensorF;
 
 
     @Override
@@ -123,6 +123,7 @@ public class AutoRightHanging2 extends LinearOpMode {
         // reset imu at the beginning of autonomous
         imu = drive.lazyImu.get();
         imu.resetYaw();
+        Params.imuReseted = true;
         double imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES);
 
         Params.startPose = newStartPose; // init storage pose.
@@ -245,10 +246,7 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .turnTo(headingAngleCorrection) // fine adjust heading
                             .build()
             );
-                            //.afterTime(0.25, new intakeAct(intake.FINGER_CLOSE))//grab first sample
-                            // flip arm after 150 ms when finger closed.
-                            //.afterTime(0.4, new intakeAct(intake.ARM_POS_DROP_SAMPLE, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_SIZE_CONSTRAINT, intake.FINGER_CLOSE))//go back for drop sample
-                            //.waitSeconds(0.4) // wait finger close before moving to second sample
+
             intake.fingerServoClose();
             sleep(150);
             intake.setKnucklePosition(intake.KNUCKLE_SIZE_CONSTRAINT);
@@ -263,14 +261,14 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .build()
             );
             intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SAMPLE_BACK);
-            sleep(500); // waiting arm reaching position to drop off first sample.
+            sleep(400); // waiting arm reaching position to drop off first sample.
             intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE_BACK);
             intake.setWristPosition(intake.WRIST_BACK);
             intake.fingerServoOpen();
             sleep(200);
             intake.setKnucklePosition(intake.KNUCKLE_SIZE_CONSTRAINT); // flip knuckle before lift arm due to size limitation
 
-            sleep(1050); // wait arm flip back to pickup second sample
+            sleep(1000); // wait arm flip back to pickup second sample
             intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SAMPLE_BACK); // flip knuckle before lift arm due to size limitation
             sleep(400);
             intake.fingerServoClose();
@@ -280,13 +278,8 @@ public class AutoRightHanging2 extends LinearOpMode {
            // moving during arm flip for wall case, starting flip arm here
             intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN_WALL); // flip arm to grab specimen position before drop off second sample
             intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
-            sleep(850);
-            intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN_WALL);
-            // waiting arm flip to front to drop off second specimen
-            sleep(150);
-
-            Logging.log("after 2nd sample drop heading: %2f", Math.toDegrees(drive.pose.heading.log()));
-
+            sleep(800);
+            
             // pick up specimen from wall, loop to hang specimen
             for (int j = 1; j < 4; j++) {
 

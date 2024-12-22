@@ -33,7 +33,6 @@ import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -63,16 +62,14 @@ import java.util.List;
 @TeleOp(name="Teleop 2024", group="Concept")
 //@Disabled
 public class Teleop2024 extends AutoRightHanging2 {
-    // Declare OpMode members.
-    private final ElapsedTime runtime = new ElapsedTime();
-
     // chassis
     //MecanumDrive drive;
 
     //claw and arm unit
     //private intakeUnit intake;
-    private DistanceSensor distSensorHanging;
-    private DistanceSensor distSensorF;
+
+    //private DistanceSensor distSensorB;
+    //private DistanceSensor distSensorF;
 
     int specimenCount = 0;//counter used to update specimen hanging position
     int specimenShiftMax = 7; //shift 2 inch for each specimen hanging
@@ -110,7 +107,7 @@ public class Teleop2024 extends AutoRightHanging2 {
 
 
         // you can use this as a regular DistanceSensor.
-        distSensorHanging = hardwareMap.get(DistanceSensor.class, "distanceB");
+        distSensorB = hardwareMap.get(DistanceSensor.class, "distanceB");
         distSensorF = hardwareMap.get(DistanceSensor.class, "distanceF");
 
         // bulk reading setting - auto refresh mode
@@ -118,8 +115,6 @@ public class Teleop2024 extends AutoRightHanging2 {
         for (LynxModule hub : allHubs) {
             hub.setBulkCachingMode(LynxModule.BulkCachingMode.AUTO);
         }
-
-        //preset positions used for teleop commands
 
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Mode", "waiting for start.");
@@ -261,16 +256,21 @@ public class Teleop2024 extends AutoRightHanging2 {
 
             // cycling specimen from wall, gamepad1.y
             if (gpButtons.SpecimenCycleWall) {
+
+                // Reset IMU if it has not been reset at the beginning of autonomous
+                if (!Params.imuReseted) {
+                    imu.resetYaw();
+                    Params.imuReseted = true;
+                }
                 imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
                 drive.pose = new Pose2d(pickupSpecimen, imu_heading - Math.PI); // pickup Position
 
                 for (int i = 0; i < specimenShiftMax; i++) { // cycling specimen
                     // close finger
                     intake.setFingerPosition(intake.FINGER_CLOSE);
                     sleep(150);
-                    if (gamepad1.x) {
-                        break;
-                    } // quit specimen cycling if gamepad1.x
+
                     intake.setKnucklePosition(intake.KNUCKLE_POS_LIFT_FROM_WALL);
                     sleep(100); // wait knuckle lift the specimen
 
@@ -289,11 +289,9 @@ public class Teleop2024 extends AutoRightHanging2 {
                                     .turnTo(headingAngleCorrection) // fine correct heading
                                     .build()
                     );
-                    if (gamepad1.x) {
-                        break;
-                    } // quit specimen cycling if gamepad1.x
+
                     //adjust pos using distance sensor
-                    adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging, drive);
+                    adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorB, drive);
 
                     if (gamepad1.x) {
                         break;
@@ -305,14 +303,27 @@ public class Teleop2024 extends AutoRightHanging2 {
 
                     // hanging specimen
                     intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
-
                     sleep(sleepTimeForHangingSpecimen);
+
+                    intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN);
+                    sleep(200);
+
                     if (gamepad1.x) {
                         break;
                     } // quit specimen cycling if gamepad1.x
 
-                    intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN);
-                    sleep(200);
+                    // if it is the last specimen, quit after hanging without y shift
+                    if (specimenShiftMax -1 == i) {
+                        intake.fingerServoOpen();
+                        intake.setKnucklePosition(intake.KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE);
+                        //  back 10 inch before stop
+                        Actions.runBlocking(
+                                drive.actionBuilder(drive.pose)
+                                        .strafeTo(new Vector2d(drive.pose.position.x - 10, drive.pose.position.y)) // line up
+                                        .build()
+                        );
+                        break;
+                    }
 
                     //  y shift
                     Actions.runBlocking(
@@ -321,12 +332,12 @@ public class Teleop2024 extends AutoRightHanging2 {
                                     .build()
                     );
                     Logging.log(" after y shift pos: X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
-                    Logging.log(" finger position = %2f ", intake.getFingerPosition());
 
                     //return to wall to pickup next specimen
                     intake.fingerServoOpen();
                     intake.setKnucklePosition(intake.KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE);
                     sleep(200);
+
                     if (gamepad1.x) {
                         break;
                     } // quit specimen cycling if gamepad1.x
@@ -338,9 +349,6 @@ public class Teleop2024 extends AutoRightHanging2 {
                                     .turnTo(headingAngleCorrection) // fine correct heading
                                     .build()
                     );
-                    if (gamepad1.x) {
-                        break;
-                    } // quit specimen cycling if gamepad1.x
 
                     // adjust wall distance by distance sensor
                     adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF, drive);
@@ -352,6 +360,11 @@ public class Teleop2024 extends AutoRightHanging2 {
 
             // pickup specimen and move to high chamber
             if ( gamepad1.right_trigger > 0) {
+                // Reset IMU if it has not been reset at the beginning of autonomous
+                if (!Params.imuReseted) {
+                    imu.resetYaw();
+                    Params.imuReseted = true;
+                }
                 imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
                 drive.pose = new Pose2d(pickupSpecimen, imu_heading - Math.PI);
                 intake.setFingerPosition(intake.FINGER_CLOSE);
@@ -366,7 +379,7 @@ public class Teleop2024 extends AutoRightHanging2 {
                 );
 
                 intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
-                adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging, drive);
+                adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorB, drive);
             }
 
             // pickup specimen from wall positions, gamepad2.right_trigger
@@ -432,7 +445,7 @@ public class Teleop2024 extends AutoRightHanging2 {
 
                 telemetry.addData(" --- ", " --- ");
 
-                telemetry.addData("back distance range", " %2f", distSensorHanging.getDistance(DistanceUnit.INCH));
+                telemetry.addData("back distance range", " %2f", distSensorB.getDistance(DistanceUnit.INCH));
 
                 telemetry.addData("front distance range", " %2f", distSensorF.getDistance(DistanceUnit.INCH));
 

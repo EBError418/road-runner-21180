@@ -75,5 +75,7 @@ public class Params {
     static double pickupSpecimenX = pickupSpecimenLineupX - 0.2 * HALF_MAT;
     static double hangingSpecimenX = -3.2 * HALF_MAT; // it will be updated during autonomous
 
+    static boolean imuReseted = false;
+
 
 }
