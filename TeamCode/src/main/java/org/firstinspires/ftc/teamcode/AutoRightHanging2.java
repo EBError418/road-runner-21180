@@ -226,7 +226,8 @@ public class AutoRightHanging2 extends LinearOpMode {
             Params.hangingSpecimenX = drive.pose.position.x; // restore hang position for teleop.
             hangSpecimenPos = new Vector2d(Params.hangingSpecimenX, firstHighChamberPos.y);
             Logging.log("Distance sensor reading for hanging preload specimen: %2f", distSensorB.getDistance(DistanceUnit.INCH));
-            Logging.log(" hangSpecimenPos: X position = %2f, Y position = %2f", hangSpecimenPos.x, hangSpecimenPos.y);
+            Logging.log(" Preload hang Specimen Pos: X position = %2f, defined pos X = %2f", hangSpecimenPos.x, firstHighChamberPos.x);
+            Logging.log("hanging # 0 specimen X position = %2f", Params.hangingSpecimenX);
 
             //hanging action
             intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
@@ -246,6 +247,9 @@ public class AutoRightHanging2 extends LinearOpMode {
                             .turnTo(headingAngleCorrection) // fine adjust heading
                             .build()
             );
+            Logging.log("pickup first sample: dead wheel heading = %2f", Math.toDegrees(drive.pose.heading.log()));
+            Logging.log("pickup first sample: imu heading = %2f", imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) + 180);
+
 
             intake.fingerServoClose();
             sleep(150);
@@ -272,6 +276,9 @@ public class AutoRightHanging2 extends LinearOpMode {
             intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SAMPLE_BACK); // flip knuckle before lift arm due to size limitation
             sleep(400);
             intake.fingerServoClose();
+            Logging.log("pickup second sample: dead wheel heading = %2f", Math.toDegrees(drive.pose.heading.log()));
+            Logging.log("pickup second sample: imu heading = %2f", imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) + 180);
+
             sleep(150); // wait finger close to grab second sample
             intake.setKnucklePosition(intake.KNUCKLE_SIZE_CONSTRAINT); // flip knuckle before lift arm due to size limitation
             sleep(150);
@@ -328,6 +335,8 @@ public class AutoRightHanging2 extends LinearOpMode {
                 // this one should be more accurate than the preload one, due to the same pathway for teleop.
                 Params.hangingSpecimenX = drive.pose.position.x;
                 hangSpecimenPos = new Vector2d(Params.hangingSpecimenX, firstHighChamberPos.y);
+                Logging.log("hanging # %d specimen X position = %2f", j, Params.hangingSpecimenX);
+
                 //hang specimen
                 intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
                 sleep(400);

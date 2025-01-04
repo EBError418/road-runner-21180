@@ -42,6 +42,7 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
 import com.qualcomm.robotcore.hardware.IMU;
@@ -74,7 +75,7 @@ import java.util.List;
  */
 
 @Autonomous(name=" A - 4 specimens with rubber claw pickup", group="Concept")
-//@Disabled
+@Disabled
 public class AutoRightHangingRubberClaw extends LinearOpMode {
     /**
      * Robot Start location: "1" - right side; "-1" - left side.

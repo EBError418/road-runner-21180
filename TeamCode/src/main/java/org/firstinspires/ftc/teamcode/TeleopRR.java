@@ -413,7 +413,7 @@ public class TeleopRR extends LinearOpMode {
 
                 telemetry.addData("Wrist", "position %s", intake.getWristPosition());
 
-                telemetry.addData("Arm", "position = %.3f", (double)(intake.getArmPosition()));
+                telemetry.addData("Arm", "position = %s", intake.getArmPosition());
 
                 telemetry.addData(" ", " ");
 
@@ -425,9 +425,9 @@ public class TeleopRR extends LinearOpMode {
 
                 telemetry.addData(" --- ", " --- ");
 
-                telemetry.addData("back distance range", String.format("%.01f in", distSensorHanging.getDistance(DistanceUnit.INCH)));
+                telemetry.addData("back distance range", "%.01f inch", distSensorHanging.getDistance(DistanceUnit.INCH));
 
-                telemetry.addData("front distance range", String.format("%.01f in", distSensorF.getDistance(DistanceUnit.INCH)));
+                telemetry.addData("front distance range", "%.01f inch", distSensorF.getDistance(DistanceUnit.INCH));
 
                 telemetry.update(); // update message at the end of while loop
             }
