@@ -198,7 +198,7 @@ public class AutoRightHanging2 extends LinearOpMode {
 
         //new stuff for 2024-2025 season
         //hang specimen
-        Vector2d firstHighChamberPos = new Vector2d(-3.1 * Params.HALF_MAT, newStartPose.position.y);
+        Vector2d firstHighChamberPos = new Vector2d(-3.05 * Params.HALF_MAT, newStartPose.position.y);
 
         //grab
         Vector2d firstSamplePosition = new Vector2d(- 3.2 * Params.HALF_MAT, - 4.1 * Params.HALF_MAT);
@@ -320,11 +320,12 @@ public class AutoRightHanging2 extends LinearOpMode {
                 Actions.runBlocking(
                         drive.actionBuilder(drive.pose)
                                 // flip arm to high chamber position, back knuckle to avoid hitting chamber during strafing
-                                .afterTime(0.6, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_BACK, Params.NO_CATION, Params.NO_CATION))
+                                .afterTime(0.3, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_BACK, Params.NO_CATION, Params.NO_CATION))
+                                .afterTime(0.9, new intakeAct(Params.NO_CATION, Params.NO_CATION, intake.KNUCKLE_POS_HIGH_CHAMBER, Params.NO_CATION))
                                 // shift 1.5 inch for each specimen on high chamber
                                 .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x, hangSpecimenPos.y - 1.2 * j), newStartPose.heading)
                                 // get knuckle ready for hanging
-                                .afterTime(0.001, new intakeAct(Params.NO_CATION, Params.NO_CATION, intake.KNUCKLE_POS_HIGH_CHAMBER, Params.NO_CATION))
+                                //.afterTime(0.001, new intakeAct(Params.NO_CATION, Params.NO_CATION, intake.KNUCKLE_POS_HIGH_CHAMBER, Params.NO_CATION))
                                 .turnTo(headingAngleCorrection) // fine correct heading
                                 .build()
                 );

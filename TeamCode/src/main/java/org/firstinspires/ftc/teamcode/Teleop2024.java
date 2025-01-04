@@ -281,11 +281,12 @@ public class Teleop2024 extends AutoRightHanging2 {
                     Actions.runBlocking(
                             drive.actionBuilder(drive.pose)
                                     // flip arm to high chamber position, back knuckle to avoid hitting chamber during strafing
-                                    .afterTime(0.6, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_BACK, Params.NO_CATION, Params.NO_CATION))
+                                    .afterTime(0.3, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_BACK, Params.NO_CATION, Params.NO_CATION))
+                                    .afterTime(0.9, new intakeAct(Params.NO_CATION, Params.NO_CATION, intake.KNUCKLE_POS_HIGH_CHAMBER, Params.NO_CATION))
                                     // shift 1.5 inch for each specimen on high chamber
                                     .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x, hangSpecimenPos.y + specimenShiftEach * specimenCount), initHeading)
                                     // get knuckle ready for hanging
-                                    .afterTime(0.001, new intakeAct(Params.NO_CATION, Params.NO_CATION, intake.KNUCKLE_POS_HIGH_CHAMBER, Params.NO_CATION))
+                                    //.afterTime(0.001, new intakeAct(Params.NO_CATION, Params.NO_CATION, intake.KNUCKLE_POS_HIGH_CHAMBER, Params.NO_CATION))
                                     .turnTo(headingAngleCorrection) // fine correct heading
                                     .build()
                     );
