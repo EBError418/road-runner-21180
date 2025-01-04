@@ -224,9 +224,9 @@ public class AutoRightHanging2 extends LinearOpMode {
             // Adjust hanging specimen position.x according to the preload specimen hanging position
             // after adjusted by distance sensor
             Params.hangingSpecimenX = drive.pose.position.x; // restore hang position for teleop.
-            hangSpecimenPos = new Vector2d(Params.hangingSpecimenX, firstHighChamberPos.y);
+            hangSpecimenPos = new Vector2d(Params.hangingSpecimenX - 1.0, firstHighChamberPos.y);
             Logging.log("Distance sensor reading for hanging preload specimen: %2f", distSensorB.getDistance(DistanceUnit.INCH));
-            Logging.log(" Preload hang Specimen Pos: X position = %2f, defined pos X = %2f", hangSpecimenPos.x, firstHighChamberPos.x);
+            Logging.log(" Preload hang Specimen Pos: X position = %2f, defined pos X = %2f", drive.pose.position.x, firstHighChamberPos.x);
             Logging.log("hanging # 0 specimen X position = %2f", Params.hangingSpecimenX);
 
             //hanging action
@@ -304,10 +304,10 @@ public class AutoRightHanging2 extends LinearOpMode {
                 adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF, drive);
 
                 Params.pickupSpecimenX = drive.pose.position.x; // restore X position for teleop.
-                Params.pickupSpecimenLineupX = drive.pose.position.x + 2.5; // leave 2.5 inch gap to avoid hitting the specimen
+                Params.pickupSpecimenLineupX = drive.pose.position.x + 3.0; // leave 3.0 inch gap to avoid hitting the specimen
                 // adjust wall pickup position.x according to distance sensor to speedup next pickup.
                 pickupSpecimenLineup = new Vector2d(Params.pickupSpecimenLineupX, -3.8 * Params.HALF_MAT);
-                Logging.log(" After adjust of pickupSpecimenLineup: X position = %2f, Y position = %2f", pickupSpecimenLineup.x, pickupSpecimenLineup.y);
+                Logging.log(" After adjust of pickupSpecimenLineup: X position = %2f", pickupSpecimenLineup.x);
 
                 // start picking up actions
                 intake.fingerServoClose();
@@ -334,7 +334,7 @@ public class AutoRightHanging2 extends LinearOpMode {
                 // restore hang position for teleop.
                 // this one should be more accurate than the preload one, due to the same pathway for teleop.
                 Params.hangingSpecimenX = drive.pose.position.x;
-                hangSpecimenPos = new Vector2d(Params.hangingSpecimenX, firstHighChamberPos.y);
+                hangSpecimenPos = new Vector2d(Params.hangingSpecimenX - 1.0, firstHighChamberPos.y);
                 Logging.log("hanging # %d specimen X position = %2f", j, Params.hangingSpecimenX);
 
                 //hang specimen

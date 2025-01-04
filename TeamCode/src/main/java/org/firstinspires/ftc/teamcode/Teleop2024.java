@@ -95,7 +95,7 @@ public class Teleop2024 extends AutoRightHanging2 {
 
         Vector2d pickupSpecimen = new Vector2d(Params.pickupSpecimenX, -4.0 * Params.HALF_MAT);
         pickupSpecimenLineup = new Vector2d(Params.pickupSpecimenLineupX, -4.0 * Params.HALF_MAT);
-        hangSpecimenPos = new Vector2d(Params.hangingSpecimenX, -0.2 * Params.HALF_MAT);
+        hangSpecimenPos = new Vector2d(Params.hangingSpecimenX - 2.0, -0.2 * Params.HALF_MAT);
 
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist",

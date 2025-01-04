@@ -71,7 +71,7 @@ public class Params {
     static final double DRONE_START = 0.57;
 
     // X positions for pickup and hang specimen
-    static double pickupSpecimenLineupX = - 3.9 * HALF_MAT;
+    static double pickupSpecimenLineupX = - 3.85 * HALF_MAT;
     static double pickupSpecimenX = pickupSpecimenLineupX - 0.2 * HALF_MAT;
     static double hangingSpecimenX = -3.2 * HALF_MAT; // it will be updated during autonomous
 

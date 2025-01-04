@@ -106,7 +106,7 @@ public class intakeUnit
     int ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN = -3150; // moving specimen left/right
 
     int ARM_POS_GRAB_SAMPLE = -500; // pickup sample during teleop
-    int ARM_POS_HIGH_CHAMBER = -3450;//-2967;//2490;
+    int ARM_POS_HIGH_CHAMBER = -3475;//-2967;//2490;
     int ARM_POS_LOW_BUCKET = -1853;
     int ARM_POS_LEFT_PARKING = -500;
     int ARM_POS_OBS_ZONE = -430;
