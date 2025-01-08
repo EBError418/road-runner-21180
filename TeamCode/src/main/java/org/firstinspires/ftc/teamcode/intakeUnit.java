@@ -73,7 +73,7 @@ public class intakeUnit
     final double KNUCKLE_MAX = 0.9;
 
     final double KNUCKLE_POS_AUTO_INIT = 0.15 - 0.03;
-    final double KNUCKLE_POS_LIFT_FROM_WALL = 0.15  - 0.03;
+    final double KNUCKLE_POS_LIFT_FROM_WALL = 0.15  - 0.06;
     final double KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE = 0.21 - 0.03;
     final double KNUCKLE_POS_PICKUP_SPECIMEN_ready = 0.2 - 0.03;
     final double KNUCKLE_POS_WRIST_CONSTRAINT = 0.3;
@@ -112,8 +112,7 @@ public class intakeUnit
     int ARM_POS_OBS_ZONE = -430;
     int ARM_POS_BACK = -3000;
     int ARM_POS_BEFORE_HANG = -2130; // ready for hanging robot during end game
-    int ARM_POS_GRAB_SPECIMEN = -185; //-240;
-    int ARM_POS_GRAB_SPECIMEN_READY = -400;
+    int ARM_POS_GRAB_SPECIMEN = -170; //-240;
     int ARM_POS_SUB = -500;
     int ARM_POS_DOWN_HANGING = 100;
     int ARM_POS_GRAB_SPECIMEN_WALL = -375;

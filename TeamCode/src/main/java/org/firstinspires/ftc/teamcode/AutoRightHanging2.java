@@ -198,13 +198,13 @@ public class AutoRightHanging2 extends LinearOpMode {
 
         //new stuff for 2024-2025 season
         //hang specimen
-        Vector2d firstHighChamberPos = new Vector2d(-3.05 * Params.HALF_MAT, newStartPose.position.y);
+        Vector2d firstHighChamberPos = new Vector2d(-3.0 * Params.HALF_MAT + 0.5, newStartPose.position.y);
 
         //grab
-        Vector2d firstSamplePosition = new Vector2d(- 3.2 * Params.HALF_MAT, - 4.1 * Params.HALF_MAT);
+        Vector2d firstSamplePosition = new Vector2d(- 3.1 * Params.HALF_MAT, - 4.1 * Params.HALF_MAT);
 
         // adjust x for second sample a little bit according to testing
-        Vector2d secondSamplePosition = new Vector2d(- 3.2 * Params.HALF_MAT - 1, firstSamplePosition.y - 10.5);
+        Vector2d secondSamplePosition = new Vector2d(- 3.15 * Params.HALF_MAT, firstSamplePosition.y - 10.5);
 
         Vector2d obsZone = new Vector2d(- 4.3 * Params.HALF_MAT, - 3.5 * Params.HALF_MAT);
 
@@ -224,7 +224,7 @@ public class AutoRightHanging2 extends LinearOpMode {
             // Adjust hanging specimen position.x according to the preload specimen hanging position
             // after adjusted by distance sensor
             Params.hangingSpecimenX = drive.pose.position.x; // restore hang position for teleop.
-            hangSpecimenPos = new Vector2d(Params.hangingSpecimenX - 1.0, firstHighChamberPos.y);
+            hangSpecimenPos = new Vector2d(Params.hangingSpecimenX - 2.5, firstHighChamberPos.y);
             Logging.log("Distance sensor reading for hanging preload specimen: %2f", distSensorB.getDistance(DistanceUnit.INCH));
             Logging.log(" Preload hang Specimen Pos: X position = %2f, defined pos X = %2f", drive.pose.position.x, firstHighChamberPos.x);
             Logging.log("hanging # 0 specimen X position = %2f", Params.hangingSpecimenX);
@@ -296,7 +296,7 @@ public class AutoRightHanging2 extends LinearOpMode {
                         drive.actionBuilder(drive.pose)
                                 .afterTime(0.1, new intakeAct(intake.ARM_POS_GRAB_SPECIMEN_WALL, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_POS_PICKUP_SPECIMEN_WALL, Params.NO_CATION))
                                 .strafeToLinearHeading(pickupSpecimenLineup, newStartPose.heading) // line up
-                                .turnTo(headingAngleCorrection) // fine correct heading
+                                //.turnTo(headingAngleCorrection) // fine correct heading
                                 .build()
                 );
                 intake.fingerServoOpen(); // drop off the second sample
@@ -313,17 +313,17 @@ public class AutoRightHanging2 extends LinearOpMode {
                 intake.fingerServoClose();
                 sleep(150); // waiting finger close
                 intake.setKnucklePosition(intake.KNUCKLE_POS_LIFT_FROM_WALL);
-                sleep(100); // wait knuckle lift the specimen
+                //sleep(100); // wait knuckle lift the specimen
 
                 Logging.log(" Start moving to high chamber to hang # %s specimen. ", j);
                 // strafe to high chamber for hanging specimen
                 Actions.runBlocking(
                         drive.actionBuilder(drive.pose)
                                 // flip arm to high chamber position, back knuckle to avoid hitting chamber during strafing
-                                .afterTime(0.3, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_BACK, Params.NO_CATION, Params.NO_CATION))
-                                .afterTime(0.9, new intakeAct(Params.NO_CATION, Params.NO_CATION, intake.KNUCKLE_POS_HIGH_CHAMBER, Params.NO_CATION))
+                                .afterTime(0.1, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_BACK, Params.NO_CATION, Params.NO_CATION))
+                                .afterTime(1.5, new intakeAct(Params.NO_CATION, Params.NO_CATION, intake.KNUCKLE_POS_HIGH_CHAMBER, Params.NO_CATION))
                                 // shift 1.5 inch for each specimen on high chamber
-                                .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x, hangSpecimenPos.y - 1.2 * j), newStartPose.heading)
+                                .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x, hangSpecimenPos.y - 1.3 * j), newStartPose.heading)
                                 // get knuckle ready for hanging
                                 //.afterTime(0.001, new intakeAct(Params.NO_CATION, Params.NO_CATION, intake.KNUCKLE_POS_HIGH_CHAMBER, Params.NO_CATION))
                                 .turnTo(headingAngleCorrection) // fine correct heading

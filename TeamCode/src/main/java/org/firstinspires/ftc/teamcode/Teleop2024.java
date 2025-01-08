@@ -73,8 +73,8 @@ public class Teleop2024 extends AutoRightHanging2 {
 
     int specimenCount = 0;//counter used to update specimen hanging position
     int specimenShiftMax = 7; //shift 2 inch for each specimen hanging
-    double specimenShiftInch = -7.0; // shift specimen to 7 inch right (-y) after hanging on high chamber
-    double specimenShiftEach = 1.5; // shift hanging place shift in Y direct
+    double specimenShiftInch = -12.0; // shift specimen to 7 inch right (-y) after hanging on high chamber
+    double specimenShiftEach = 1.3; // shift hanging place shift in Y direct
     // debug flags, turn it off for formal version to save time of logging
     boolean debugFlag = true;
 
@@ -94,8 +94,8 @@ public class Teleop2024 extends AutoRightHanging2 {
         imu = drive.lazyImu.get();
 
         Vector2d pickupSpecimen = new Vector2d(Params.pickupSpecimenX, -4.0 * Params.HALF_MAT);
-        pickupSpecimenLineup = new Vector2d(Params.pickupSpecimenLineupX, -4.0 * Params.HALF_MAT);
-        hangSpecimenPos = new Vector2d(Params.hangingSpecimenX - 2.0, -0.2 * Params.HALF_MAT);
+        pickupSpecimenLineup = new Vector2d(Params.pickupSpecimenLineupX + 1.0, -4.0 * Params.HALF_MAT);
+        hangSpecimenPos = new Vector2d(Params.hangingSpecimenX - 3.0, -0.2 * Params.HALF_MAT);
 
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
@@ -256,7 +256,7 @@ public class Teleop2024 extends AutoRightHanging2 {
 
             // cycling specimen from wall, gamepad1.y
             if (gpButtons.SpecimenCycleWall) {
-
+                specimenCount = 0;
                 // Reset IMU if it has not been reset at the beginning of autonomous
                 if (!Params.imuReseted) {
                     imu.resetYaw();
@@ -281,8 +281,8 @@ public class Teleop2024 extends AutoRightHanging2 {
                     Actions.runBlocking(
                             drive.actionBuilder(drive.pose)
                                     // flip arm to high chamber position, back knuckle to avoid hitting chamber during strafing
-                                    .afterTime(0.3, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_BACK, Params.NO_CATION, Params.NO_CATION))
-                                    .afterTime(0.9, new intakeAct(Params.NO_CATION, Params.NO_CATION, intake.KNUCKLE_POS_HIGH_CHAMBER, Params.NO_CATION))
+                                    .afterTime(0.1, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_BACK, Params.NO_CATION, Params.NO_CATION))
+                                    //.afterTime(1., new intakeAct(Params.NO_CATION, Params.NO_CATION, intake.KNUCKLE_POS_HIGH_CHAMBER, Params.NO_CATION))
                                     // shift 1.5 inch for each specimen on high chamber
                                     .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x, hangSpecimenPos.y + specimenShiftEach * specimenCount), initHeading)
                                     // get knuckle ready for hanging
@@ -291,6 +291,7 @@ public class Teleop2024 extends AutoRightHanging2 {
                                     .build()
                     );
 
+                    intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
                     //adjust pos using distance sensor
                     adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorB, drive);
 
@@ -345,7 +346,8 @@ public class Teleop2024 extends AutoRightHanging2 {
 
                     Actions.runBlocking(
                             drive.actionBuilder(drive.pose)
-                                    .afterTime(0.1, new intakeAct(intake.ARM_POS_GRAB_SPECIMEN_WALL, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_POS_PICKUP_SPECIMEN_WALL, Params.NO_CATION))
+                                    .afterTime(0.1, new intakeAct(intake.ARM_POS_GRAB_SPECIMEN_WALL, intake.WRIST_POS_NEUTRAL, Params.NO_CATION, Params.NO_CATION))
+                                    .afterTime(0.6, new intakeAct(Params.NO_CATION, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_POS_PICKUP_SPECIMEN_WALL, Params.NO_CATION))
                                     .strafeToLinearHeading(pickupSpecimenLineup, initHeading) // line up
                                     .turnTo(headingAngleCorrection) // fine correct heading
                                     .build()

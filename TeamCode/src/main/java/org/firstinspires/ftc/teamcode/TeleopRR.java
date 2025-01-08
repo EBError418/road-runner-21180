@@ -439,20 +439,6 @@ public class TeleopRR extends LinearOpMode {
     }
 
     //action to set arm and wrist position to pick up from sub
-    private class armToPickUpPos implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            intake.fingerServoOpen();
-            intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN_READY);
-            intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN_ready);
-            sleep(knuckleSleepTime);
-            intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
-
-            return false;
-        }
-    }
-
-    //action to set arm and wrist position to pick up from sub
     private class armToPickUpWallPos implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
