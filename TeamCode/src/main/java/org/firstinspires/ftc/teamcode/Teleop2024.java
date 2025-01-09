@@ -286,12 +286,10 @@ public class Teleop2024 extends AutoRightHanging2 {
                                     // shift 1.5 inch for each specimen on high chamber
                                     .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x, hangSpecimenPos.y + specimenShiftEach * specimenCount), initHeading)
                                     // get knuckle ready for hanging
-                                    //.afterTime(0.001, new intakeAct(Params.NO_CATION, Params.NO_CATION, intake.KNUCKLE_POS_HIGH_CHAMBER, Params.NO_CATION))
+                                    .afterTime(0.001, new intakeAct(Params.NO_CATION, Params.NO_CATION, intake.KNUCKLE_POS_HIGH_CHAMBER, Params.NO_CATION))
                                     .turnTo(headingAngleCorrection) // fine correct heading
                                     .build()
                     );
-
-                    intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
                     //adjust pos using distance sensor
                     adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorB, drive);
 

@@ -321,11 +321,10 @@ public class AutoRightHanging2 extends LinearOpMode {
                         drive.actionBuilder(drive.pose)
                                 // flip arm to high chamber position, back knuckle to avoid hitting chamber during strafing
                                 .afterTime(0.1, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_BACK, Params.NO_CATION, Params.NO_CATION))
-                                .afterTime(1.5, new intakeAct(Params.NO_CATION, Params.NO_CATION, intake.KNUCKLE_POS_HIGH_CHAMBER, Params.NO_CATION))
                                 // shift 1.5 inch for each specimen on high chamber
                                 .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x, hangSpecimenPos.y - 1.3 * j), newStartPose.heading)
                                 // get knuckle ready for hanging
-                                //.afterTime(0.001, new intakeAct(Params.NO_CATION, Params.NO_CATION, intake.KNUCKLE_POS_HIGH_CHAMBER, Params.NO_CATION))
+                                .afterTime(0.001, new intakeAct(Params.NO_CATION, Params.NO_CATION, intake.KNUCKLE_POS_HIGH_CHAMBER, Params.NO_CATION))
                                 .turnTo(headingAngleCorrection) // fine correct heading
                                 .build()
                 );
