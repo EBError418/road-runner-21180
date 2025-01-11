@@ -263,19 +263,19 @@ public class Teleop2025 extends AutoRightHanging2 {
                     imu.resetYaw();
                     Params.imuReseted = true;
                 }
-                imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+                imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - Math.PI;
 
-                drive.pose = new Pose2d(pickupSpecimen, imu_heading - Math.PI); // pickup Position
+                drive.pose = new Pose2d(pickupSpecimen, imu_heading); // pickup Position
 
                 for (int i = 0; i < specimenShiftMax; i++) { // cycling specimen
-                    // close finger
-                    intake.setFingerPosition(intake.FINGER_CLOSE);
-                    sleep(150);
 
-                    imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
+                    imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - Math.PI;
 
                     Logging.log("teleop cycle # %s specimen pick up before update imu heading: %2f dead wheel heading: %2f", i, Math.toDegrees(imu_heading), Math.toDegrees(drive.pose.heading.log()));
-                    //drive.pose = new Pose2d(drive.pose.position, imu_heading - Math.PI); // pickup Position
+                    //drive.pose = new Pose2d(drive.pose.position, imu_heading); // pickup Position
+                    drive.pose = new Pose2d(pickupSpecimen, imu_heading); // pickup Position
+
                     Logging.log("teleop cycle # %s specimen pick up after replace by imu heading: %2f dead wheel heading: %2f", i, Math.toDegrees(imu_heading), Math.toDegrees(drive.pose.heading.log()));
 
                     Actions.runBlocking(
@@ -283,9 +283,20 @@ public class Teleop2025 extends AutoRightHanging2 {
                                     .turnTo(headingAngleCorrection) // fine correct heading
                                     .build()
                     );
-                    imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
-                    Logging.log("teleop cycle # %s specimen pick up after update imu heading: %2f dead wheel heading: %2f", i, Math.toDegrees(imu_heading), Math.toDegrees(drive.pose.heading.log()));
 
+                    imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - Math.PI;
+                    Logging.log("teleop cycle # %s specimen pick up after update imu heading: %2f dead wheel heading: %2f", i, Math.toDegrees(imu_heading), Math.toDegrees(drive.pose.heading.log()));
+                    // adjust wall distance by distance sensor
+                    adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF, drive);
+                    drive.pose = new Pose2d(pickupSpecimen, imu_heading); // pickup Position
+
+                    if (gamepad1.x) {
+                        break;
+                    } // quit specimen cycling if gamepad1.x
+
+                    // close finger
+                    intake.setFingerPosition(intake.FINGER_CLOSE);
+                    sleep(150);
                     intake.setKnucklePosition(intake.KNUCKLE_POS_LIFT_FROM_WALL);
                     sleep(100); // wait knuckle lift the specimen
 
@@ -302,26 +313,28 @@ public class Teleop2025 extends AutoRightHanging2 {
                                     .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x, hangSpecimenPos.y + specimenShiftEach * specimenCount), initHeading)
                                     // get knuckle ready for hanging
                                     //.afterTime(0.001, new intakeAct(Params.NO_CATION, Params.NO_CATION, intake.KNUCKLE_POS_HIGH_CHAMBER, Params.NO_CATION))
-                                    .turnTo(headingAngleCorrection) // fine correct heading
+                                    //.turnTo(headingAngleCorrection) // fine correct heading
                                     .build()
                     );
 
-                    intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
+                    //intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
 
-                    imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+                    imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - Math.PI;
 
                     Logging.log("teleop cycle # %s specimen hang before update imu heading: %2f dead wheel heading: %2f", i, Math.toDegrees(imu_heading), Math.toDegrees(drive.pose.heading.log()));
-                    //drive.pose = new Pose2d(drive.pose.position, imu_heading - Math.PI); // pickup Position
+                    //drive.pose = new Pose2d(drive.pose.position, imu_heading); // pickup Position
                     Actions.runBlocking(
                             drive.actionBuilder(drive.pose)
                                     .turnTo(headingAngleCorrection) // fine correct heading
                                     .build()
                     );
-                    imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+                    imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - Math.PI;
                     Logging.log("teleop cycle # %s specimen hang after update imu heading: %2f dead wheel heading: %2f", i, Math.toDegrees(imu_heading), Math.toDegrees(drive.pose.heading.log()));
 
                     //adjust pos using distance sensor
                     adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorB, drive);
+                    intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
+                    sleep(250);
 
                     if (gamepad1.x) {
                         break;
@@ -380,12 +393,6 @@ public class Teleop2025 extends AutoRightHanging2 {
                                     .turnTo(headingAngleCorrection) // fine correct heading
                                     .build()
                     );
-
-                    // adjust wall distance by distance sensor
-                    adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF, drive);
-                    if (gamepad1.x) {
-                        break;
-                    } // quit specimen cycling if gamepad1.x
                 }
             }
 
