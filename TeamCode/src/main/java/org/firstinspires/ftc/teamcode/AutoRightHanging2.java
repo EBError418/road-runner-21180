@@ -148,7 +148,7 @@ public class AutoRightHanging2 extends LinearOpMode {
             telemetry.addData( "FTC 2024 - ", "Wait for starting ");
 
             telemetry.addData("deviceName", distSensorB.getDeviceName() );
-            telemetry.addData("back range", " = %2f", distSensorF.getDistance(DistanceUnit.INCH));
+            telemetry.addData("back range", " = %2f", distSensorB.getDistance(DistanceUnit.INCH));
 
 
             telemetry.addData("deviceName", distSensorF.getDeviceName() );
@@ -201,10 +201,10 @@ public class AutoRightHanging2 extends LinearOpMode {
         Vector2d firstHighChamberPos = new Vector2d(-3.0 * Params.HALF_MAT + 0.5, newStartPose.position.y);
 
         //grab
-        Vector2d firstSamplePosition = new Vector2d(- 3.1 * Params.HALF_MAT, - 4.1 * Params.HALF_MAT);
+        Vector2d firstSamplePosition = new Vector2d(- 3.15 * Params.HALF_MAT, - 4.1 * Params.HALF_MAT);
 
         // adjust x for second sample a little bit according to testing
-        Vector2d secondSamplePosition = new Vector2d(- 3.15 * Params.HALF_MAT, firstSamplePosition.y - 10.5);
+        Vector2d secondSamplePosition = new Vector2d(- 3.20 * Params.HALF_MAT, firstSamplePosition.y - 10.5);
 
         Vector2d obsZone = new Vector2d(- 4.3 * Params.HALF_MAT, - 3.5 * Params.HALF_MAT);
 
@@ -242,7 +242,7 @@ public class AutoRightHanging2 extends LinearOpMode {
             //Go to pick up first sample on mat
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
-                            .afterTime(1.3, new armToPickUpPos()) // lower arm during spline moving
+                            .afterTime(1.4, new armToPickUpPos()) // lower arm during spline moving
                             .strafeToLinearHeading(firstSamplePosition, newStartPose.heading)//go to first sample position
                             .turnTo(headingAngleCorrection) // fine adjust heading
                             .build()
@@ -466,7 +466,7 @@ public class AutoRightHanging2 extends LinearOpMode {
             Logging.log("distance sensor reading repetition # %s reading number = %2f", i, sensorReading);
             sleep(2);
         }
-        sensorDist = sensorDist / repeatTimes;
+        sensorDist = sensorDist / repeatTimes * 1.01; // adjust 1% based on testing
 
         double shiftDelta = sensorDist - aimDistance;
 

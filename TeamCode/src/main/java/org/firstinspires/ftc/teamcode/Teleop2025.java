@@ -74,8 +74,8 @@ public class Teleop2025 extends AutoRightHanging2 {
 
     int specimenCount = 0;//counter used to update specimen hanging position
     int specimenShiftMax = 7; //shift 2 inch for each specimen hanging
-    double specimenShiftInch = -7.0; // shift specimen to 7 inch right (-y) after hanging on high chamber
-    double specimenShiftEach = 1.6; // shift hanging place shift in Y direct
+    double specimenShiftInch = -7.3; // shift specimen to 7 inch right (-y) after hanging on high chamber
+    double specimenShiftEach = 1.7; // shift hanging place shift in Y direct
     // debug flags, turn it off for formal version to save time of logging
     boolean debugFlag = true;
 
@@ -96,7 +96,7 @@ public class Teleop2025 extends AutoRightHanging2 {
 
         Vector2d pickupSpecimen = new Vector2d(Params.pickupSpecimenX, -4.0 * Params.HALF_MAT);
         pickupSpecimenLineup = new Vector2d(Params.pickupSpecimenLineupX + 1.0, -4.0 * Params.HALF_MAT);
-        hangSpecimenPos = new Vector2d(Params.hangingSpecimenX - 3.0, -0.2 * Params.HALF_MAT);
+        hangSpecimenPos = new Vector2d(Params.hangingSpecimenX - 3.0, 0); //y: -0.2 * Params.HALF_MAT
 
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
