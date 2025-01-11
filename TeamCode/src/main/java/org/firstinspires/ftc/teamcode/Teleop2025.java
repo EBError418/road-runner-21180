@@ -27,6 +27,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
+import com.acmerobotics.roadrunner.Rotation2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -59,9 +60,9 @@ import java.util.List;
  *          "Finger"
  */
 
-@TeleOp(name="Teleop 2024", group="Concept")
+@TeleOp(name="Teleop 2025", group="Concept")
 //@Disabled
-public class Teleop2024 extends AutoRightHanging2 {
+public class Teleop2025 extends AutoRightHanging2 {
     // chassis
     //MecanumDrive drive;
 
@@ -73,8 +74,8 @@ public class Teleop2024 extends AutoRightHanging2 {
 
     int specimenCount = 0;//counter used to update specimen hanging position
     int specimenShiftMax = 7; //shift 2 inch for each specimen hanging
-    double specimenShiftInch = -12.0; // shift specimen to 7 inch right (-y) after hanging on high chamber
-    double specimenShiftEach = 1.3; // shift hanging place shift in Y direct
+    double specimenShiftInch = -7.0; // shift specimen to 7 inch right (-y) after hanging on high chamber
+    double specimenShiftEach = 1.6; // shift hanging place shift in Y direct
     // debug flags, turn it off for formal version to save time of logging
     boolean debugFlag = true;
 
@@ -271,6 +272,20 @@ public class Teleop2024 extends AutoRightHanging2 {
                     intake.setFingerPosition(intake.FINGER_CLOSE);
                     sleep(150);
 
+                    imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
+                    Logging.log("teleop cycle # %s specimen pick up before update imu heading: %2f dead wheel heading: %2f", i, Math.toDegrees(imu_heading), Math.toDegrees(drive.pose.heading.log()));
+                    //drive.pose = new Pose2d(drive.pose.position, imu_heading - Math.PI); // pickup Position
+                    Logging.log("teleop cycle # %s specimen pick up after replace by imu heading: %2f dead wheel heading: %2f", i, Math.toDegrees(imu_heading), Math.toDegrees(drive.pose.heading.log()));
+
+                    Actions.runBlocking(
+                            drive.actionBuilder(drive.pose)
+                                    .turnTo(headingAngleCorrection) // fine correct heading
+                                    .build()
+                    );
+                    imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+                    Logging.log("teleop cycle # %s specimen pick up after update imu heading: %2f dead wheel heading: %2f", i, Math.toDegrees(imu_heading), Math.toDegrees(drive.pose.heading.log()));
+
                     intake.setKnucklePosition(intake.KNUCKLE_POS_LIFT_FROM_WALL);
                     sleep(100); // wait knuckle lift the specimen
 
@@ -292,6 +307,19 @@ public class Teleop2024 extends AutoRightHanging2 {
                     );
 
                     intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
+
+                    imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+
+                    Logging.log("teleop cycle # %s specimen hang before update imu heading: %2f dead wheel heading: %2f", i, Math.toDegrees(imu_heading), Math.toDegrees(drive.pose.heading.log()));
+                    //drive.pose = new Pose2d(drive.pose.position, imu_heading - Math.PI); // pickup Position
+                    Actions.runBlocking(
+                            drive.actionBuilder(drive.pose)
+                                    .turnTo(headingAngleCorrection) // fine correct heading
+                                    .build()
+                    );
+                    imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS);
+                    Logging.log("teleop cycle # %s specimen hang after update imu heading: %2f dead wheel heading: %2f", i, Math.toDegrees(imu_heading), Math.toDegrees(drive.pose.heading.log()));
+
                     //adjust pos using distance sensor
                     adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorB, drive);
 
