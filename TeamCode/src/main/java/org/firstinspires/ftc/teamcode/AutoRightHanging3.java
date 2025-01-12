@@ -75,40 +75,7 @@ import java.util.List;
 
 @Autonomous(name=" B - 4 specimens", group="Concept")
 //@Disabled
-public class AutoRightHanging3 extends LinearOpMode {
-    /**
-     * Robot Start location: "1" - right side; "-1" - left side.
-     */
-    public int leftOrRight = 1; // -1: left; 1: right
-    public int sleepTimeForHangingSpecimen = 500;
-    public int knuckleSleepTime = 150;
-    // avoid program crush when calling turnTo() function for fine heading correction
-    double headingAngleCorrection = Math.toRadians(180.0 - 0.1);
-    Vector2d hangSpecimenPos;
-
-    //wall positions
-    Vector2d pickupSpecimenLineup = new Vector2d(Params.pickupSpecimenLineupX, - 3.8 * Params.HALF_MAT);
-
-    // Declare OpMode members.
-    public ElapsedTime runtime = new ElapsedTime();
-    public intakeUnit intake;
-    public MecanumDrive drive;
-    public IMU imu;
-
-    Pose2d newStartPose;
-
-    /**
-     * Set robot starting position, and blueOrRed, frontOrBack variables:
-     * @param leftRight : the value of robot location in the field.
-     *                      -1 for left, -1 for left,
-     */
-    private void setStartPoses(int leftRight) {
-        // road runner variables
-        newStartPose = new Pose2d((-6 * Params.HALF_MAT + Params.CHASSIS_LENGTH / 2), (-leftRight * (Params.CHASSIS_HALF_WIDTH - 2.0)), Math.toRadians(180));
-    }
-    DistanceSensor distSensorB;
-    DistanceSensor distSensorF;
-
+public class AutoRightHanging3 extends AutoRightHanging2 {
 
     @Override
     public void runOpMode() {
@@ -198,7 +165,7 @@ public class AutoRightHanging3 extends LinearOpMode {
 
         //new stuff for 2024-2025 season
         //hang specimen
-        Vector2d firstHighChamberPos = new Vector2d(-3.0 * Params.HALF_MAT + 0.5, newStartPose.position.y);
+        Vector2d firstHighChamberPos = new Vector2d(-3.0 * Params.HALF_MAT, newStartPose.position.y);
 
         //grab
         Vector2d firstSamplePosition = new Vector2d(- 3.15 * Params.HALF_MAT, - 4.1 * Params.HALF_MAT);
@@ -359,166 +326,5 @@ public class AutoRightHanging3 extends LinearOpMode {
         }
     } // end auto_core()
 
-    //action for arm flip to hang specimen on high chamber
-    private class armToReadyHangAct implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_READY);
-            intake.setWristPosition(intake.WRIST_BACK);
-            intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
-            return false;
-        }
-    }
-
-    //action for arm to pick up neutral sample during auto
-    private class armToPickUpPos implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SAMPLE_BACK);
-            sleep(100);
-            intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE_BACK);
-            intake.setWristPosition(intake.WRIST_BACK);
-            intake.setFingerPosition(intake.FINGER_OPEN);
-            return false;
-        }
-    }
-
-    private class logPos implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            Logging.log("pick up specimen X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
-
-            return false;
-        }
-    }
-
-    //action for arm, wrist, finger position control during driving
-    class intakeAct implements Action {
-        /**
-         *
-         * @param armPos:  the target position for arm motor
-         * @param wristPos: wrist position
-         * @param knucklePos: knuckle position
-         * @param fingerPos: finger position
-         */
-        public intakeAct(int armPos, int wristPos, double knucklePos, double fingerPos) {
-            arm = armPos;
-            wrist = wristPos;
-            knuckle = knucklePos;
-            finger = fingerPos;
-        }
-
-        // moving arm only with input a integer value.
-        public intakeAct(int armPos) {
-            arm = armPos;
-        }
-
-        // moving finger only with a double value.
-        public intakeAct(double fingerPos) {
-            finger = fingerPos;
-        }
-
-        private int arm = Params.NO_CATION;
-        private int wrist = Params.NO_CATION;
-        private double knuckle = Params.NO_CATION;
-        private double finger = Params.NO_CATION;
-
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-
-            if (Params.NO_CATION != arm) {
-                intake.setArmPosition(arm);
-            }
-
-            if (Params.NO_CATION != wrist) {
-                intake.setWristPosition(wrist);
-            }
-
-            if (Params.NO_CATION != (int)(knuckle)){
-                intake.setKnucklePosition(knuckle);
-            }
-
-            if (Params.NO_CATION != (int)(finger)){
-                intake.setFingerPosition(finger);
-            }
-            return false;
-        }
-    }
-
-    //action to set arm and wrist position to pick up from sub
-    class armToPickUpWallPos implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            pickupFromWallActions();
-
-            return false;
-        }
-    }
-
-    void adjustPosByDistanceSensor(double aimDistance, DistanceSensor distSensorID, MecanumDrive drv) {
-        double sensorDist = 0.0;
-        int repeatTimes = 5;
-
-        for (int i = 1; i <= repeatTimes; i++)
-        {
-            double sensorReading = distSensorID.getDistance(DistanceUnit.INCH);
-            sensorDist = sensorDist + sensorReading;
-            Logging.log("distance sensor reading repetition # %s reading number = %2f", i, sensorReading);
-            sleep(2);
-        }
-        sensorDist = sensorDist / repeatTimes; // adjust 1% based on testing
-
-        double shiftDelta = (sensorDist - aimDistance) * 1.092; //ratio between deadwheel distance and sensor distance determined empirically
-
-        // something wrong when reading distance sensor
-        if (sensorDist > 50.0 ) {
-            shiftDelta = 3.0;
-        }
-
-        if (aimDistance > 10) // wall distance is bigger than 10, robot need move to -x direction.
-        {
-            shiftDelta = -shiftDelta;
-        }
-        shiftDelta = Range.clip(shiftDelta, -10.0, 10.0); // limit adjust distance to +-10.0 inch
-        Logging.log("drive pose before distance average number");
-        Logging.log("before adjust, sensor distance = %2f, shift delta = %2f", sensorDist, shiftDelta);
-        Logging.log(" X position = %2f, Y position = %2f , heading = %sf", drv.pose.position.x, drv.pose.position.y, Math.toDegrees(drv.pose.heading.log()));
-
-        // adjust when shiftDelta big enough than 0.2 inch to same some time
-        if (Math.abs(shiftDelta) > 0.2) {
-            Actions.runBlocking(
-                    drv.actionBuilder(drv.pose)
-                            .strafeToLinearHeading(new Vector2d(drv.pose.position.x + shiftDelta, drv.pose.position.y), Params.startPose.heading) // adjust heading also.
-                            .build()
-            );
-            Logging.log(" After adjust: X position = %2f, Y position = %2f , heading = %sf", drv.pose.position.x, drv.pose.position.y, Math.toDegrees(drv.pose.heading.log()));
-            Logging.log("after adjust, sensor distance = %2f, aim distance = %2f ", distSensorID.getDistance(DistanceUnit.INCH), aimDistance);
-        }
-        else {
-            Logging.log("No adjust by distance sensor ");
-        }
-    }
-
-    /**
-     * Set intake positions for picking up specimen from wall
-     */
-    void pickupFromWallActions() {
-        intake.fingerServoOpen();
-        sleep(knuckleSleepTime);
-        intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN_WALL);
-        intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SPECIMEN_WALL);
-        sleep(knuckleSleepTime);
-        sleep(knuckleSleepTime); // double sleep time since we have enough spare time here
-        intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
-    }
-
-    void updateProfileAccel(boolean slowMode) {
-        if (slowMode) {
-            MecanumDrive.PARAMS.minProfileAccel = -25;
-            MecanumDrive.PARAMS.maxProfileAccel = 40;
-        } else {
-            MecanumDrive.PARAMS.minProfileAccel = -40;
-            MecanumDrive.PARAMS.maxProfileAccel = 60;
-        }
-    }
+    
 }

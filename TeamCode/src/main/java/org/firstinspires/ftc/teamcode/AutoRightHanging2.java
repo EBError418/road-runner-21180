@@ -87,7 +87,7 @@ public class AutoRightHanging2 extends LinearOpMode {
     Vector2d hangSpecimenPos;
 
     //wall positions
-    Vector2d pickupSpecimenLineup = new Vector2d(Params.pickupSpecimenLineupX, - 3.8 * Params.HALF_MAT);
+    Vector2d pickupSpecimenLineup = new Vector2d(Params.pickupSpecimenLineupX, - 3.5 * Params.HALF_MAT);
 
     // Declare OpMode members.
     public ElapsedTime runtime = new ElapsedTime();
@@ -102,7 +102,7 @@ public class AutoRightHanging2 extends LinearOpMode {
      * @param leftRight : the value of robot location in the field.
      *                      -1 for left, -1 for left,
      */
-    private void setStartPoses(int leftRight) {
+    void setStartPoses(int leftRight) {
         // road runner variables
         newStartPose = new Pose2d((-6 * Params.HALF_MAT + Params.CHASSIS_LENGTH / 2), (-leftRight * (Params.CHASSIS_HALF_WIDTH - 2.0)), Math.toRadians(180));
     }
@@ -198,7 +198,7 @@ public class AutoRightHanging2 extends LinearOpMode {
 
         //new stuff for 2024-2025 season
         //hang specimen
-        Vector2d firstHighChamberPos = new Vector2d(-3.0 * Params.HALF_MAT + 0.5, newStartPose.position.y);
+        Vector2d firstHighChamberPos = new Vector2d(-3.0 * Params.HALF_MAT, newStartPose.position.y);
 
         //grab
         Vector2d firstSamplePosition = new Vector2d(- 3.15 * Params.HALF_MAT, - 4.1 * Params.HALF_MAT);
@@ -306,7 +306,7 @@ public class AutoRightHanging2 extends LinearOpMode {
                 Params.pickupSpecimenX = drive.pose.position.x; // restore X position for teleop.
                 Params.pickupSpecimenLineupX = drive.pose.position.x + 3.0; // leave 3.0 inch gap to avoid hitting the specimen
                 // adjust wall pickup position.x according to distance sensor to speedup next pickup.
-                pickupSpecimenLineup = new Vector2d(Params.pickupSpecimenLineupX, -3.8 * Params.HALF_MAT);
+                pickupSpecimenLineup = new Vector2d(Params.pickupSpecimenLineupX, pickupSpecimenLineup.y);
                 Logging.log(" After adjust of pickupSpecimenLineup: X position = %2f", pickupSpecimenLineup.x);
 
                 // start picking up actions
@@ -360,7 +360,7 @@ public class AutoRightHanging2 extends LinearOpMode {
     } // end auto_core()
 
     //action for arm flip to hang specimen on high chamber
-    private class armToReadyHangAct implements Action {
+    class armToReadyHangAct implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_READY);
@@ -371,7 +371,7 @@ public class AutoRightHanging2 extends LinearOpMode {
     }
 
     //action for arm to pick up neutral sample during auto
-    private class armToPickUpPos implements Action {
+    class armToPickUpPos implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SAMPLE_BACK);
@@ -383,7 +383,7 @@ public class AutoRightHanging2 extends LinearOpMode {
         }
     }
 
-    private class logPos implements Action {
+    class logPos implements Action {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             Logging.log("pick up specimen X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
@@ -457,7 +457,7 @@ public class AutoRightHanging2 extends LinearOpMode {
 
     void adjustPosByDistanceSensor(double aimDistance, DistanceSensor distSensorID, MecanumDrive drv) {
         double sensorDist = 0.0;
-        int repeatTimes = 5;
+        int repeatTimes = 2;
 
         for (int i = 1; i <= repeatTimes; i++)
         {
