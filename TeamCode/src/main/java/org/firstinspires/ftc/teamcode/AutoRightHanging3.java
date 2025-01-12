@@ -175,6 +175,7 @@ public class AutoRightHanging3 extends AutoRightHanging2 {
 
         Vector2d obsZone = new Vector2d(- 4.3 * Params.HALF_MAT, - 3.5 * Params.HALF_MAT);
 
+        updateProfileAccel(false); // fast mode
         if (leftOrRight == 1) { // right side auto
             //Go to position for arm flip and hang on high chamber
             Logging.log(" Start position: X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
