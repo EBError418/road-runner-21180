@@ -466,9 +466,9 @@ public class AutoRightHanging2 extends LinearOpMode {
             Logging.log("distance sensor reading repetition # %s reading number = %2f", i, sensorReading);
             sleep(2);
         }
-        sensorDist = sensorDist / repeatTimes * 1.01; // adjust 1% based on testing
+        sensorDist = sensorDist / repeatTimes; // adjust 1% based on testing
 
-        double shiftDelta = sensorDist - aimDistance;
+        double shiftDelta = (sensorDist - aimDistance) * 1.092; //ratio between deadwheel distance and sensor distance determined empirically
 
         // something wrong when reading distance sensor
         if (sensorDist > 50.0 ) {

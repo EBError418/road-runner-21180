@@ -74,8 +74,8 @@ public class Teleop2025 extends AutoRightHanging2 {
 
     int specimenCount = 0;//counter used to update specimen hanging position
     int specimenShiftMax = 7; //shift 2 inch for each specimen hanging
-    double specimenShiftInch = -7.3; // shift specimen to 7 inch right (-y) after hanging on high chamber
-    double specimenShiftEach = 1.7; // shift hanging place shift in Y direct
+    double specimenShiftInch = 7.3; // shift specimen to 7 inch right (-y) after hanging on high chamber
+    double specimenShiftEach = 0; // shift hanging place shift in Y direct
     // debug flags, turn it off for formal version to save time of logging
     boolean debugFlag = true;
 
@@ -96,7 +96,7 @@ public class Teleop2025 extends AutoRightHanging2 {
 
         Vector2d pickupSpecimen = new Vector2d(Params.pickupSpecimenX, -4.0 * Params.HALF_MAT);
         pickupSpecimenLineup = new Vector2d(Params.pickupSpecimenLineupX + 1.0, -4.0 * Params.HALF_MAT);
-        hangSpecimenPos = new Vector2d(Params.hangingSpecimenX - 3.0, 0); //y: -0.2 * Params.HALF_MAT
+        hangSpecimenPos = new Vector2d(Params.hangingSpecimenX - 3.0, 2); //y: -0.2 * Params.HALF_MAT
 
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
@@ -263,18 +263,18 @@ public class Teleop2025 extends AutoRightHanging2 {
                     imu.resetYaw();
                     Params.imuReseted = true;
                 }
-                imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - Math.PI;
+                imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) + Math.PI;
 
                 drive.pose = new Pose2d(pickupSpecimen, imu_heading); // pickup Position
 
                 for (int i = 0; i < specimenShiftMax; i++) { // cycling specimen
 
 
-                    imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - Math.PI;
+                    imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) + Math.PI;
 
                     Logging.log("teleop cycle # %s specimen pick up before update imu heading: %2f dead wheel heading: %2f", i, Math.toDegrees(imu_heading), Math.toDegrees(drive.pose.heading.log()));
                     //drive.pose = new Pose2d(drive.pose.position, imu_heading); // pickup Position
-                    drive.pose = new Pose2d(pickupSpecimen, imu_heading); // pickup Position
+                    drive.pose = new Pose2d(new Vector2d(pickupSpecimen.x, drive.pose.position.y), imu_heading); // pickup Position
 
                     Logging.log("teleop cycle # %s specimen pick up after replace by imu heading: %2f dead wheel heading: %2f", i, Math.toDegrees(imu_heading), Math.toDegrees(drive.pose.heading.log()));
 
@@ -284,7 +284,7 @@ public class Teleop2025 extends AutoRightHanging2 {
                                     .build()
                     );
 
-                    imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - Math.PI;
+                    imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) + Math.PI;
                     Logging.log("teleop cycle # %s specimen pick up after update imu heading: %2f dead wheel heading: %2f", i, Math.toDegrees(imu_heading), Math.toDegrees(drive.pose.heading.log()));
                     // adjust wall distance by distance sensor
                     adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF, drive);
@@ -308,33 +308,30 @@ public class Teleop2025 extends AutoRightHanging2 {
                             drive.actionBuilder(drive.pose)
                                     // flip arm to high chamber position, back knuckle to avoid hitting chamber during strafing
                                     .afterTime(0.1, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_BACK, Params.NO_CATION, Params.NO_CATION))
-                                    //.afterTime(1., new intakeAct(Params.NO_CATION, Params.NO_CATION, intake.KNUCKLE_POS_HIGH_CHAMBER, Params.NO_CATION))
                                     // shift 1.5 inch for each specimen on high chamber
                                     .strafeToLinearHeading(new Vector2d(hangSpecimenPos.x, hangSpecimenPos.y + specimenShiftEach * specimenCount), initHeading)
-                                    // get knuckle ready for hanging
-                                    //.afterTime(0.001, new intakeAct(Params.NO_CATION, Params.NO_CATION, intake.KNUCKLE_POS_HIGH_CHAMBER, Params.NO_CATION))
-                                    //.turnTo(headingAngleCorrection) // fine correct heading
-                                    .build()
-                    );
-
-                    //intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
-
-                    imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - Math.PI;
-
-                    Logging.log("teleop cycle # %s specimen hang before update imu heading: %2f dead wheel heading: %2f", i, Math.toDegrees(imu_heading), Math.toDegrees(drive.pose.heading.log()));
-                    //drive.pose = new Pose2d(drive.pose.position, imu_heading); // pickup Position
-                    Actions.runBlocking(
-                            drive.actionBuilder(drive.pose)
                                     .turnTo(headingAngleCorrection) // fine correct heading
                                     .build()
                     );
-                    imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) - Math.PI;
+
+                    /*
+                    imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) + Math.PI;
+
+                    Logging.log("teleop cycle # %s specimen hang before update imu heading: %2f dead wheel heading: %2f", i, Math.toDegrees(imu_heading), Math.toDegrees(drive.pose.heading.log()));
+                    drive.pose = new Pose2d(drive.pose.position, imu_heading);
+                    Actions.runBlocking(
+                            drive.actionBuilder(drive.pose)
+                                    .turnTo(headingAngleCorrection)
+                                    .build()
+                    );
+                    imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) + Math.PI;
                     Logging.log("teleop cycle # %s specimen hang after update imu heading: %2f dead wheel heading: %2f", i, Math.toDegrees(imu_heading), Math.toDegrees(drive.pose.heading.log()));
 
+                     */
                     //adjust pos using distance sensor
                     adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorB, drive);
                     intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
-                    sleep(250);
+                    sleep(200);
 
                     if (gamepad1.x) {
                         break;
@@ -390,7 +387,7 @@ public class Teleop2025 extends AutoRightHanging2 {
                                     .afterTime(0.1, new intakeAct(intake.ARM_POS_GRAB_SPECIMEN_WALL, intake.WRIST_POS_NEUTRAL, Params.NO_CATION, Params.NO_CATION))
                                     .afterTime(0.6, new intakeAct(Params.NO_CATION, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_POS_PICKUP_SPECIMEN_WALL, Params.NO_CATION))
                                     .strafeToLinearHeading(pickupSpecimenLineup, initHeading) // line up
-                                    .turnTo(headingAngleCorrection) // fine correct heading
+                                    //.turnTo(headingAngleCorrection) // fine correct heading
                                     .build()
                     );
                 }

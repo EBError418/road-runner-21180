@@ -48,7 +48,7 @@ public class Params {
 
     //distances for dist sensor
     static double HIGH_CHAMBER_DIST = 6.2; // back distance sensor to chamber when hanging specimen
-    static double SPECIMEN_PICKUP_DIST = 14.1; //14.5; // front distance sensor to wall when pickup specimen
+    static double SPECIMEN_PICKUP_DIST = 14.3; //14.5; // front distance sensor to wall when pickup specimen
 
     static int NO_CATION = 999999;
     //game field parameters

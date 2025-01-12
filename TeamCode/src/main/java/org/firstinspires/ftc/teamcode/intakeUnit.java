@@ -115,7 +115,7 @@ public class intakeUnit
     int ARM_POS_GRAB_SPECIMEN = -170; //-240, grab specimen from ground
     int ARM_POS_SUB = -500;
     int ARM_POS_DOWN_HANGING = 100;
-    int ARM_POS_GRAB_SPECIMEN_WALL = -360; // grab specimen from wall
+    int ARM_POS_GRAB_SPECIMEN_WALL = -350; // grab specimen from wall
     int ARM_POS_OBZ_PARKING = -100;
 
     /**
