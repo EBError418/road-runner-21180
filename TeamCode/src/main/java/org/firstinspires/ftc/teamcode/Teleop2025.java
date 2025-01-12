@@ -273,7 +273,6 @@ public class Teleop2025 extends AutoRightHanging2 {
                     imu_heading = imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.RADIANS) + Math.PI;
 
                     Logging.log("teleop cycle # %s specimen pick up before update imu heading: %2f dead wheel heading: %2f", i, Math.toDegrees(imu_heading), Math.toDegrees(drive.pose.heading.log()));
-                    //drive.pose = new Pose2d(drive.pose.position, imu_heading); // pickup Position
                     drive.pose = new Pose2d(new Vector2d(pickupSpecimen.x, drive.pose.position.y), imu_heading); // pickup Position
 
                     Logging.log("teleop cycle # %s specimen pick up after replace by imu heading: %2f dead wheel heading: %2f", i, Math.toDegrees(imu_heading), Math.toDegrees(drive.pose.heading.log()));
@@ -288,7 +287,9 @@ public class Teleop2025 extends AutoRightHanging2 {
                     Logging.log("teleop cycle # %s specimen pick up after update imu heading: %2f dead wheel heading: %2f", i, Math.toDegrees(imu_heading), Math.toDegrees(drive.pose.heading.log()));
                     // adjust wall distance by distance sensor
                     adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF, drive);
-                    drive.pose = new Pose2d(pickupSpecimen, imu_heading); // pickup Position
+                    adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF, drive); // adjust twice to make more accurate
+
+                    drive.pose = new Pose2d(new Vector2d(pickupSpecimen.x, drive.pose.position.y), imu_heading); // pickup Position
 
                     if (gamepad1.x) {
                         break;
@@ -332,6 +333,7 @@ public class Teleop2025 extends AutoRightHanging2 {
                     adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorB, drive);
                     intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
                     sleep(200);
+                    drive.pose = new Pose2d(hangSpecimenPos.x, drive.pose.position.y, imu_heading);
 
                     if (gamepad1.x) {
                         break;
