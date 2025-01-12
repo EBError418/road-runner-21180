@@ -27,7 +27,6 @@ package org.firstinspires.ftc.teamcode;
 
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
-import com.acmerobotics.roadrunner.Rotation2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.lynx.LynxModule;
@@ -74,7 +73,7 @@ public class Teleop2025 extends AutoRightHanging2 {
 
     int specimenCount = 0;//counter used to update specimen hanging position
     int specimenShiftMax = 7; //shift 2 inch for each specimen hanging
-    double specimenShiftInch = 7.3; // shift specimen to 7 inch right (-y) after hanging on high chamber
+    double specimenPushLeft = 7.5; // push specimen to 7 inch right (-y) after hanging on high chamber
     double specimenShiftEach = 0; // shift hanging place shift in Y direct
     // debug flags, turn it off for formal version to save time of logging
     boolean debugFlag = true;
@@ -94,9 +93,9 @@ public class Teleop2025 extends AutoRightHanging2 {
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
         imu = drive.lazyImu.get();
 
-        Vector2d pickupSpecimen = new Vector2d(Params.pickupSpecimenX, -4.0 * Params.HALF_MAT);
-        pickupSpecimenLineup = new Vector2d(Params.pickupSpecimenLineupX + 1.0, -4.0 * Params.HALF_MAT);
-        hangSpecimenPos = new Vector2d(Params.hangingSpecimenX - 3.0, 2); //y: -0.2 * Params.HALF_MAT
+        Vector2d pickupSpecimen = new Vector2d(Params.pickupSpecimenX, -3.5 * Params.HALF_MAT);
+        pickupSpecimenLineup = new Vector2d(Params.pickupSpecimenLineupX + 1.0, -3.5 * Params.HALF_MAT);
+        hangSpecimenPos = new Vector2d(Params.hangingSpecimenX - 3.0, 0); //y: -0.2 * Params.HALF_MAT
 
 
         intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
@@ -368,12 +367,14 @@ public class Teleop2025 extends AutoRightHanging2 {
                     }
 
                     //  y shift
-                    Actions.runBlocking(
-                            drive.actionBuilder(drive.pose)
-                                    .strafeTo(new Vector2d(drive.pose.position.x, drive.pose.position.y + specimenShiftInch)) // line up
-                                    .build()
-                    );
-                    Logging.log(" after y shift pos: X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
+                    if (Math.abs(specimenPushLeft) > 0) {
+                        Actions.runBlocking(
+                                drive.actionBuilder(drive.pose)
+                                        .strafeTo(new Vector2d(drive.pose.position.x, drive.pose.position.y + specimenPushLeft)) // line up
+                                        .build()
+                        );
+                        Logging.log(" after y shift pos: X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
+                    }
 
                     //return to wall to pickup next specimen
                     intake.fingerServoOpen();
