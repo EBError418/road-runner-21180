@@ -114,16 +114,15 @@ public class AutoRightHanging3 extends AutoRightHanging2 {
 
             telemetry.addData( "FTC 2024 - ", "Wait for starting ");
 
-            telemetry.addData("deviceName", distSensorB.getDeviceName() );
-            telemetry.addData("back range", " = %2f", distSensorB.getDistance(DistanceUnit.INCH));
+            telemetry.addData(" ---- ", " ---  ");
 
+            telemetry.addData("Back distance", " = %2f", distSensorB.getDistance(DistanceUnit.INCH));
 
-            telemetry.addData("deviceName", distSensorF.getDeviceName() );
-            telemetry.addData("front range", " = %2f", distSensorF.getDistance(DistanceUnit.INCH));
-
-            telemetry.addData("Arm", "position = %d", intake.getArmPosition());
+            telemetry.addData("front distance", " = %2f", distSensorF.getDistance(DistanceUnit.INCH));
 
             telemetry.addData(" ---- ", " ---  ");
+
+            telemetry.addData("Arm", "position = %d", intake.getArmPosition());
 
             telemetry.addData("Arm calibration - -    ", Params.armCalibrated? "Pass!" :" Failed !!!!!");
 
@@ -187,7 +186,7 @@ public class AutoRightHanging3 extends AutoRightHanging2 {
             );
 
             // adjust robot position by distance sensor. Temp comment out for saving time
-            adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorB, drive);
+            // adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorB, drive);
 
             // Adjust hanging specimen position.x according to the preload specimen hanging position
             // after adjusted by distance sensor
@@ -206,18 +205,17 @@ public class AutoRightHanging3 extends AutoRightHanging2 {
             intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN);
             intake.setKnucklePosition(intake.KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE);
 
-            sleep(200);
+            //sleep(200);
             //Go to pick up first sample on mat
             Actions.runBlocking(
                     drive.actionBuilder(drive.pose)
                             .afterTime(1.4, new armToPickUpPos()) // lower arm during spline moving
                             .strafeToLinearHeading(firstSamplePosition, newStartPose.heading)//go to first sample position
-                            .turnTo(headingAngleCorrection) // fine adjust heading
+                            //.turnTo(headingAngleCorrection) // fine adjust heading
                             .build()
             );
             Logging.log("pickup first sample: dead wheel heading = %2f", Math.toDegrees(drive.pose.heading.log()));
             Logging.log("pickup first sample: imu heading = %2f", imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) + 180);
-
 
             intake.fingerServoClose();
             sleep(150);
@@ -233,27 +231,47 @@ public class AutoRightHanging3 extends AutoRightHanging2 {
                             .build()
             );
             intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SAMPLE_BACK);
-            sleep(400); // waiting arm reaching position to drop off first sample.
+            sleep(300); // waiting arm reaching position to drop off first sample.
             intake.setArmPosition(intake.ARM_POS_GRAB_SAMPLE_BACK);
             intake.setWristPosition(intake.WRIST_BACK);
-            intake.fingerServoOpen();
-            sleep(200);
+            intake.fingerServoOpen(); // drop first sample
+            sleep(100);
             intake.setKnucklePosition(intake.KNUCKLE_SIZE_CONSTRAINT); // flip knuckle before lift arm due to size limitation
 
             sleep(1000); // wait arm flip back to pickup second sample
             intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SAMPLE_BACK); // flip knuckle before lift arm due to size limitation
-            sleep(400);
+            sleep(300);
             intake.fingerServoClose();
             Logging.log("pickup second sample: dead wheel heading = %2f", Math.toDegrees(drive.pose.heading.log()));
             Logging.log("pickup second sample: imu heading = %2f", imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) + 180);
 
             sleep(150); // wait finger close to grab second sample
             intake.setKnucklePosition(intake.KNUCKLE_SIZE_CONSTRAINT); // flip knuckle before lift arm due to size limitation
-            sleep(150);
-           // moving during arm flip for wall case, starting flip arm here
-            intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN_WALL); // flip arm to grab specimen position before drop off second sample
+
+            intake.setArmPosition(intake.ARM_POS_DROP_SAMPLE);
             intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
-            sleep(800);
+            sleep(400);
+            intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SAMPLE_BACK);
+            sleep(400); // waiting arm reaching position to drop off first sample.
+
+            intake.fingerServoOpen(); // drop off second sample
+            intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_READY);
+            intake.setWristPosition(intake.WRIST_BACK);
+            intake.setKnucklePosition(intake.KNUCKLE_SIZE_CONSTRAINT); // flip knuckle before lift arm due to size limitation
+
+            // strafe to second sample during flip arm to drop first sample
+            Actions.runBlocking(
+                    drive.actionBuilder(drive.pose)
+                            .strafeTo(new Vector2d(-Params.HALF_MAT, drive.pose.position.y))//go to 3rd sample position
+                            .strafeTo(new Vector2d(drive.pose.position.x, -6.0 * Params.HALF_MAT + Params.CHASSIS_HALF_WIDTH - 1.0))//go to wall to reach 3rd sample position
+                            .strafeTo(new Vector2d(-4.5 * Params.HALF_MAT, drive.pose.position.y))//push 3rd sample too obz
+                            .build()
+            );
+
+           // moving during arm flip for wall case, starting flip arm here
+            //intake.setArmPosition(intake.ARM_POS_GRAB_SPECIMEN_WALL); // flip arm to grab specimen position before drop off second sample
+            //intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
+            //sleep(800);
             
             // pick up specimen from wall, loop to hang specimen
             for (int j = 1; j < 4; j++) {
@@ -264,7 +282,7 @@ public class AutoRightHanging3 extends AutoRightHanging2 {
                         drive.actionBuilder(drive.pose)
                                 .afterTime(0.1, new intakeAct(intake.ARM_POS_GRAB_SPECIMEN_WALL, intake.WRIST_POS_NEUTRAL, intake.KNUCKLE_POS_PICKUP_SPECIMEN_WALL, Params.NO_CATION))
                                 .strafeToLinearHeading(pickupSpecimenLineup, newStartPose.heading) // line up
-                                //.turnTo(headingAngleCorrection) // fine correct heading
+                                .turnTo(headingAngleCorrection) // fine correct heading
                                 .build()
                 );
                 intake.fingerServoOpen(); // drop off the second sample

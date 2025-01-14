@@ -518,7 +518,7 @@ public class AutoRightHanging2 extends LinearOpMode {
             MecanumDrive.PARAMS.maxProfileAccel = 40;
         } else {
             MecanumDrive.PARAMS.minProfileAccel = -40;
-            MecanumDrive.PARAMS.maxProfileAccel = 60;
+            MecanumDrive.PARAMS.maxProfileAccel = 70;
         }
     }
 }
