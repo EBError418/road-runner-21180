@@ -255,8 +255,8 @@ public class AprilTagTest {
 
             driveMC.updatePoseEstimate();
 
-            Logging.log("Drive Heading = %2.2f", Math.toDegrees(driveMC.pose.heading.log()));
-            Logging.log("Drive position x = %2.2f, y = %2.2f", driveMC.pose.position.x, driveMC.pose.position.y);
+            //Logging.log("Drive Heading = %2.2f", Math.toDegrees(driveMC.pose.heading.log()));
+            //Logging.log("Drive position x = %2.2f, y = %2.2f", driveMC.pose.position.x, driveMC.pose.position.y);
         }
 
         return reachedTarget;

@@ -227,7 +227,7 @@ public final class MecanumDrive {
 
     public MecanumDrive(HardwareMap hardwareMap, Pose2d pose) {
 
-        this.pose = pose;
+        //this.pose = pose;
 
         /*  only uncomment for tuning to lift arm
         intakeUnit intake = new intakeUnit(hardwareMap, "Arm", "Wrist",
@@ -282,7 +282,7 @@ public final class MecanumDrive {
         voltageSensor = hardwareMap.voltageSensor.iterator().next();
 
         if (PARAMS.useDeadWheel){
-            localizer = new ThreeDeadWheelLocalizer(hardwareMap, PARAMS.inPerTick);
+            localizer = new ThreeDeadWheelLocalizer(hardwareMap, PARAMS.inPerTick, pose);
         } else {
             localizer = new DriveLocalizer(pose);
         }

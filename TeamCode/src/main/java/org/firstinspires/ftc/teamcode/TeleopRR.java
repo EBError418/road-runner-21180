@@ -282,128 +282,6 @@ public class TeleopRR extends LinearOpMode {
                 intake.setKnucklePosition(intake.KNUCKLE_SIZE_CONSTRAINT);
             }
 
-            // cycling specimen from wall, gamepad1.y
-            if (gpButtons.SpecimenCycleWall) {
-                drive.pose = pickUpSpecimenWallPos;
-
-                // close finger
-                intake.setFingerPosition(intake.FINGER_CLOSE);
-                sleep(150);
-                intake.setKnucklePosition(intake.KNUCKLE_POS_LIFT_FROM_WALL);
-                sleep(100); // wait knuckle lift the specimen
-
-                // strafe to high chamber for hanging specimen
-                Actions.runBlocking(
-                        drive.actionBuilder(drive.pose)
-                                // flip arm to high chamber position, back knuckle to avoid hitting chamber during strafing
-                                .afterTime(0.6, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_BACK, intake.KNUCKLE_POS_LIFT_FROM_WALL, intake.FINGER_CLOSE))
-                                // shift 1.5 inch for each specimen on high chamber
-                                .strafeToLinearHeading(hangSpecimenPos, initHeading)
-                                .turnTo(headingAngleCorrection) // fine correction heading
-                                .build()
-                );
-                intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
-
-                intake.setKnucklePosition(intake.getKnucklePosition() + 0.01);//reset position after collision
-                intake.setFingerPosition(intake.getFingerPosition() - 0.01);//reset position after collision
-
-                sleep(sleepHighChamber);
-                adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
-
-                if (specimenCount <= specimenShiftMax) {
-                    specimenCount ++;//update specimen pos
-                }
-
-                // hanging specimen
-                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER);
-
-                sleep(sleepTimeForHangingSpecimen);
-
-                intake.setKnucklePosition(intake.getKnucklePosition() + 0.01);//reset position after collision
-
-                intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER_MOVING_SPECIMEN);
-
-                Logging.log(" after y shift pos: X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
-                Logging.log(" finger position = %2f ", intake.getFingerPosition());
-
-                //return to wall to pickup next specimen
-                intake.fingerServoOpen();
-                sleep(150);
-                intake.setKnucklePosition(intake.KNUCKLE_POS_AWAY_FROM_SUBMERSIBLE);
-                Actions.runBlocking(
-                        drive.actionBuilder(drive.pose)
-                                .afterTime(0.15, new armToPickUpWallPos())
-                                // left high chamber
-                                .strafeTo(new Vector2d(drive.pose.position.x - 1, drive.pose.position.y))
-                                .strafeToLinearHeading(specimenLineUpPos.position, initHeading)
-                                .turnTo(headingAngleCorrection) // fine correction heading
-                                .build()
-                );
-
-                // adjust wall distance by distance sensor
-                //adjustPosByDistanceSensor(Params.SPECIMEN_PICKUP_DIST, distSensorF);
-
-            }
-
-            // pickup specimen and move to high chamber
-            if ( gamepad1.right_trigger > 0) {
-                drive.pose = pickUpSpecimenWallPos;
-                intake.setFingerPosition(intake.FINGER_CLOSE);
-                sleep(150);
-                intake.setKnucklePosition(intake.KNUCKLE_POS_LIFT_FROM_WALL);
-                sleep(100); // wait knuckle lift the specimen
-                Actions.runBlocking(
-                        drive.actionBuilder(drive.pose)
-                                .afterTime(0.6, new intakeAct(intake.ARM_POS_HIGH_CHAMBER_READY, intake.WRIST_BACK, intake.KNUCKLE_POS_LIFT_FROM_WALL, intake.FINGER_CLOSE))
-                                .strafeToLinearHeading(hangSpecimenPos, initHeading)
-                                .build()
-                );
-
-                intake.setKnucklePosition(intake.KNUCKLE_POS_HIGH_CHAMBER);
-                sleep(sleepHighChamber);
-                adjustPosByDistanceSensor(Params.HIGH_CHAMBER_DIST, distSensorHanging);
-            }
-
-            // pickup specimen from wall positions, gamepad2.right_trigger or left_trigger
-            if (gpButtons.SpecimenPickupWallPos) {
-                pickupFromWallActions();
-            }
-
-            // set arm and wrist position for picking up at the center of field. gamepad2.right_bumper
-            // right bumper of pad2
-            if (gpButtons.PickupSampleIntakePos) {
-                intake.setArmPosition(intake.ARM_POS_SUB);
-                //intake.setFingerPosition(intake.FINGER_OPEN_BACK);
-                intake.setKnucklePosition(intake.KNUCKLE_POS_PICKUP_SAMPLE);
-                sleep(knuckleSleepTime); // remove wrist and fingers interference
-                intake.setWristPosition(intake.WRIST_BACK);
-            }
-
-            // set arm and wrist position for drop off at low bucket. gamepad2.left_bumper
-            if (gpButtons.LowBucketPos) {
-                intake.setArmPosition(intake.ARM_POS_LOW_BUCKET);
-                intake.setKnucklePosition(intake.KNUCKLE_POS_LOW_BUCKET);
-                sleep(knuckleSleepTime); // remove wrist and fingers interference
-                intake.setWristPosition(intake.WRIST_BACK);
-            }
-
-            // get ready for hanging at end game
-            //gamepad2.x
-            if (gpButtons.EndgameHangingLineup) {
-                intake.setKnucklePosition(intake.KNUCKLE_POS_HANGING);
-                sleep(knuckleSleepTime); // remove wrist and fingers interference
-                intake.setArmPosition(intake.ARM_POS_BEFORE_HANG);
-                intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
-            }
-
-            // hanging robot
-            //gamepad2.y
-            if (gpButtons.EndgameHangingPos) {
-                intake.setArmPosition(intake.ARM_POS_DOWN_HANGING);
-            }
-
-            drive.updatePoseEstimate();
-            Params.currentPose = drive.pose;
 
             if (debugFlag) {
                 // claw arm servo log
@@ -417,9 +295,9 @@ public class TeleopRR extends LinearOpMode {
 
                 telemetry.addData(" ", " ");
 
-                telemetry.addData("heading", " %.3f", Math.toDegrees(drive.pose.heading.log()));
+                telemetry.addData("heading", " %.3f", Math.toDegrees(drive.localizer.getPose().heading.log()));
 
-                telemetry.addData("location", " %s", drive.pose.position.toString());
+                telemetry.addData("location", " %s", drive.localizer.getPose().position.toString());
 
                 telemetry.addData("specimens hanged: %s", specimenCount);
 
@@ -551,43 +429,4 @@ public class TeleopRR extends LinearOpMode {
         intake.setWristPosition(intake.WRIST_POS_NEUTRAL);
     }
 
-    private void adjustPosByDistanceSensor(double aimDistance, DistanceSensor distSensorID) { //distSensorID: 1 for hanging sensor, 2 for pickup sensor
-        double sensorDist = 0.0;
-        int repeatTimes = 5;
-
-        for (int i = 1; i <= repeatTimes; i++)
-        {
-            double sensorReading = distSensorID.getDistance(DistanceUnit.INCH) ;
-            sensorDist = sensorDist + sensorReading;
-            Logging.log("distance sensor reading repetition # %s reading number = %2f", i, sensorReading);
-            sleep(2);
-        }
-        sensorDist = sensorDist / repeatTimes;
-
-
-        double shiftDelta = sensorDist - aimDistance;
-        shiftDelta = Range.clip(shiftDelta, -10.0, 10.0); // limit adjust distance to +-7.0 inch
-
-
-        if (sensorDist > 300.0 ) {
-            shiftDelta = 3.0;
-        }
-
-        if (aimDistance > 10) // wall distance is bigger than 10, robot need move to -x direction.
-        {
-            shiftDelta = -shiftDelta;
-        }
-
-        Logging.log("drive pose before distance average number");
-        Logging.log("before adjust, sensor distance = %2f, shift delta = %2f", sensorDist, shiftDelta);
-        Logging.log(" X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
-
-        Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
-                        .strafeToLinearHeading(new Vector2d(drive.pose.position.x + shiftDelta , drive.pose.position.y), initHeading) // adjust heading also.
-                        .build()
-        );
-        Logging.log(" After adjust: X position = %2f, Y position = %2f , heading = %sf", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
-        Logging.log("after adjust, sensor distance = %2f, aim distance = %2f ", distSensorID.getDistance(DistanceUnit.INCH), aimDistance);
-    }
 }

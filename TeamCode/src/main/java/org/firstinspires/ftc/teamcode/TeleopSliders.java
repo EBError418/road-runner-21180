@@ -203,7 +203,7 @@ public class TeleopSliders extends LinearOpMode {
             }
 
             mecanum.updatePoseEstimate();
-            Params.currentPose = mecanum.pose;
+
             if (debugFlag) {
                 // claw arm servo log
                 telemetry.addData("Finger", "position %.3f", intake.getFingerPosition());
@@ -223,12 +223,6 @@ public class TeleopSliders extends LinearOpMode {
                 //telemetry.addData("switch Left", "position %.3f", intake.getSwitchLeftPosition());
 
                 telemetry.addData(" ", " ");
-
-
-
-                telemetry.addData("heading", " %.3f", Math.toDegrees(mecanum.pose.heading.log()));
-
-                telemetry.addData("location", " %s", mecanum.pose.position.toString());
 
                 //telemetry.addData("motor velocity = ", " %.3f", mecanum.leftFront.getVelocity());
 
@@ -331,49 +325,8 @@ public class TeleopSliders extends LinearOpMode {
     */
 
     private void logRobotHeading(String sTag) {
-        Logging.log("%s drive.pose: %.2f", sTag, Math.toDegrees(mecanum.pose.heading.log()));
+        //Logging.log("%s drive.pose: %.2f", sTag, Math.toDegrees(mecanum.pose.heading.log()));
         //Logging.log("%s imu: %.2f", sTag, mecanum.imu.getRobotYawPitchRollAngles().getYaw(AngleUnit.DEGREES) - Math.toDegrees(Params.startPose.heading.log()));
     }
 
-    private void moveForward(double moveDistance) {
-        intake.underTheBeam();
-        sleep(300); // make sure arm is out of camera sight
-
-        mecanum.updatePoseEstimate();
-        mecanum.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        logVector("robot drive: current drive pose", mecanum.pose.position);
-        logRobotHeading("before moving to back area");
-
-        double turnAngle = -mecanum.pose.heading.log() - Math.PI / 2.0;
-        turnAngle = (Math.abs(turnAngle) > Math.PI)? (turnAngle - Math.signum(turnAngle) * 2 * Math.PI) :  turnAngle;
-        // shift to AprilTag
-        Actions.runBlocking(
-                mecanum.actionBuilder(mecanum.pose)
-                        .turn(turnAngle)
-                        .lineToYLinearHeading(mecanum.pose.position.y - moveDistance, -Math.PI / 2.0)
-                        .build()
-        );
-        logRobotHeading("after moving to back area");
-        logVector("robot drive: arrive back area, drive pose", mecanum.pose.position);
-        mecanum.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-    }
-
-    private void moveBack(double moveDistance) {
-        mecanum.updatePoseEstimate();
-        mecanum.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-
-        logVector("robot drive: current drive pose", mecanum.pose.position);
-        logRobotHeading("before moving to back area");
-
-        // shift to AprilTag
-        Actions.runBlocking(
-                mecanum.actionBuilder(mecanum.pose)
-                        .lineToYLinearHeading(mecanum.pose.position.y + moveDistance, -Math.PI / 2.0)
-                        .build()
-        );
-        logRobotHeading("after moving to back area");
-        logVector("robot drive: arrive back area, drive pose", mecanum.pose.position);
-        mecanum.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-    }
 }

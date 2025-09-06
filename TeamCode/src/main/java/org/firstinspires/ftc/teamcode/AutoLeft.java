@@ -197,7 +197,7 @@ public class AutoLeft extends LinearOpMode {
 
         if (leftOrRight == -1) { // left side auto
             //Go to position for arm flip and hang on high chamber
-            Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
+            //Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
             Actions.runBlocking(
                     drive.actionBuilder(newStartPose)
                             .afterTime(0.6, new armFlipToHangAct())
@@ -205,7 +205,7 @@ public class AutoLeft extends LinearOpMode {
                             .build()
             );
             Logging.log("After arm flip pos wrist pos: %2f", intake.getWristPosition());
-            Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
+            //Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
             sleep(1600);
 
             //release specimen and raise arm to clear high chamber
@@ -221,7 +221,7 @@ public class AutoLeft extends LinearOpMode {
 
             //Go to pick up neutral sample
             Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
+                    drive.actionBuilder(drive.localizer.getPose())
                             .afterTime(0.4, new armToPickUpPos())
                             .splineTo(changeHeadingForPickup, Math.toRadians(58))
                             .strafeTo(driveForwardToPickup)
@@ -235,7 +235,7 @@ public class AutoLeft extends LinearOpMode {
 
             //place sample in bucket
             Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
+                    drive.actionBuilder(drive.localizer.getPose())
                             .afterTime(0.4, new armToDropSampleAct())
                             .splineToLinearHeading(new Pose2d(placeSample, Math.toRadians(135)), Math.toRadians(135))
                             .build()
@@ -246,7 +246,7 @@ public class AutoLeft extends LinearOpMode {
 
             //pick up second sample
             Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
+                    drive.actionBuilder(drive.localizer.getPose())
                             .afterTime(0.4, new armToPickUpPos())
                             .strafeToLinearHeading(new Vector2d(changeHeadingForPickup.x + 0.3 * Params.HALF_MAT, changeHeadingForPickup.y + 0.85 * Params.HALF_MAT), Math.toRadians(65))
                             .strafeTo(new Vector2d(driveForwardToPickup.x + 0.2 * Params.HALF_MAT, driveForwardToPickup.y + 0.85 * Params.HALF_MAT))
@@ -260,7 +260,7 @@ public class AutoLeft extends LinearOpMode {
 
             //place second sample in bucket
             Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
+                    drive.actionBuilder(drive.localizer.getPose())
                             .afterTime(0.4, new armToDropSampleAct())
                             .splineToLinearHeading(new Pose2d(placeSample, Math.toRadians(135)), Math.toRadians(135))
                             .build()
@@ -271,7 +271,7 @@ public class AutoLeft extends LinearOpMode {
             
             //pick up third sample
             Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
+                    drive.actionBuilder(drive.localizer.getPose())
                             .afterTime(0.4, new armToPickUpPos())
                             .strafeToLinearHeading(splineThirdSample, Math.toRadians(90))
                             .strafeToConstantHeading(new Vector2d(splineThirdSample.x, splineThirdSample.y + 0.9 * Params.HALF_MAT))
@@ -281,7 +281,7 @@ public class AutoLeft extends LinearOpMode {
             intake.setFingerPosition(intake.FINGER_CLOSE);
             sleep(200);
             Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
+                    drive.actionBuilder(drive.localizer.getPose())
                             .strafeToConstantHeading(splineThirdSample)
                             .build()
             );
@@ -289,7 +289,7 @@ public class AutoLeft extends LinearOpMode {
 
             //place third sample in bucket
             Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
+                    drive.actionBuilder(drive.localizer.getPose())
                             .afterTime(0.4, new armToDropSampleAct())
                             .splineToLinearHeading(new Pose2d(placeSample, Math.toRadians(135)), Math.toRadians(135))
                             .build()
@@ -300,7 +300,7 @@ public class AutoLeft extends LinearOpMode {
 
             //Go to ascent level 1
             Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
+                    drive.actionBuilder(drive.localizer.getPose())
                             .afterTime(0.2, new armToParkingAct())
                             .setReversed(true)
                             .splineToLinearHeading(new Pose2d(parkStepThree, Math.toRadians(-90)), Math.toRadians(-90))
@@ -311,7 +311,9 @@ public class AutoLeft extends LinearOpMode {
 
         if (leftOrRight == 1) { // right side auto
             //Go to position for arm flip and hang on high chamber
-            Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
+            Logging.log("X position = %2f, Y position = %2f, Heading = %2f",
+                    drive.localizer.getPose().position.x, drive.localizer.getPose().position.y,
+                    Math.toDegrees(drive.localizer.getPose().heading.log()));
             Actions.runBlocking(
                     drive.actionBuilder(newStartPose)
                             .afterTime(0.6, new armFlipToHangAct())
@@ -319,7 +321,7 @@ public class AutoLeft extends LinearOpMode {
                             .build()
             );
             Logging.log("After arm flip pos wrist pos: %2f", intake.getWristPosition());
-            Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
+            //Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
             sleep(1600);
 
             //release specimen and raise arm to clear high chamber
@@ -335,7 +337,7 @@ public class AutoLeft extends LinearOpMode {
 
             //Go to pick up red sample
             Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
+                    drive.actionBuilder(drive.localizer.getPose())
                             .afterTime(0.4, new armToPickUpPos())
                             .splineTo(changeHeadingForPickup, Math.toRadians(-58))
                             .turnTo(Math.toRadians(297))
@@ -350,7 +352,7 @@ public class AutoLeft extends LinearOpMode {
 
             //place sample in observation zone
             Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
+                    drive.actionBuilder(drive.localizer.getPose())
                             .afterTime(0.4, new armToObsZoneAct())
                             .splineToLinearHeading(new Pose2d(obsZone, Math.toRadians(-135)), Math.toRadians(-135))
                             .build()
@@ -361,7 +363,7 @@ public class AutoLeft extends LinearOpMode {
 
             //pick up second sample
             Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
+                    drive.actionBuilder(drive.localizer.getPose())
                             .afterTime(0.4, new armToPickUpPos())
                             .strafeToLinearHeading(new Vector2d(changeHeadingForPickup.x + 0.3 * Params.HALF_MAT, changeHeadingForPickup.y - 0.85 * Params.HALF_MAT), Math.toRadians(-65))
                             .strafeTo(new Vector2d(driveForwardToPickup.x + 0.3 * Params.HALF_MAT, driveForwardToPickup.y - 0.7 * Params.HALF_MAT))
@@ -375,7 +377,7 @@ public class AutoLeft extends LinearOpMode {
 
             //place second sample in observation zone
             Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
+                    drive.actionBuilder(drive.localizer.getPose())
                             .afterTime(0.4, new armToObsZoneAct())
                             .splineToLinearHeading(new Pose2d(obsZone, Math.toRadians(- 135)), Math.toRadians(- 135))
                             .build()
@@ -386,7 +388,7 @@ public class AutoLeft extends LinearOpMode {
 
             //pick up third sample
             Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
+                    drive.actionBuilder(drive.localizer.getPose())
                             .afterTime(0.4, new armToPickUpPos())
                             .strafeToLinearHeading(splineThirdSample, Math.toRadians(- 90))
                             .strafeToConstantHeading(new Vector2d(splineThirdSample.x + 0.3 * Params.HALF_MAT, splineThirdSample.y - 0.7 * Params.HALF_MAT))
@@ -396,7 +398,7 @@ public class AutoLeft extends LinearOpMode {
             intake.setFingerPosition(intake.FINGER_CLOSE);
             sleep(100);
             Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
+                    drive.actionBuilder(drive.localizer.getPose())
                             .strafeToConstantHeading(new Vector2d(splineThirdSample.x, splineThirdSample.y - 0.5 * Params.HALF_MAT))
                             .build()
             );
@@ -404,7 +406,7 @@ public class AutoLeft extends LinearOpMode {
 
             //place third sample in observation zone
             Actions.runBlocking(
-                    drive.actionBuilder(drive.pose)
+                    drive.actionBuilder(drive.localizer.getPose())
                             .afterTime(0.4, new armToObsZoneAct())
                             .splineToLinearHeading(new Pose2d(obsZone, Math.toRadians(- 135)), Math.toRadians(- 135))
                             .build()
@@ -413,7 +415,7 @@ public class AutoLeft extends LinearOpMode {
             intake.setFingerPosition(intake.FINGER_OPEN);
             sleep(200);
         }
-        Logging.log("X position = %2f, Y position = %2f", drive.pose.position.x, drive.pose.position.y);
+        //Logging.log("X position = %2f, Y position = %2f", drive.pose.position.x, drive.pose.position.y);
     }
 
     //action for arm flip to hang

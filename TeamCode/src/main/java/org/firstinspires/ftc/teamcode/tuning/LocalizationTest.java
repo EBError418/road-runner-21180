@@ -6,13 +6,11 @@ import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 import org.firstinspires.ftc.teamcode.Drawing;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
 import org.firstinspires.ftc.teamcode.TankDrive;
-import org.firstinspires.ftc.teamcode.ThreeDeadWheelLocalizer;
 
 public class LocalizationTest extends LinearOpMode {
     @Override
@@ -33,84 +31,12 @@ public class LocalizationTest extends LinearOpMode {
                         -gamepad1.right_stick_x
                 ));
 
-                if (gamepad1.a) {
-                    Actions.runBlocking(
-                            drive.actionBuilder(drive.pose)
-                                    .turn(Math.PI / 2)
-                                    .build());
-                }
-
-
-                if (gamepad1.b) {
-                    Actions.runBlocking(
-                            drive.actionBuilder(drive.pose)
-                                    .turn(Math.PI)
-                                    .build());
-                }
-
-                if (gamepad1.x) {
-                    Actions.runBlocking(
-                            drive.actionBuilder(drive.pose)
-                                    .turn(-Math.PI / 2)
-                                    .build());
-                }
-
-                if (gamepad1.y) {
-                    Actions.runBlocking(
-                            drive.actionBuilder(drive.pose)
-                                    .turn(-Math.PI)
-                                    .build());
-                }
-
-                /*
-                sleep(1000);
-
-                drive.setDrivePowers(new PoseVelocity2d(
-                        new Vector2d(
-                                -0.8,
-                                -gamepad1.left_stick_x
-                        ),
-                        -gamepad1.right_stick_x
-                ));
-                sleep(2000);
-
-                drive.setDrivePowers(new PoseVelocity2d(
-                        new Vector2d(
-                                -gamepad1.left_stick_y,
-                                -gamepad1.left_stick_x
-                        ),
-                        -gamepad1.right_stick_x
-                ));
-                sleep(1000);
-
-                drive.setDrivePowers(new PoseVelocity2d(
-                        new Vector2d(
-                                0.8,
-                                -gamepad1.left_stick_x
-                        ),
-                        -gamepad1.right_stick_x
-                ));
-                sleep(2000);
-                 */
-
                 drive.updatePoseEstimate();
-                telemetry.addData("left front pos", drive.leftFront.getCurrentPosition());
-                telemetry.addData("left back pos", drive.leftBack.getCurrentPosition());
-                telemetry.addData("right front pos", drive.rightFront.getCurrentPosition());
-                telemetry.addData("right back pos", drive.rightBack.getCurrentPosition());
-
-                if (drive.localizer instanceof ThreeDeadWheelLocalizer) {
-                    ThreeDeadWheelLocalizer dl = (ThreeDeadWheelLocalizer) drive.localizer;
-                    telemetry.addData("par0 pos = ", dl.par0.getPositionAndVelocity().position);
-                    telemetry.addData("par1 pos = ", dl.par1.getPositionAndVelocity().position);
-                    telemetry.addData("perp pos = ", dl.perp.getPositionAndVelocity().position);
-                }
 
                 Pose2d pose = drive.localizer.getPose();
                 telemetry.addData("x", pose.position.x);
                 telemetry.addData("y", pose.position.y);
                 telemetry.addData("heading (deg)", Math.toDegrees(pose.heading.toDouble()));
-
                 telemetry.update();
 
                 TelemetryPacket packet = new TelemetryPacket();

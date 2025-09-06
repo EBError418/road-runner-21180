@@ -328,7 +328,7 @@ public class AutoLeftSliders extends LinearOpMode {
         intake.setWristPosition(0.744);
         slider.setCountPosition(slider.SLIDER_HIGH_CHAMBER_POS_ONE);
         sleep(1000);
-        Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
+        //Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
         Actions.runBlocking(
                 drive.actionBuilder(newStartPose)
                         .strafeTo(armFlip)
@@ -336,7 +336,7 @@ public class AutoLeftSliders extends LinearOpMode {
                         .build()
         );
         Logging.log("After arm flip pos wrist pos: %2f", intake.getWristPosition());
-        Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
+        //Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
         sleep(500);
         slider.setCountPosition(slider.SLIDER_HIGH_CHAMBER_POS_TWO);
         sleep(300);
@@ -354,7 +354,7 @@ public class AutoLeftSliders extends LinearOpMode {
 
          */
         Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
+                drive.actionBuilder(drive.localizer.getPose())
                         .lineToXConstantHeading(retractArm.x)
                         .turnTo(Math.toRadians(45))
                         .build()
@@ -365,7 +365,7 @@ public class AutoLeftSliders extends LinearOpMode {
         //intake.setArmPosition(0.4);
         intake.setWristPosition(0.5);
         Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
+                drive.actionBuilder(drive.localizer.getPose())
                         .strafeTo(grabNeutralSample)
                         .build()
         );
@@ -377,7 +377,7 @@ public class AutoLeftSliders extends LinearOpMode {
 
         //place sample in bucket
         Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
+                drive.actionBuilder(drive.localizer.getPose())
                         .lineToXConstantHeading(placeSample.x)
                         .turnTo(Math.toRadians(135))
                         .build()
@@ -391,7 +391,7 @@ public class AutoLeftSliders extends LinearOpMode {
         //Go to ascent level 1
         slider.setCountPosition(-1000);
         Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
+                drive.actionBuilder(drive.localizer.getPose())
                         .turnTo(Math.toRadians(-90))
                         .strafeTo(parkStepOne)
                         .build()
@@ -399,12 +399,12 @@ public class AutoLeftSliders extends LinearOpMode {
         //slider.setInchPosition(7.0);
         sleep(400);
         Actions.runBlocking(
-                drive.actionBuilder(drive.pose)
+                drive.actionBuilder(drive.localizer.getPose())
                         .strafeTo(parkStepTwo)
                         .strafeTo(parkStepThree)
                         .build()
         );
-        Logging.log("X position = %2f, Y position = %2f", drive.pose.position.x, drive.pose.position.y);
+        //Logging.log("X position = %2f, Y position = %2f", drive.pose.position.x, drive.pose.position.y);
 
         /*
         if (blueOrRed > 0) {

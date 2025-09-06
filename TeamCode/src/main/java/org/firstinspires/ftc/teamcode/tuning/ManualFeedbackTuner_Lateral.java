@@ -30,10 +30,8 @@ public final class ManualFeedbackTuner_Lateral extends LinearOpMode {
             waitForStart();
 
             while (opModeIsActive()) {
-                drive.pose = new Pose2d(0, 0, 0);
                 Actions.runBlocking(
-                        //drive.actionBuilder(new Pose2d(0, 0, 0))
-                        drive.actionBuilder(drive.pose)
+                        drive.actionBuilder(new Pose2d(0,0,0))
                                 .strafeTo(new Vector2d(0, DISTANCE * (gamepad1.a ? (-1) : 1)))
                                 .waitSeconds(1)
                                 .strafeTo(new Vector2d(0, 0))
