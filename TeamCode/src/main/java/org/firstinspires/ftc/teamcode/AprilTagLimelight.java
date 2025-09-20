@@ -27,30 +27,27 @@ public class AprilTagLimelight extends LinearOpMode {
         waitForStart();   // <-- REQUIRED
         limelight.pipelineSwitch(0);
         while (opModeIsActive()) {
-            detectAprilTags();
-            telemetry.update();
-        }
-    }
-
-    // Detect any AprilTags in view and send their IDs to telemetry
-    public void detectAprilTags() {
-        LLResult result = limelight.getLatestResult();
-        double[] pythonOutputs = result.getPythonOutput();
-        if (pythonOutputs != null && pythonOutputs.length > 0) {
-            double x = pythonOutputs[1];
-            double y = pythonOutputs[2];
-            double w = pythonOutputs[3];
-            double h = pythonOutputs[4];
-            int colorCode = (int) pythonOutputs[0];
-            if (colorCode == 1) {
-                telemetry.addData("Green Artifact", "x: %.1f, y: %.1f, w: %.1f, h: %.1f", x, y, w, h);
-            } else if (colorCode == 2) {
-                telemetry.addData("Purple Artifact", "x: %.1f, y: %.1f, w: %.1f, h: %.1f", x, y, w, h);
+            // from old function start
+            LLResult result = limelight.getLatestResult();
+            double[] pythonOutputs = result.getPythonOutput();
+            if (pythonOutputs != null && pythonOutputs.length > 0) {
+                double x = pythonOutputs[1];
+                double y = pythonOutputs[2];
+                double w = pythonOutputs[3];
+                double h = pythonOutputs[4];
+                int colorCode = (int) pythonOutputs[0];
+                if (colorCode == 1) {
+                    telemetry.addData("Green Artifact", "x: %.1f, y: %.1f, w: %.1f, h: %.1f", x, y, w, h);
+                } else if (colorCode == 2) {
+                    telemetry.addData("Purple Artifact", "x: %.1f, y: %.1f, w: %.1f, h: %.1f", x, y, w, h);
+                } else {
+                    telemetry.addData("Unknown Artifact", "x: %.1f, y: %.1f, w: %.1f, h: %.1f", x, y, w, h);
+                }
             } else {
-                telemetry.addData("Unknown Artifact", "x: %.1f, y: %.1f, w: %.1f, h: %.1f", x, y, w, h);
+                telemetry.addData("No ball detected", "");
             }
-        } else {
-            telemetry.addData("No ball detected", "");
+            //end
+            telemetry.update();
         }
     }
 }
