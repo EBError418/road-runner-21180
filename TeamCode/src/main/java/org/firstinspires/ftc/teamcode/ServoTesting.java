@@ -108,23 +108,19 @@ public class ServoTesting extends LinearOpMode {
         // run until the end of the match (driver presses STOP)
         if (opModeIsActive()) {
             autonomousCore();
-
             Logging.log("Autonomous time - total Run Time: " + runtime);
         }
     }
 
     private void autonomousCore() {
-
         autoCore();
-        //intake.armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
     }
 
     private void autoCore() {
         Logging.log("Status - Start auto core");
-        intake.setServo1Position(1);
-        intake.setServo2Position(1);
+        intake.setServo1Position(1.0);
+        intake.setServo2Position(-1.0);
         sleep(100000);
         }
-        //Logging.log("X position = %2f, Y position = %2f", drive.pose.position.x, drive.pose.position.y);
     }
 

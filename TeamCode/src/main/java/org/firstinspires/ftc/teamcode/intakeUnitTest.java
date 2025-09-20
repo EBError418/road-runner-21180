@@ -76,11 +76,11 @@ public class intakeUnitTest
         //setArmModeRunToPosition(getArmPosition());
     }
 
-    public void setServo1Position(int servoPos) {
+    public void setServo1Position(double servoPos) {
         servo1.setPosition(servoPos);
     }
 
-    public void setServo2Position(int servoPos) {
+    public void setServo2Position(double servoPos) {
         servo2.setPosition(servoPos);
     }
 
