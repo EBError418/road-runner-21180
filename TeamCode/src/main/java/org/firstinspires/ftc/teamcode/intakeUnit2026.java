@@ -29,11 +29,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
-import com.qualcomm.robotcore.util.Range;
 
 
 /**
@@ -46,21 +43,20 @@ import com.qualcomm.robotcore.util.Range;
  * 1. Arm servo motor: ArmServo
  * 2. wrist servo motor: wristServo
  */
-public class intakeUnitTest
+public class intakeUnit2026
 {
     //private
     HardwareMap hardwareMap =  null;
 
     //2 servos
     private Servo servo1 = null;
-    public Servo servo2 = null;
-
+    private Servo servo2 = null;
 
     /**
      * Init slider motors hardware, and set their behaviors.
      * @param hardwareMap the Hardware Mappings.
      */
-    public intakeUnitTest(HardwareMap hardwareMap, String servoOne, String servoTwo) {
+    public intakeUnit2026(HardwareMap hardwareMap, String servoOne, String servoTwo) {
         // Save reference to Hardware map
         this.hardwareMap = hardwareMap;
 
@@ -82,6 +78,10 @@ public class intakeUnitTest
 
     public void setServo2Position(double servoPos) {
         servo2.setPosition(servoPos);
+    }
+
+    public double servoPos() {
+        return servo1.getPosition();
     }
 
     private void sleep(long milliseconds) {

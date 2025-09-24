@@ -33,16 +33,8 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import androidx.annotation.NonNull;
-
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.Pose2d;
-import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
@@ -79,7 +71,7 @@ public class ServoTesting extends LinearOpMode {
 
     // Declare OpMode members.
     private final ElapsedTime runtime = new ElapsedTime();
-    private intakeUnitTest intake;
+    private intakeUnit2026 intake;
 
     //private SlidersWith2Motors slider;
 
@@ -88,7 +80,7 @@ public class ServoTesting extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         Logging.log("Status - Initialized");
 
-        intake = new intakeUnitTest(hardwareMap, "servo1", "servo2");
+        intake = new intakeUnit2026(hardwareMap, "servo1", "servo2");
         //intake.resetArmEncoder();
 
         //intake.setWristPosition(0.95);
