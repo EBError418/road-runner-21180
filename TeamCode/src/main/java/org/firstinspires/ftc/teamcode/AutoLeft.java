@@ -183,6 +183,22 @@ public class AutoLeft extends LinearOpMode {
         Vector2d armFlip = new Vector2d(-4.4 * Params.HALF_MAT, newStartPose.position.y);
         Vector2d retractArm = new Vector2d(- 4.9 * Params.HALF_MAT, armFlip.y);
 
+        //Left Autonomous - DECODE(simple)
+        Vector2d backLeftCorner = new Vector2d(0, -4 * Params.HALF_MAT);
+
+        //Right Autonomous - DECODE(simple)
+        Vector2d firstLeftDash = new Vector2d(2 * Params.HALF_MAT, 1.5 * Params.HALF_MAT);
+
+        /*Left Autonomous - DECODE(two artifacts)
+        - Needs Launch Code
+        - Needs Artifact Pickup Code */
+        Vector2d backRightCorner = new Vector2d(0, 4 * Params.HALF_MAT);
+        Vector2d firstDashLaunch = new Vector2d( 4 * Params.HALF_MAT, 3 * Params.HALF_MAT);
+        Vector2d returnSecondDash = new Vector2d( -2 * Params.HALF_MAT, -3 * Params.HALF_MAT);
+        Vector2d secondDashLaunch = new Vector2d( 2 * Params.HALF_MAT, 3 * Params.HALF_MAT);
+        Vector2d returnThirdDash = new Vector2d( 0, -3 * Params.HALF_MAT);
+
+
         //grab
         Vector2d changeHeadingForPickup = new Vector2d(- 3.5 * Params.HALF_MAT, - leftOrRight * 1.85 * Params.HALF_MAT);
         Vector2d driveForwardToPickup = new Vector2d(- 3.5 * Params.HALF_MAT, - leftOrRight * 2.7 * Params.HALF_MAT);
@@ -195,225 +211,267 @@ public class AutoLeft extends LinearOpMode {
         Vector2d parkStepTwo = new Vector2d(parkStepOne.x + 3 * Params.HALF_MAT, parkStepOne.y);
         Vector2d parkStepThree = new Vector2d(parkStepTwo.x, 1.8 * Params.HALF_MAT);
 
-        if (leftOrRight == -1) { // left side auto
-            //Go to position for arm flip and hang on high chamber
-            //Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
+        if (leftOrRight == -1) {
+            // left side auto
             Actions.runBlocking(
                     drive.actionBuilder(newStartPose)
-                            .afterTime(0.6, new armFlipToHangAct())
-                            .strafeTo(armFlip)
+                            .strafeTo(backLeftCorner)
                             .build()
             );
-            Logging.log("After arm flip pos wrist pos: %2f", intake.getWristPosition());
-            //Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
-            sleep(1600);
-
-            //release specimen and raise arm to clear high chamber
-            intake.setFingerPosition(intake.FINGER_OPEN);
             Actions.runBlocking(
                     drive.actionBuilder(newStartPose)
                             .waitSeconds(0.1)
-                            .strafeToConstantHeading(retractArm)
-                            .build()
-            );
-            sleep(100);
-            intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 600);
+                            .strafeTo(firstLeftDash)
 
-            //Go to pick up neutral sample
-            Actions.runBlocking(
-                    drive.actionBuilder(drive.localizer.getPose())
-                            .afterTime(0.4, new armToPickUpPos())
-                            .splineTo(changeHeadingForPickup, Math.toRadians(58))
-                            .strafeTo(driveForwardToPickup)
-                            .build()
-            );
-            sleep(100);
-            intake.setFingerPosition(intake.FINGER_CLOSE);
-            sleep(200);
-            intake.setArmPosition(intake.ARM_POS_LOW_BUCKET);
-            sleep(200);
+                            //Supposed to Pick up Artifacts
+                            .waitSeconds(0.1)
+                            .splineTo(firstDashLaunch, Math.toRadians(45))
+                            .waitSeconds(0.1)
 
-            //place sample in bucket
-            Actions.runBlocking(
-                    drive.actionBuilder(drive.localizer.getPose())
-                            .afterTime(0.4, new armToDropSampleAct())
-                            .splineToLinearHeading(new Pose2d(placeSample, Math.toRadians(135)), Math.toRadians(135))
-                            .build()
-            );
-            sleep(100);
-            intake.setFingerPosition(intake.FINGER_OPEN);
-            sleep(200);
+                            // Supposed to enter launch code
+                            .turnTo(Math.toRadians(-45))
+                            .waitSeconds(0.1)
+                            .strafeTo(returnSecondDash)
+                            .waitSeconds(0.1)
 
-            //pick up second sample
-            Actions.runBlocking(
-                    drive.actionBuilder(drive.localizer.getPose())
-                            .afterTime(0.4, new armToPickUpPos())
-                            .strafeToLinearHeading(new Vector2d(changeHeadingForPickup.x + 0.3 * Params.HALF_MAT, changeHeadingForPickup.y + 0.85 * Params.HALF_MAT), Math.toRadians(65))
-                            .strafeTo(new Vector2d(driveForwardToPickup.x + 0.2 * Params.HALF_MAT, driveForwardToPickup.y + 0.85 * Params.HALF_MAT))
-                            .build()
-            );
-            sleep(100);
-            intake.setFingerPosition(intake.FINGER_CLOSE);
-            sleep(200);
-            intake.setArmPosition(intake.ARM_POS_LOW_BUCKET);
-            sleep(200);
+                            //Supposed to Pick up Artifacts #2
+                            .splineTo(secondDashLaunch, Math.toRadians(45))
+                            .waitSeconds(0.1)
 
-            //place second sample in bucket
-            Actions.runBlocking(
-                    drive.actionBuilder(drive.localizer.getPose())
-                            .afterTime(0.4, new armToDropSampleAct())
-                            .splineToLinearHeading(new Pose2d(placeSample, Math.toRadians(135)), Math.toRadians(135))
-                            .build()
-            );
-            sleep(100);
-            intake.setFingerPosition(intake.FINGER_OPEN);
-            sleep(200);
-            
-            //pick up third sample
-            Actions.runBlocking(
-                    drive.actionBuilder(drive.localizer.getPose())
-                            .afterTime(0.4, new armToPickUpPos())
-                            .strafeToLinearHeading(splineThirdSample, Math.toRadians(90))
-                            .strafeToConstantHeading(new Vector2d(splineThirdSample.x, splineThirdSample.y + 0.9 * Params.HALF_MAT))
-                            .build()
-            );
-            sleep(100);
-            intake.setFingerPosition(intake.FINGER_CLOSE);
-            sleep(200);
-            Actions.runBlocking(
-                    drive.actionBuilder(drive.localizer.getPose())
-                            .strafeToConstantHeading(splineThirdSample)
-                            .build()
-            );
+                            // Supposed to enter launch code
+                            .turnTo(Math.toRadians(-45))
+                            .waitSeconds(0.1)
+                            .strafeTo(returnThirdDash)
+                            .waitSeconds(0.1)
 
-
-            //place third sample in bucket
-            Actions.runBlocking(
-                    drive.actionBuilder(drive.localizer.getPose())
-                            .afterTime(0.4, new armToDropSampleAct())
-                            .splineToLinearHeading(new Pose2d(placeSample, Math.toRadians(135)), Math.toRadians(135))
+//                            .strafeTo(secondLeftDash)
+//                            .waitSeconds(0.1)
+//                            .strafeTo(thirdLeftDash)
                             .build()
             );
-            sleep(100);
-            intake.setFingerPosition(intake.FINGER_OPEN);
-            sleep(200);
-
-            //Go to ascent level 1
-            Actions.runBlocking(
-                    drive.actionBuilder(drive.localizer.getPose())
-                            .afterTime(0.2, new armToParkingAct())
-                            .setReversed(true)
-                            .splineToLinearHeading(new Pose2d(parkStepThree, Math.toRadians(-90)), Math.toRadians(-90))
-                            .build()
-            );
-            sleep(100);
+//            //Go to position for arm flip and hang on high chamber
+//            //Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
+//            Actions.runBlocking(
+//                    drive.actionBuilder(newStartPose)
+//                            .afterTime(0.6, new armFlipToHangAct())
+//                            .strafeTo(armFlip)
+//                            .build()
+//            );
+//            Logging.log("After arm flip pos wrist pos: %2f", intake.getWristPosition());
+//            //Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
+//            sleep(1600);
+//
+//            //release specimen and raise arm to clear high chamber
+//            intake.setFingerPosition(intake.FINGER_OPEN);
+//            Actions.runBlocking(
+//                    drive.actionBuilder(newStartPose)
+//                            .waitSeconds(0.1)
+//                            .strafeToConstantHeading(retractArm)
+//                            .build()
+//            );
+//            sleep(100);
+//            intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 600);
+//
+//            //Go to pick up neutral sample
+//            Actions.runBlocking(
+//                    drive.actionBuilder(drive.localizer.getPose())
+//                         //   .afterTime(0.4, new armToPickUpPos())
+//                            .splineTo(changeHeadingForPickup, Math.toRadians(58))
+//                            .strafeTo(driveForwardToPickup)
+//                            .build()
+//            );
+//            sleep(100);
+//            intake.setFingerPosition(intake.FINGER_CLOSE);
+//            sleep(200);
+//            intake.setArmPosition(intake.ARM_POS_LOW_BUCKET);
+//            sleep(200);
+//
+//            //place sample in bucket
+//            Actions.runBlocking(
+//                    drive.actionBuilder(drive.localizer.getPose())
+//                            .afterTime(0.4, new armToDropSampleAct())
+//                            .splineToLinearHeading(new Pose2d(placeSample, Math.toRadians(135)), Math.toRadians(135))
+//                            .build()
+//            );
+//            sleep(100);
+//            intake.setFingerPosition(intake.FINGER_OPEN);
+//            sleep(200);
+//
+//            //pick up second sample
+//            Actions.runBlocking(
+//                    drive.actionBuilder(drive.localizer.getPose())
+//                            .afterTime(0.4, new armToPickUpPos())
+//                            .strafeToLinearHeading(new Vector2d(changeHeadingForPickup.x + 0.3 * Params.HALF_MAT, changeHeadingForPickup.y + 0.85 * Params.HALF_MAT), Math.toRadians(65))
+//                            .strafeTo(new Vector2d(driveForwardToPickup.x + 0.2 * Params.HALF_MAT, driveForwardToPickup.y + 0.85 * Params.HALF_MAT))
+//                            .build()
+//            );
+//            sleep(100);
+//            intake.setFingerPosition(intake.FINGER_CLOSE);
+//            sleep(200);
+//            intake.setArmPosition(intake.ARM_POS_LOW_BUCKET);
+//            sleep(200);
+//
+//            //place second sample in bucket
+//            Actions.runBlocking(
+//                    drive.actionBuilder(drive.localizer.getPose())
+//                            .afterTime(0.4, new armToDropSampleAct())
+//                            .splineToLinearHeading(new Pose2d(placeSample, Math.toRadians(135)), Math.toRadians(135))
+//                            .build()
+//            );
+//            sleep(100);
+//            intake.setFingerPosition(intake.FINGER_OPEN);
+//            sleep(200);
+//
+//            //pick up third sample
+//            Actions.runBlocking(
+//                    drive.actionBuilder(drive.localizer.getPose())
+//                            .afterTime(0.4, new armToPickUpPos())
+//                            .strafeToLinearHeading(splineThirdSample, Math.toRadians(90))
+//                            .strafeToConstantHeading(new Vector2d(splineThirdSample.x, splineThirdSample.y + 0.9 * Params.HALF_MAT))
+//                            .build()
+//            );
+//            sleep(100);
+//            intake.setFingerPosition(intake.FINGER_CLOSE);
+//            sleep(200);
+//            Actions.runBlocking(
+//                    drive.actionBuilder(drive.localizer.getPose())
+//                            .strafeToConstantHeading(splineThirdSample)
+//                            .build()
+//            );
+//
+//
+//            //place third sample in bucket
+//            Actions.runBlocking(
+//                    drive.actionBuilder(drive.localizer.getPose())
+//                            .afterTime(0.4, new armToDropSampleAct())
+//                            .splineToLinearHeading(new Pose2d(placeSample, Math.toRadians(135)), Math.toRadians(135))
+//                            .build()
+//            );
+//            sleep(100);
+//            intake.setFingerPosition(intake.FINGER_OPEN);
+//            sleep(200);
+//
+//            //Go to ascent level 1
+//            Actions.runBlocking(
+//                    drive.actionBuilder(drive.localizer.getPose())
+//                            .afterTime(0.2, new armToParkingAct())
+//                            .setReversed(true)
+//                            .splineToLinearHeading(new Pose2d(parkStepThree, Math.toRadians(-90)), Math.toRadians(-90))
+//                            .build()
+//            );
+//            sleep(100);
         }
 
         if (leftOrRight == 1) { // right side auto
-            //Go to position for arm flip and hang on high chamber
-            Logging.log("X position = %2f, Y position = %2f, Heading = %2f",
-                    drive.localizer.getPose().position.x, drive.localizer.getPose().position.y,
-                    Math.toDegrees(drive.localizer.getPose().heading.log()));
             Actions.runBlocking(
                     drive.actionBuilder(newStartPose)
-                            .afterTime(0.6, new armFlipToHangAct())
-                            .strafeTo(armFlip)
+                            .strafeTo(backRightCorner)
                             .build()
             );
-            Logging.log("After arm flip pos wrist pos: %2f", intake.getWristPosition());
-            //Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
-            sleep(1600);
-
-            //release specimen and raise arm to clear high chamber
-            intake.setFingerPosition(intake.FINGER_OPEN);
-            Actions.runBlocking(
-                    drive.actionBuilder(newStartPose)
-                            .waitSeconds(0.5)
-                            .strafeToConstantHeading(retractArm)
-                            .build()
-            );
-            sleep(100);
-            intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 600);
-
-            //Go to pick up red sample
-            Actions.runBlocking(
-                    drive.actionBuilder(drive.localizer.getPose())
-                            .afterTime(0.4, new armToPickUpPos())
-                            .splineTo(changeHeadingForPickup, Math.toRadians(-58))
-                            .turnTo(Math.toRadians(297))
-                            .strafeTo(new Vector2d(driveForwardToPickup.x + 0.3 * Params.HALF_MAT, driveForwardToPickup.y + 0.2 * Params.HALF_MAT))
-                            .build()
-            );
-            sleep(100);
-            intake.setFingerPosition(intake.FINGER_CLOSE);
-            sleep(200);
-            intake.setArmPosition(intake.ARM_POS_OBS_ZONE);
-            sleep(200);
-
-            //place sample in observation zone
-            Actions.runBlocking(
-                    drive.actionBuilder(drive.localizer.getPose())
-                            .afterTime(0.4, new armToObsZoneAct())
-                            .splineToLinearHeading(new Pose2d(obsZone, Math.toRadians(-135)), Math.toRadians(-135))
-                            .build()
-            );
-            sleep(400);
-            intake.setFingerPosition(intake.FINGER_OPEN);
-            sleep(200);
-
-            //pick up second sample
-            Actions.runBlocking(
-                    drive.actionBuilder(drive.localizer.getPose())
-                            .afterTime(0.4, new armToPickUpPos())
-                            .strafeToLinearHeading(new Vector2d(changeHeadingForPickup.x + 0.3 * Params.HALF_MAT, changeHeadingForPickup.y - 0.85 * Params.HALF_MAT), Math.toRadians(-65))
-                            .strafeTo(new Vector2d(driveForwardToPickup.x + 0.3 * Params.HALF_MAT, driveForwardToPickup.y - 0.7 * Params.HALF_MAT))
-                            .build()
-            );
-            sleep(100);
-            intake.setFingerPosition(intake.FINGER_CLOSE);
-            sleep(200);
-            intake.setArmPosition(intake.ARM_POS_OBS_ZONE);
-            sleep(200);
-
-            //place second sample in observation zone
-            Actions.runBlocking(
-                    drive.actionBuilder(drive.localizer.getPose())
-                            .afterTime(0.4, new armToObsZoneAct())
-                            .splineToLinearHeading(new Pose2d(obsZone, Math.toRadians(- 135)), Math.toRadians(- 135))
-                            .build()
-            );
-            sleep(400);
-            intake.setFingerPosition(intake.FINGER_OPEN);
-            sleep(200);
-
-            //pick up third sample
-            Actions.runBlocking(
-                    drive.actionBuilder(drive.localizer.getPose())
-                            .afterTime(0.4, new armToPickUpPos())
-                            .strafeToLinearHeading(splineThirdSample, Math.toRadians(- 90))
-                            .strafeToConstantHeading(new Vector2d(splineThirdSample.x + 0.3 * Params.HALF_MAT, splineThirdSample.y - 0.7 * Params.HALF_MAT))
-                            .build()
-            );
-            sleep(100);
-            intake.setFingerPosition(intake.FINGER_CLOSE);
-            sleep(100);
-            Actions.runBlocking(
-                    drive.actionBuilder(drive.localizer.getPose())
-                            .strafeToConstantHeading(new Vector2d(splineThirdSample.x, splineThirdSample.y - 0.5 * Params.HALF_MAT))
-                            .build()
-            );
-
-
-            //place third sample in observation zone
-            Actions.runBlocking(
-                    drive.actionBuilder(drive.localizer.getPose())
-                            .afterTime(0.4, new armToObsZoneAct())
-                            .splineToLinearHeading(new Pose2d(obsZone, Math.toRadians(- 135)), Math.toRadians(- 135))
-                            .build()
-            );
-            sleep(400);
-            intake.setFingerPosition(intake.FINGER_OPEN);
-            sleep(200);
+//            //Go to position for arm flip and hang on high chamber
+//            Logging.log("X position = %2f, Y position = %2f, Heading = %2f",
+//                    drive.localizer.getPose().position.x, drive.localizer.getPose().position.y,
+//                    Math.toDegrees(drive.localizer.getPose().heading.log()));
+//            Actions.runBlocking(
+//                    drive.actionBuilder(newStartPose)
+//                            .afterTime(0.6, new armFlipToHangAct())
+//                            .strafeTo(armFlip)
+//                            .build()
+//            );
+//            Logging.log("After arm flip pos wrist pos: %2f", intake.getWristPosition());
+//            //Logging.log("X position = %2f, Y position = %2f, Heading = %2f", drive.pose.position.x, drive.pose.position.y, Math.toDegrees(drive.pose.heading.log()));
+//            sleep(1600);
+//
+//            //release specimen and raise arm to clear high chamber
+//            intake.setFingerPosition(intake.FINGER_OPEN);
+//            Actions.runBlocking(
+//                    drive.actionBuilder(newStartPose)
+//                            .waitSeconds(0.5)
+//                            .strafeToConstantHeading(retractArm)
+//                            .build()
+//            );
+//            sleep(100);
+//            intake.setArmPosition(intake.ARM_POS_HIGH_CHAMBER - 600);
+//
+//            //Go to pick up red sample
+//            Actions.runBlocking(
+//                    drive.actionBuilder(drive.localizer.getPose())
+//                            .afterTime(0.4, new armToPickUpPos())
+//                            .splineTo(changeHeadingForPickup, Math.toRadians(-58))
+//                            .turnTo(Math.toRadians(297))
+//                            .strafeTo(new Vector2d(driveForwardToPickup.x + 0.3 * Params.HALF_MAT, driveForwardToPickup.y + 0.2 * Params.HALF_MAT))
+//                            .build()
+//            );
+//            sleep(100);
+//            intake.setFingerPosition(intake.FINGER_CLOSE);
+//            sleep(200);
+//            intake.setArmPosition(intake.ARM_POS_OBS_ZONE);
+//            sleep(200);
+//
+//            //place sample in observation zone
+//            Actions.runBlocking(
+//                    drive.actionBuilder(drive.localizer.getPose())
+//                            .afterTime(0.4, new armToObsZoneAct())
+//                            .splineToLinearHeading(new Pose2d(obsZone, Math.toRadians(-135)), Math.toRadians(-135))
+//                            .build()
+//            );
+//            sleep(400);
+//            intake.setFingerPosition(intake.FINGER_OPEN);
+//            sleep(200);
+//
+//            //pick up second sample
+//            Actions.runBlocking(
+//                    drive.actionBuilder(drive.localizer.getPose())
+//                            .afterTime(0.4, new armToPickUpPos())
+//                            .strafeToLinearHeading(new Vector2d(changeHeadingForPickup.x + 0.3 * Params.HALF_MAT, changeHeadingForPickup.y - 0.85 * Params.HALF_MAT), Math.toRadians(-65))
+//                            .strafeTo(new Vector2d(driveForwardToPickup.x + 0.3 * Params.HALF_MAT, driveForwardToPickup.y - 0.7 * Params.HALF_MAT))
+//                            .build()
+//            );
+//            sleep(100);
+//            intake.setFingerPosition(intake.FINGER_CLOSE);
+//            sleep(200);
+//            intake.setArmPosition(intake.ARM_POS_OBS_ZONE);
+//            sleep(200);
+//
+//            //place second sample in observation zone
+//            Actions.runBlocking(
+//                    drive.actionBuilder(drive.localizer.getPose())
+//                            .afterTime(0.4, new armToObsZoneAct())
+//                            .splineToLinearHeading(new Pose2d(obsZone, Math.toRadians(- 135)), Math.toRadians(- 135))
+//                            .build()
+//            );
+//            sleep(400);
+//            intake.setFingerPosition(intake.FINGER_OPEN);
+//            sleep(200);
+//
+//            //pick up third sample
+//            Actions.runBlocking(
+//                    drive.actionBuilder(drive.localizer.getPose())
+//                            .afterTime(0.4, new armToPickUpPos())
+//                            .strafeToLinearHeading(splineThirdSample, Math.toRadians(- 90))
+//                            .strafeToConstantHeading(new Vector2d(splineThirdSample.x + 0.3 * Params.HALF_MAT, splineThirdSample.y - 0.7 * Params.HALF_MAT))
+//                            .build()
+//            );
+//            sleep(100);
+//            intake.setFingerPosition(intake.FINGER_CLOSE);
+//            sleep(100);
+//            Actions.runBlocking(
+//                    drive.actionBuilder(drive.localizer.getPose())
+//                            .strafeToConstantHeading(new Vector2d(splineThirdSample.x, splineThirdSample.y - 0.5 * Params.HALF_MAT))
+//                            .build()
+//            );
+//
+//
+//            //place third sample in observation zone
+//            Actions.runBlocking(
+//                    drive.actionBuilder(drive.localizer.getPose())
+//                            .afterTime(0.4, new armToObsZoneAct())
+//                            .splineToLinearHeading(new Pose2d(obsZone, Math.toRadians(- 135)), Math.toRadians(- 135))
+//                            .build()
+//            );
+//            sleep(400);
+//            intake.setFingerPosition(intake.FINGER_OPEN);
+//            sleep(200);
         }
         //Logging.log("X position = %2f, Y position = %2f", drive.pose.position.x, drive.pose.position.y);
     }
