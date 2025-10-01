@@ -110,7 +110,7 @@ public class ServoTesting extends LinearOpMode {
 
     private void autoCore() {
         Logging.log("Status - Start auto core");
-        intake.setMotorPower(5000);
+        intake.setMotorPower(6000);
         sleep(100000);
         }
     }

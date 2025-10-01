@@ -70,6 +70,8 @@ public class intakeUnit2026
         //servo1 = hardwareMap.get(Servo.class, servoOne);
         //servo2 = hardwareMap.get(Servo.class, servoTwo);
 
+        motor1 = hardwareMap.get(DcMotor.class, motorOne);
+
         motor1.setDirection(DcMotorSimple.Direction.FORWARD);
         motor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
 
