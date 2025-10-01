@@ -29,8 +29,10 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 
 /**
@@ -49,29 +51,33 @@ public class intakeUnit2026
     HardwareMap hardwareMap =  null;
 
     //2 servos
-    private Servo servo1 = null;
-    private Servo servo2 = null;
+    //private Servo servo1 = null;
+    //private Servo servo2 = null;
+
+    //1 motor
+    private DcMotor motor1 = null;
 
     /**
      * Init slider motors hardware, and set their behaviors.
      * @param hardwareMap the Hardware Mappings.
      */
-    public intakeUnit2026(HardwareMap hardwareMap, String servoOne, String servoTwo) {
+    public intakeUnit2026(HardwareMap hardwareMap, String motorOne) {
         // Save reference to Hardware map
         this.hardwareMap = hardwareMap;
 
         Logging.log("init motors for finger, wrist and arm.");
 
-        servo1 = hardwareMap.get(Servo.class, servoOne);
-        //servo1.setDirection(Servo.Direction.REVERSE);
-        servo2 = hardwareMap.get(Servo.class, servoTwo);
-        //servo2.setDirection(Servo.Direction.FORWARD);
+        //servo1 = hardwareMap.get(Servo.class, servoOne);
+        //servo2 = hardwareMap.get(Servo.class, servoTwo);
+
+        motor1.setDirection(DcMotorSimple.Direction.FORWARD);
+        motor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
 
         sleep(100);
-
-        //setArmModeRunToPosition(getArmPosition());
     }
 
+    /*
     public void setServo1Position(double servoPos) {
         servo1.setPosition(servoPos);
     }
@@ -82,6 +88,11 @@ public class intakeUnit2026
 
     public double servoPos() {
         return servo1.getPosition();
+    }
+     */
+
+    public void setMotorPower(int power) {
+        motor1.setPower(power);
     }
 
     private void sleep(long milliseconds) {
