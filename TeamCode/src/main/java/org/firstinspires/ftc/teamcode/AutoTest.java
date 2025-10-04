@@ -27,11 +27,11 @@ public class AutoTest extends LinearOpMode {
     }
 
     public void driveToBall(double distance) { // distance should be in half mats
-        moveToBall = new Vector2d(distance * Params.HALF_MAT, 0);
+        moveToBall = new Vector2d(newStartPose.position.x + distance, 0);
     }
 
     public double pixelsToHalfmats(double pixels) { // pixels = area of bounding box
-        return Math.sqrt(62320.0 / pixels); // returns half mats
+        return Math.sqrt(62320.0 / pixels) / 2; // returns half mats
     }
 
     @Override
