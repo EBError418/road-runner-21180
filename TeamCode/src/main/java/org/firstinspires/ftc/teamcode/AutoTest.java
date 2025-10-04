@@ -14,11 +14,10 @@ public class AutoTest extends LinearOpMode {
     public int leftOrRight = 1;
     Pose2d newStartPose;
     Vector2d moveForward = new Vector2d(2 * Params.HALF_MAT, 0);
-
     Vector2d moveToBall;
 
-    public void setRobotLocation(int side) {
-        leftOrRight = side;  // side should be either -1 for left or 1 for right
+    public void setRobotLocation() {
+        leftOrRight = 1;  // side should be either -1 for left or 1 for right
     }
 
     private void setStartPoses(int leftRight) {
@@ -36,11 +35,10 @@ public class AutoTest extends LinearOpMode {
 
     @Override
     public void runOpMode() {
-        setRobotLocation(1); // -1 for left or 1 for right
-
+        setRobotLocation();
         setStartPoses(leftOrRight);
 
-        driveToBall(pixelsToHalfmats(100)); // replace 100 with area of bounding box from LL
+        driveToBall(pixelsToHalfmats(15590)); // replace 100 with area of bounding box from LL
 
         drive = new MecanumDrive(hardwareMap, newStartPose);
         waitForStart();   // <-- REQUIRED
