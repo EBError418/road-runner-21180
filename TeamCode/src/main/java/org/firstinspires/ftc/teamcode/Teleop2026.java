@@ -65,6 +65,7 @@ import java.util.List;
  */
 
 @TeleOp(name="Teleop 2026", group="Concept")
+@Disabled
 public class Teleop2026 extends LinearOpMode {
     // Declare OpMode members.
     private final ElapsedTime runtime = new ElapsedTime();
@@ -89,7 +90,7 @@ public class Teleop2026 extends LinearOpMode {
         drive = new MecanumDrive(hardwareMap, Params.currentPose);
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        intake = new intakeUnit2026(hardwareMap, "servo1", "servo2");
+        intake = new intakeUnit2026(hardwareMap, "motor1");
 
         // bulk reading setting - auto refresh mode
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
@@ -132,13 +133,13 @@ public class Teleop2026 extends LinearOpMode {
             ));
 
             if (gpButtons.servoStart) {
-                intake.setServo1Position(1);
+                intake.setMotorPower(5000);
             }
 
-            if (gpButtons.servoStop) {
-                telemetry.addData("Stopped!!!", "%.3f", intake.servoPos());
-                intake.setServo1Position(0.5);
-            }
+            //if (gpButtons.servoStop) {
+            //    telemetry.addData("Stopped!!!", "%.3f", intake.servoPos());
+            //    intake.setServo1Position(0.5);
+            //}
             telemetry.update();
             if (debugFlag) {
                 telemetry.addData("heading", " %.3f", Math.toDegrees(drive.localizer.getPose().heading.log()));
