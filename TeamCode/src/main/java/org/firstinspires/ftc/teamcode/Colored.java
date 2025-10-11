@@ -15,14 +15,37 @@ public final class Colored {
         limelight.start();
         limelight.pipelineSwitch(2);
     }
+    public double[] returnPosition() {
+        // Get latest result from Limelight
+        LLResult result = limelight.getLatestResult();
+        if (result == null) return null;
 
+        double[] pythonOutputs = result.getPythonOutput();
+        if (pythonOutputs == null || pythonOutputs.length < 5) return null;
+
+        // Each detection is 5 values long: [goal code, x, y, w, h]
+        for (int i = 0; i < pythonOutputs.length; i += 5) {
+            double goalCode = pythonOutputs[i];
+            double x = pythonOutputs[i + 1];
+            double y = pythonOutputs[i + 2];
+            double w = pythonOutputs[i + 3];
+            double h = pythonOutputs[i + 4];
+
+            if (goalCode == 20 || goalCode == 24) {
+                // Return array of all 5 values
+                return new double[] {goalCode, x, y, w, h};
+            }
+        }
+
+        // No valid detection found
+        return null;
+    }
     public double returnId() {
         LLResult result = limelight.getLatestResult();
         if (result == null) return 0;
 
         double[] pythonOutputs = result.getPythonOutput();
         if (pythonOutputs == null || pythonOutputs.length < 5) return 0;
-
         // Each detection is 5 values long: [colorCode, x, y, w, h]
         for (int i = 0; i < pythonOutputs.length; i += 5) {
             double colorCode = pythonOutputs[i];
