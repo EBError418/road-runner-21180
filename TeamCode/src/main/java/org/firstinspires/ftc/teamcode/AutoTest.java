@@ -86,6 +86,19 @@ public class AutoTest extends LinearOpMode {
                         .strafeTo(new Vector2d(-3 * Params.HALF_MAT, 3.75 * Params.HALF_MAT))
                         .strafeTo(new Vector2d(-3 * Params.HALF_MAT, 3 * Params.HALF_MAT))
                         .strafeToLinearHeading(shootPos.position, shootPos.heading)
+                        .afterDisp(distanceToShootPos, () -> {
+                            sortArtifacts((int) detectedPattern);
+                            shootArtifacts();
+                        })
+                        .strafeToLinearHeading(new Vector2d(-1 * Params.HALF_MAT, 2 * Params.HALF_MAT), Math.toRadians(90))
+                        .strafeTo(new Vector2d(-1 * Params.HALF_MAT, 3.75 * Params.HALF_MAT))
+                        .strafeTo(new Vector2d(-1 * Params.HALF_MAT, 3 * Params.HALF_MAT))
+                        .strafeToLinearHeading(shootPos.position, shootPos.heading)
+                        .afterDisp(distanceToShootPos, () -> {
+                            sortArtifacts((int) detectedPattern);
+                            shootArtifacts();
+                        })
+                        .strafeToLinearHeading(new Vector2d(-0.75 * Params.HALF_MAT, 4 * Params.HALF_MAT), Math.toRadians(90))
                         .build()
         );
     }
