@@ -48,6 +48,23 @@ public class AutoTest extends LinearOpMode {
     private void setRobotLocation() {
         leftOrRight = 1;
     }
+    // create a function that allows for calibration of shoot position from an array in the format of [goal code, x, y, w, h]
+    private void calibrateShootPosition(double[] detection) {
+        if (detection == null || detection.length < 5) return;
+
+        double x = detection[1];
+        double y = detection[2];
+        double w = detection[3];
+        double h = detection[4];
+
+        double distanceInHalfMats = pixelsToHalfmats(h);
+        double angleToGoal = Math.toRadians(x - 160); // assuming 320px width, center is 160px
+
+        double shootX = newStartPose.position.x + distanceInHalfMats * Math.cos(angleToGoal);
+        double shootY = newStartPose.position.y + distanceInHalfMats * Math.sin(angleToGoal);
+
+        shootPos = new Pose2d(shootX, shootY, angleToGoal);
+    }
 
     private void setStartPoses(int leftRight) {
         newStartPose = new Pose2d(
