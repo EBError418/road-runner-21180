@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 @Autonomous(name="Auto2026", group="Concept")
 public class AutoTest extends LinearOpMode {
     private MecanumDrive drive;
+    private Colored patterndetector;
     public int leftOrRight = 1;
     Pose2d newStartPose;
     Vector2d moveToBall;
@@ -61,7 +62,6 @@ public class AutoTest extends LinearOpMode {
                         // Shoot
                         .afterDisp(distanceToShootPos, () -> {
                             sortArtifacts();
-
                             shootArtifacts();
                         })
                         // First move to artifacts
@@ -75,7 +75,6 @@ public class AutoTest extends LinearOpMode {
                         // Shoot
                         .afterDisp(distanceToShootPos, () -> {
                             sortArtifacts();
-
                             shootArtifacts();
                         })
                         .build()
@@ -89,4 +88,5 @@ public class AutoTest extends LinearOpMode {
     private void sortArtifacts() {
         // Sort balls code here
     }
+
 }
