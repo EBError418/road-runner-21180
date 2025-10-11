@@ -61,7 +61,8 @@ public class AutoTest extends LinearOpMode {
                         .strafeToLinearHeading(shootPos.position, shootPos.heading)
                         // Shoot
                         .afterDisp(distanceToShootPos, () -> {
-                            sortArtifacts();
+                            sortArtifacts(22);
+
                             shootArtifacts();
                         })
                         // First move to artifacts
@@ -74,9 +75,27 @@ public class AutoTest extends LinearOpMode {
                         .strafeToLinearHeading(shootPos.position, shootPos.heading)
                         // Shoot
                         .afterDisp(distanceToShootPos, () -> {
-                            sortArtifacts();
+                            sortArtifacts(23);
+
                             shootArtifacts();
                         })
+                        // Second move to artifacts
+                        .strafeToLinearHeading(new Vector2d(-1 * Params.HALF_MAT, 3 * Params.HALF_MAT), Math.toRadians(90))
+                        // Move forward to collect artifacts
+                        .strafeTo(new Vector2d(-1 * Params.HALF_MAT, 3.75 * Params.HALF_MAT))
+                        // Move a little back
+                        .strafeTo(new Vector2d(-1 * Params.HALF_MAT, 3 * Params.HALF_MAT))
+                        // Move to shooting position
+                        .strafeToLinearHeading(shootPos.position, shootPos.heading)
+                        // Shoot
+                        .afterDisp(distanceToShootPos, () -> {
+                            sortArtifacts(21);
+
+                            shootArtifacts();
+                        })
+                        // Empty artifacts
+                        .strafeToLinearHeading(new Vector2d(0, 4 * Params.HALF_MAT), Math.toRadians(90))
+
                         .build()
         );
     }
@@ -85,8 +104,23 @@ public class AutoTest extends LinearOpMode {
         // Shoot balls code here
     }
 
-    private void sortArtifacts() {
+    private void sortArtifacts(int pattern) {
         // Sort balls code here
+
+        switch (pattern) {
+            case 21:
+                // Pattern 1 code here
+                break;
+            case 22:
+                // Pattern 2 code here
+                break;
+            case 23:
+                // Pattern 3 code here
+                break;
+            default:
+                // Default case code here
+                break;
+        }
     }
 
 }
