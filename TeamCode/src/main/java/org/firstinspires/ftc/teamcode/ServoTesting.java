@@ -62,7 +62,7 @@ import java.util.List;
 
 
 
-@Autonomous(name="Servo", group="Concept")
+@Autonomous(name="motor", group="Concept")
 
 public class ServoTesting extends LinearOpMode {
     /**
@@ -80,7 +80,7 @@ public class ServoTesting extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         Logging.log("Status - Initialized");
 
-        intake = new intakeUnit2026(hardwareMap, "servo1", "servo2");
+        intake = new intakeUnit2026(hardwareMap, "motor1");
         //intake.resetArmEncoder();
 
         //intake.setWristPosition(0.95);
@@ -110,8 +110,7 @@ public class ServoTesting extends LinearOpMode {
 
     private void autoCore() {
         Logging.log("Status - Start auto core");
-        intake.setServo1Position(1.0);
-        intake.setServo2Position(-1.0);
+        intake.setMotorPower(6000);
         sleep(100000);
         }
     }
