@@ -11,6 +11,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 @Autonomous(name="Auto2026", group="Concept")
 public class AutoTest extends LinearOpMode {
     private MecanumDrive drive;
+    private Colored patterndetector;
     public int leftOrRight = 1;
     Pose2d newStartPose;
     Vector2d moveToBall;
@@ -121,4 +122,5 @@ public class AutoTest extends LinearOpMode {
                 break;
         }
     }
+
 }
