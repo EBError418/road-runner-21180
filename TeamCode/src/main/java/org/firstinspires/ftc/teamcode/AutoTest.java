@@ -13,6 +13,8 @@ public class AutoTest extends LinearOpMode {
 
     private int leftOrRight = 1;
     private Pose2d newStartPose;
+    private Vector2d moveToBall;
+
     private Pose2d shootPos = new Pose2d(Params.HALF_MAT, Params.HALF_MAT, Math.toRadians(45));
 
     @Override
