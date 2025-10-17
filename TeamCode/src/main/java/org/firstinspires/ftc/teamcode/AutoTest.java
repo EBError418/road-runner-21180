@@ -78,25 +78,13 @@ public class AutoTest extends LinearOpMode {
         double w = detection[3];
         double h = detection[4];
 
-        // ↓ Coordinates of goal in half-mats. Temp right now, change at meeting.
         double goalX = 4 * Params.HALF_MAT;
         double goalY = 4 * Params.HALF_MAT;
+        double z = Math.sqrt((Math.pow((x-1), 2) + Math.pow((y-1),2)));
+//        double shootX = newStartPose.position.x + distanceInHalfMats * Math.cos(angleToGoal);
+//        double shootY = newStartPose.position.y + distanceInHalfMats * Math.sin(angleToGoal);
 
-        double z = horizontalDistanceFromGoal(goalX, goalY); // x,y coordinates of goal.
-
-        // ↓ Angle launcher has to be for artifact to reach goal.
-        double angle = Math.toRadians(Math.toDegrees(Math.asin(x / z)));
-
-        // ↓ This might not work because it is calibrated for bounding box area of ball.
-        double distanceInHalfMats = pixelsToHalfmats(h);
-        // ↓ Literally what...?
-        double angleToGoal = Math.toRadians(x - 160); // assuming 320px width, center is 160px
-
-        double shootX = newStartPose.position.x + distanceInHalfMats * Math.cos(angleToGoal);
-        double shootY = newStartPose.position.y + distanceInHalfMats * Math.sin(angleToGoal);
-
-        // ↓ I don't think we should change shootPos, it should be the same every time. Angle is NOT angle of launcher!
-        shootPos = new Pose2d(shootX, shootY, angleToGoal);
+//        shootPos = new Pose2d(shootX, shootY, angleToGoal);
     }
 
     private void setStartPoses(int leftRight) {
@@ -111,8 +99,10 @@ public class AutoTest extends LinearOpMode {
 //        moveToBall = new Vector2d(newStartPose.position.x + distance, 0);
 //    }
 
-    private double pixelsToHalfmats(double pixels) {
-        return Math.sqrt(62320.0 / pixels) / 2;
+    private double pixelsToHalfmats(double x, double y) {
+        double area = Math.pow(((x +y )/2),2);
+        telemetry.addData("Area: ", Double.toString(area));
+        return 0;
     }
 
     private void auto(double detectedPattern) {
@@ -167,6 +157,8 @@ public class AutoTest extends LinearOpMode {
 
     private void shootArtifacts() {
         telemetry.addLine("Shooting...");
+        double[] position = patternDetector.returnPosition();
+        calibrateShootPosition(position);
         telemetry.update();
         motors.startLauncher();
         sleep(2500);
