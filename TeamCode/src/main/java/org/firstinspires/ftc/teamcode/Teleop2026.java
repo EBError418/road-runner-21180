@@ -66,7 +66,6 @@ import java.util.List;
  */
 
 @TeleOp(name="Teleop 2026", group="Concept")
-@Disabled
 public class Teleop2026 extends LinearOpMode {
     // Declare OpMode members.
     private final ElapsedTime runtime = new ElapsedTime();
