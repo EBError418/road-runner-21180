@@ -4,6 +4,8 @@ import com.acmerobotics.dashboard.config.Config;
 import com.qualcomm.hardware.limelightvision.LLResult;
 import com.qualcomm.hardware.limelightvision.Limelight3A;
 import com.qualcomm.robotcore.hardware.HardwareMap;
+import org.firstinspires.ftc.robotcore.internal.opmode.TelemetryInternal;
+
 
 @Config
 public final class Colored {
@@ -23,7 +25,9 @@ public final class Colored {
         double[] pythonOutputs = result.getPythonOutput();
         if (pythonOutputs == null || pythonOutputs.length < 5) return null;
 
+
         // Each detection is 5 values long: [goal code, x, y, w, h]
+        /*
         for (int i = 0; i < pythonOutputs.length; i += 5) {
             double goalCode = pythonOutputs[i];
             double x = pythonOutputs[i + 1];
@@ -37,8 +41,10 @@ public final class Colored {
             }
         }
 
+         */
+
         // No valid detection found
-        return null;
+        return pythonOutputs;
     }
     public double returnId() {
         LLResult result = limelight.getLatestResult();

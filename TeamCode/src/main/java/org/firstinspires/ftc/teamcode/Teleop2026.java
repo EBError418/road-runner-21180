@@ -32,6 +32,7 @@ import com.acmerobotics.roadrunner.Action;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
+import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
@@ -73,7 +74,7 @@ public class Teleop2026 extends LinearOpMode {
     MecanumDrive drive;
 
     //claw and arm unit
-    private intakeUnit2026 intake;
+    private intakeUnit2026 motors;
     private DistanceSensor distSensorHanging;
     private DistanceSensor distSensorF;
     boolean debugFlag = true;
@@ -89,7 +90,7 @@ public class Teleop2026 extends LinearOpMode {
         drive = new MecanumDrive(hardwareMap, Params.currentPose);
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        intake = new intakeUnit2026(hardwareMap, "motor1");
+        motors = new intakeUnit2026(hardwareMap, "launcher", "intake");
 
         // bulk reading setting - auto refresh mode
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
@@ -131,8 +132,30 @@ public class Teleop2026 extends LinearOpMode {
                     -gpButtons.robotTurn * maxDrivePower
             ));
 
-            if (gpButtons.servoStart) {
-                intake.setMotorPower(5000);
+//            if (gpButtons.servoStart) {
+//                intake.setMotorPower(5000);
+//            }
+
+            if (gpButtons.alignShootPos) {
+                Actions.runBlocking(
+                        drive.actionBuilder(new AutoTest().newStartPose)
+                                .strafeToLinearHeading(new AutoTest().shootPos.position, new AutoTest().shootPos.heading)
+                                .build()
+                );
+            }
+
+            if (gpButtons.autoPark) {
+                Actions.runBlocking(
+                        drive.actionBuilder(new AutoTest().newStartPose)
+                                .strafeToLinearHeading(new Vector2d(-4 * Params.HALF_MAT, 2 * Params.HALF_MAT), Math.toRadians(90))
+                                .build()
+                );
+            }
+
+            if (gpButtons.launch) {
+                motors.startLauncher();
+                sleep(2500);
+                motors.stopLauncher();
             }
 
             //if (gpButtons.servoStop) {

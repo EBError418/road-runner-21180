@@ -29,9 +29,7 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.hardware.DcMotor;
 
 
@@ -40,68 +38,39 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  *
  * This hardware class assumes the following device names have been configured on the robot:
  * Note:  All names are case sensitive.
- * Motors type: motors for arm and wrist, finger.
+ * Motors type: motors for intake and launcher.
  *
- * 1. Arm servo motor: ArmServo
- * 2. wrist servo motor: wristServo
+ * 1. The intake motor: intake
+ * 2. The launcher motor: launcher
  */
 public class intakeUnit2026
 {
-    //private
-    HardwareMap hardwareMap =  null;
+    HardwareMap hardwareMap;
+    private final DcMotor intakeMotor;
+    private final DcMotor launcherMotor;
 
-    //2 servos
-    //private Servo servo1 = null;
-    //private Servo servo2 = null;
-
-    //1 motor
-    private DcMotor motor1 = null;
-
-    /**
-     * Init slider motors hardware, and set their behaviors.
-     * @param hardwareMap the Hardware Mappings.
-     */
-    public intakeUnit2026(HardwareMap hardwareMap, String motorOne) {
+    public intakeUnit2026(HardwareMap hardwareMap, String launcher, String intake) {
         // Save reference to Hardware map
         this.hardwareMap = hardwareMap;
 
-        Logging.log("init motors for finger, wrist and arm.");
-
-        //servo1 = hardwareMap.get(Servo.class, servoOne);
-        //servo2 = hardwareMap.get(Servo.class, servoTwo);
-
-        motor1 = hardwareMap.get(DcMotor.class, motorOne);
-
-        motor1.setDirection(DcMotorSimple.Direction.FORWARD);
-        motor1.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
-
-
-        sleep(100);
+        // Define and Initialize Motors
+        intakeMotor = hardwareMap.get(DcMotor.class, intake);
+        launcherMotor = hardwareMap.get(DcMotor.class, launcher);
     }
 
-    /*
-    public void setServo1Position(double servoPos) {
-        servo1.setPosition(servoPos);
+    public void startIntake() {
+        intakeMotor.setPower(1.0);
     }
 
-    public void setServo2Position(double servoPos) {
-        servo2.setPosition(servoPos);
+    public void stopIntake() {
+        intakeMotor.setPower(0.0);
     }
 
-    public double servoPos() {
-        return servo1.getPosition();
-    }
-     */
-
-    public void setMotorPower(int power) {
-        motor1.setPower(power);
+    public void startLauncher() {
+        launcherMotor.setPower(1.0);
     }
 
-    private void sleep(long milliseconds) {
-        try {
-            Thread.sleep(milliseconds);
-        } catch (InterruptedException e) {
-            Thread.currentThread().interrupt();
-        }
+    public void stopLauncher() {
+        launcherMotor.setPower(0.0);
     }
 }
