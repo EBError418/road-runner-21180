@@ -5,25 +5,28 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.hardware.DcMotor;
 
 @Autonomous(name = "Auto2026", group = "Concept")
 public class AutoTest extends LinearOpMode {
     private MecanumDrive drive;
-    private Colored patternDetector; // Limelight detector
 
     private int leftOrRight = 1;
-    private Pose2d newStartPose;
-    private Vector2d moveToBall;
+    public Pose2d newStartPose;
 
-    private Pose2d shootPos = new Pose2d(Params.HALF_MAT, Params.HALF_MAT, Math.toRadians(45));
+    public Pose2d shootPos = new Pose2d(Params.HALF_MAT, Params.HALF_MAT, Math.toRadians(45));
+
+    intakeUnit2026 motors;
 
     @Override
     public void runOpMode() {
         // Initialize drive and vision system
-        patternDetector = new Colored(hardwareMap);
+        // Limelight detector
+        Colored patternDetector = new Colored(hardwareMap);
         setRobotLocation();
         setStartPoses(leftOrRight);
         drive = new MecanumDrive(hardwareMap, newStartPose);
+        motors = new intakeUnit2026(hardwareMap, "launcher", "intake");
 
         telemetry.addLine("Initialized. Waiting for start...");
         telemetry.update();
@@ -41,8 +44,20 @@ public class AutoTest extends LinearOpMode {
                 sleep(10);
             }
 
-            auto(detectedColor);
+            tempMethodToDriveToBallDeleteLaterJustATest(532.0, 29.3);
+//            auto(detectedColor);
         }
+    }
+
+    public void tempMethodToDriveToBallDeleteLaterJustATest(double x, double y) {
+        double area = x * y;
+        double distanceInHalfMats = pixelsToHalfmats(area);
+        Vector2d moveToBall = new Vector2d(newStartPose.position.x + distanceInHalfMats, 0);
+        Actions.runBlocking(
+                drive.actionBuilder(newStartPose)
+                        .strafeTo(moveToBall)
+                        .build()
+        );
     }
 
     private void setRobotLocation() {
@@ -66,6 +81,29 @@ public class AutoTest extends LinearOpMode {
         shootPos = new Pose2d(shootX, shootY, angleToGoal);
     }
 
+    private double horizontalDistanceFromGoal(double x, double y) {
+        return Math.sqrt((Math.pow((x - 1), 2) + Math.pow((y - 1), 2)));
+    }
+
+    // ai code 💔
+    // create a function that allows for calibration of shoot position from an array in the format of [goal code, x, y, w, h]
+    private void calibrateShootPosition(double[] detection) {
+        if (detection == null || detection.length < 5) return;
+
+        double x = detection[1];
+        double y = detection[2];
+        double w = detection[3];
+        double h = detection[4];
+
+        double goalX = 4 * Params.HALF_MAT;
+        double goalY = 4 * Params.HALF_MAT;
+        double z = Math.sqrt((Math.pow((x-1), 2) + Math.pow((y-1),2)));
+//        double shootX = newStartPose.position.x + distanceInHalfMats * Math.cos(angleToGoal);
+//        double shootY = newStartPose.position.y + distanceInHalfMats * Math.sin(angleToGoal);
+
+//        shootPos = new Pose2d(shootX, shootY, angleToGoal);
+    }
+
     private void setStartPoses(int leftRight) {
         newStartPose = new Pose2d(
                 (-6 * Params.HALF_MAT + Params.CHASSIS_LENGTH / 2),
@@ -78,11 +116,15 @@ public class AutoTest extends LinearOpMode {
 //        moveToBall = new Vector2d(newStartPose.position.x + distance, 0);
 //    }
 
-    private double pixelsToHalfmats(double pixels) {
-        return Math.sqrt(62320.0 / pixels) / 2;
+    private double pixelsToHalfmats(double x, double y) {
+        double area = Math.pow(((x +y )/2),2);
+        telemetry.addData("Area: ", Double.toString(area));
+        return 0;
     }
 
     private void auto(double detectedPattern) {
+        motors.startIntake();
+
         double distanceToShootPos = Math.hypot(
                 shootPos.position.x - newStartPose.position.x,
                 shootPos.position.y - newStartPose.position.y
@@ -94,27 +136,37 @@ public class AutoTest extends LinearOpMode {
 
         Actions.runBlocking(
                 drive.actionBuilder(newStartPose)
+                        // Move to shooting position
                         .strafeToLinearHeading(shootPos.position, shootPos.heading)
                         .afterDisp(distanceToShootPos, () -> {
                             sortArtifacts((int) detectedPattern);
                             shootArtifacts();
                         })
+                        // Move to first artifact position
                         .strafeToLinearHeading(new Vector2d(-3 * Params.HALF_MAT, 3 * Params.HALF_MAT), Math.toRadians(90))
+                        // Move forward to collect artifacts
                         .strafeTo(new Vector2d(-3 * Params.HALF_MAT, 3.75 * Params.HALF_MAT))
+                        // Move slightly back
                         .strafeTo(new Vector2d(-3 * Params.HALF_MAT, 3 * Params.HALF_MAT))
+                        // Return to shooting position
                         .strafeToLinearHeading(shootPos.position, shootPos.heading)
                         .afterDisp(distanceToShootPos, () -> {
                             sortArtifacts((int) detectedPattern);
                             shootArtifacts();
                         })
+                        // Move to second artifact position
                         .strafeToLinearHeading(new Vector2d(-1 * Params.HALF_MAT, 2 * Params.HALF_MAT), Math.toRadians(90))
+                        // Move forward to collect artifacts
                         .strafeTo(new Vector2d(-1 * Params.HALF_MAT, 3.75 * Params.HALF_MAT))
+                        // Move slightly back
                         .strafeTo(new Vector2d(-1 * Params.HALF_MAT, 3 * Params.HALF_MAT))
+                        // Return to shooting position
                         .strafeToLinearHeading(shootPos.position, shootPos.heading)
                         .afterDisp(distanceToShootPos, () -> {
                             sortArtifacts((int) detectedPattern);
                             shootArtifacts();
                         })
+                        // Empty artifacts
                         .strafeToLinearHeading(new Vector2d(-0.75 * Params.HALF_MAT, 4 * Params.HALF_MAT), Math.toRadians(90))
                         .build()
         );
@@ -122,7 +174,12 @@ public class AutoTest extends LinearOpMode {
 
     private void shootArtifacts() {
         telemetry.addLine("Shooting...");
+        double[] position = patternDetector.returnPosition();
+        calibrateShootPosition(position);
         telemetry.update();
+        motors.startLauncher();
+        sleep(2500);
+        motors.stopLauncher();
     }
 
     private void sortArtifacts(int pattern) {

@@ -52,9 +52,11 @@ public class GamePadButtons2026 {
     public boolean speedDown;
     public boolean speedUp;
     public boolean speedCtrl;
-
     public boolean servoStart;
     public boolean servoStop;
+    public boolean alignShootPos;
+    public boolean autoPark;
+    public boolean launch;
 
     public void checkGamepadButtons(@NonNull Gamepad gamepad1, @NonNull Gamepad gamepad2) {
         //game pad 1 buttons
@@ -76,5 +78,10 @@ public class GamePadButtons2026 {
 
         servoStart = gamepad1.dpad_up;
         servoStop = gamepad1.dpad_down;
+
+        alignShootPos = gamepad1.a; // temp button can change later
+        autoPark = gamepad1.b; // temp button can change later
+
+        launch = gamepad1.left_bumper; // temp button can change later
     }
 }
