@@ -112,6 +112,7 @@ public class Teleop2026 extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+            motors.startIntake();
 
             //gamepad1 buttons
             gpButtons.checkGamepadButtons(gamepad1, gamepad2);
@@ -136,25 +137,25 @@ public class Teleop2026 extends LinearOpMode {
 //                intake.setMotorPower(5000);
 //            }
 
-            if (gpButtons.alignShootPos) {
-                Actions.runBlocking(
-                        drive.actionBuilder(new AutoTest().newStartPose)
-                                .strafeToLinearHeading(new AutoTest().shootPos.position, new AutoTest().shootPos.heading)
-                                .build()
-                );
-            }
-
-            if (gpButtons.autoPark) {
-                Actions.runBlocking(
-                        drive.actionBuilder(new AutoTest().newStartPose)
-                                .strafeToLinearHeading(new Vector2d(-4 * Params.HALF_MAT, 2 * Params.HALF_MAT), Math.toRadians(90))
-                                .build()
-                );
-            }
+//            if (gpButtons.alignShootPos) {
+//                Actions.runBlocking(
+//                        drive.actionBuilder(new AutoTest().newStartPose)
+//                                .strafeToLinearHeading(new AutoTest().shootPos.position, new AutoTest().shootPos.heading)
+//                                .build()
+//                );
+//            }
+//
+//            if (gpButtons.autoPark) {
+//                Actions.runBlocking(
+//                        drive.actionBuilder(new AutoTest().newStartPose)
+//                                .strafeToLinearHeading(new Vector2d(-4 * Params.HALF_MAT, 2 * Params.HALF_MAT), Math.toRadians(90))
+//                                .build()
+//                );
+//            }
 
             if (gpButtons.launch) {
                 motors.startLauncher();
-                sleep(2500);
+            } else {
                 motors.stopLauncher();
             }
 
