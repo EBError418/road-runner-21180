@@ -80,7 +80,7 @@ public class ServoTesting extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         Logging.log("Status - Initialized");
 
-        intake = new intakeUnit2026(hardwareMap, "motor1");
+        intake = new intakeUnit2026(hardwareMap, "motor1", "motor2");
         //intake.resetArmEncoder();
 
         //intake.setWristPosition(0.95);
@@ -110,7 +110,7 @@ public class ServoTesting extends LinearOpMode {
 
     private void autoCore() {
         Logging.log("Status - Start auto core");
-        intake.setMotorPower(6000);
+        //intake.setMotorPower(6000);
         sleep(100000);
         }
     }
