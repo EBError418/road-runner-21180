@@ -30,6 +30,7 @@ import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.lynx.LynxModule;
+import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
@@ -60,7 +61,7 @@ import java.util.List;
  */
 
 @TeleOp(name="Teleop 2025", group="Concept")
-//@Disabled
+@Disabled
 public class Teleop2025 extends AutoRightHanging2 {
     // chassis
     //MecanumDrive drive;
