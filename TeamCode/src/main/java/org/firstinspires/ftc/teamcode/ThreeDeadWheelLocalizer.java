@@ -15,6 +15,7 @@ import com.acmerobotics.roadrunner.ftc.PositionVelocityPair;
 import com.acmerobotics.roadrunner.ftc.RawEncoder;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.messages.ThreeDeadWheelInputsMessage;
@@ -45,6 +46,9 @@ public final class ThreeDeadWheelLocalizer implements Localizer {
         // TODO: make sure your config has **motors** with these names (or change them)
         //   the encoders should be plugged into the slot matching the named motor
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
+
+        // 2025 robot dead wheels
+        /*
         par0 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "FrontRight")));
         par1 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "FrontLeft")));
         perp = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "BackRight")));
@@ -52,6 +56,16 @@ public final class ThreeDeadWheelLocalizer implements Localizer {
         par1.setDirection(DcMotor.Direction.REVERSE);
         par0.setDirection(DcMotor.Direction.FORWARD);
         perp.setDirection(DcMotor.Direction.REVERSE);
+        */
+
+        // 2026 robot dead wheels
+        par0 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "BackRight")));
+        par1 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "BackLeft")));
+        perp = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "FrontLeft")));
+
+        par1.setDirection(DcMotor.Direction.FORWARD);
+        par0.setDirection(DcMotor.Direction.FORWARD);
+        perp.setDirection(DcMotor.Direction.FORWARD);
 
         // TODO: reverse encoder directions if needed
         //   par0.setDirection(DcMotorSimple.Direction.REVERSE);
