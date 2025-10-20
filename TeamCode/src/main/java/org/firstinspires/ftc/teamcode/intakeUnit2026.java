@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 
 /**
@@ -48,14 +49,20 @@ public class intakeUnit2026
     HardwareMap hardwareMap;
     private final DcMotor intakeMotor;
     private final DcMotor launcherMotor;
+    private Servo triggerServo = null;
 
-    public intakeUnit2026(HardwareMap hardwareMap, String launcher, String intake) {
+
+    public intakeUnit2026(HardwareMap hardwareMap, String launcher, String intake, String trigger) {
         // Save reference to Hardware map
         this.hardwareMap = hardwareMap;
 
         // Define and Initialize Motors
         intakeMotor = hardwareMap.get(DcMotor.class, intake);
         launcherMotor = hardwareMap.get(DcMotor.class, launcher);
+
+        // trigger servo
+        triggerServo = hardwareMap.get(Servo.class, trigger);
+
     }
 
     public void startIntake() {
@@ -72,5 +79,26 @@ public class intakeUnit2026
 
     public void stopLauncher() {
         launcherMotor.setPower(0.0);
+    }
+
+    /*
+    Close trigger servo during intake
+     */
+    public void triggerClose() {
+        triggerServo.setPosition(0.1);
+    }
+
+    /*
+    Open trigger servo before launch
+     */
+    public void triggerOpen() {
+        triggerServo.setPosition(0.7);
+    }
+
+    /*
+    Get trigger servo position for display during debug/testing
+     */
+    public double getTriggerPosition() {
+        return triggerServo.getPosition();
     }
 }
