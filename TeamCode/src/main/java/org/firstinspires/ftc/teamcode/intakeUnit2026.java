@@ -66,7 +66,7 @@ public class intakeUnit2026
     }
 
     public void startIntake() {
-        intakeMotor.setPower(-0.67);
+        intakeMotor.setPower(-0.767);
     }
 
     public void stopIntake() {
