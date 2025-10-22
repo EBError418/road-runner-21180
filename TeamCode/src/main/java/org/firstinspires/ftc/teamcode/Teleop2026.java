@@ -161,6 +161,7 @@ public class Teleop2026 extends LinearOpMode {
             if (gpButtons.launchOff) {
             motors.stopLauncher();
             }
+            
 
             // intake actions
             if (gpButtons.intakeOn) {
