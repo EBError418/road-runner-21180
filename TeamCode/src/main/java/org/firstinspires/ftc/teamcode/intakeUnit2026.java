@@ -66,7 +66,7 @@ public class intakeUnit2026
     }
 
     public void startIntake() {
-        intakeMotor.setPower(-0.767);
+        intakeMotor.setPower(-0.85);
     }
 
     public void stopIntake() {
@@ -74,7 +74,7 @@ public class intakeUnit2026
     }
 
     public void startLauncher() {
-        launcherMotor.setPower(1.0);
+        launcherMotor.setPower(0.9);
     }
 
     public void stopLauncher() {

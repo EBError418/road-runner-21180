@@ -90,7 +90,7 @@ public class Teleop2026 extends LinearOpMode {
         drive = new MecanumDrive(hardwareMap, Params.currentPose);
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        motors = new intakeUnit2026(hardwareMap, "launcher", "intake", "trigger");
+        motors = new intakeUnit2026(hardwareMap, "launcher", "intake", "triggerServo");
 
         // bulk reading setting - auto refresh mode
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
@@ -112,7 +112,6 @@ public class Teleop2026 extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            motors.startIntake();
 
             //gamepad1 buttons
             gpButtons.checkGamepadButtons(gamepad1, gamepad2);
@@ -132,6 +131,8 @@ public class Teleop2026 extends LinearOpMode {
                     ),
                     -gpButtons.robotTurn * maxDrivePower
             ));
+
+
 
 //            if (gpButtons.servoStart) {
 //                intake.setMotorPower(5000);
@@ -153,18 +154,38 @@ public class Teleop2026 extends LinearOpMode {
 //                );
 //            }
 
+            // launch actions
             if (gpButtons.launch) {
                 motors.startLauncher();
-            } else {
-                motors.stopLauncher();
+            }
+            if (gpButtons.launchOff) {
+            motors.stopLauncher();
             }
 
-            //if (gpButtons.servoStop) {
-            //    telemetry.addData("Stopped!!!", "%.3f", intake.servoPos());
-            //    intake.setServo1Position(0.5);
-            //}
+            // intake actions
+            if (gpButtons.intakeOn) {
+                motors.startIntake();
+            }
+
+            if (gpButtons.intakeOff) {
+                motors.stopIntake();
+            }
+
+            // trigger servo actions
+            if (gpButtons.triggerOpen) {
+                motors.triggerOpen();
+            }
+
+            if (gpButtons.triggerClose) {
+                motors.triggerClose();
+            }
+
             telemetry.update();
             if (debugFlag) {
+
+                // display trigger servo position for testing purpose.
+                telemetry.addData("trigger servo", "position = %.3f", motors.getTriggerPosition());
+
                 telemetry.addData("heading", " %.3f", Math.toDegrees(drive.localizer.getPose().heading.log()));
 
                 telemetry.addData("location", " %s", drive.localizer.getPose().position.toString());
