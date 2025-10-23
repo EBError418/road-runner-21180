@@ -46,6 +46,9 @@ import com.qualcomm.robotcore.hardware.Servo;
  */
 public class intakeUnit2026
 {
+    double launcherPower = 0.8;
+
+
     HardwareMap hardwareMap;
     private final DcMotor intakeMotor;
     private final DcMotor launcherMotor;
@@ -74,7 +77,7 @@ public class intakeUnit2026
     }
 
     public void startLauncher() {
-        launcherMotor.setPower(0.9);
+        launcherMotor.setPower(launcherPower);
     }
 
     public void stopLauncher() {
