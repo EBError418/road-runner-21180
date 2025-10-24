@@ -46,7 +46,10 @@ import com.qualcomm.robotcore.hardware.Servo;
  */
 public class intakeUnit2026
 {
-    double launcherPower = 0.8;
+    double intakePower = -0.86;
+    double launcherPower = 0.6;
+    double trigger_close = 0.05;
+    double trigger_open = 0.4;
 
 
     HardwareMap hardwareMap;
@@ -69,7 +72,7 @@ public class intakeUnit2026
     }
 
     public void startIntake() {
-        intakeMotor.setPower(-0.85);
+        intakeMotor.setPower(intakePower);
     }
 
     public void stopIntake() {
@@ -88,14 +91,14 @@ public class intakeUnit2026
     Close trigger servo during intake
      */
     public void triggerClose() {
-        triggerServo.setPosition(0.1);
+        triggerServo.setPosition(trigger_close);
     }
 
     /*
     Open trigger servo before launch
      */
     public void triggerOpen() {
-        triggerServo.setPosition(0.7);
+        triggerServo.setPosition(trigger_open);
     }
 
     /*
