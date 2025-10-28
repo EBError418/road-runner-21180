@@ -47,7 +47,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class intakeUnit2026
 {
     double intakePower = -0.86;
-    double launcherPower = 0.6;
+    double farPower = 0.78; //Power for launching from far triangle
+    double closePower = 0.7267; //Power for launching from close triangle(x=1, y=1)
     double trigger_close = 0.05;
     double trigger_open = 0.4;
 
@@ -80,7 +81,7 @@ public class intakeUnit2026
     }
 
     public void startLauncher() {
-        launcherMotor.setPower(launcherPower);
+        launcherMotor.setPower(farPower);
     }
 
     public void stopLauncher() {
