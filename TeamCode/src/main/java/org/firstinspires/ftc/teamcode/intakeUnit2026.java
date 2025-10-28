@@ -84,8 +84,10 @@ public class intakeUnit2026
         launcherMotor.setPower(farPower);
     }
 
+    // always close trigger when launcher stops to avoid artifact stuck between launcher wheels.
     public void stopLauncher() {
         launcherMotor.setPower(0.0);
+        triggerClose();
     }
 
     /*
