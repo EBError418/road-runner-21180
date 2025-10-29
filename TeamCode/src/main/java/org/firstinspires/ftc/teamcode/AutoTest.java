@@ -5,16 +5,20 @@ import com.acmerobotics.roadrunner.Vector2d;
 import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 @Autonomous(name = "Auto2026", group = "Concept")
 public class AutoTest extends LinearOpMode {
+
     private MecanumDrive drive;
+
+    private ElapsedTime runtime = new ElapsedTime();
 
     private int leftOrRight = 1;
     public Pose2d newStartPose;
 
     // Limelight detector
-    Colored patternDetector = new Colored(hardwareMap);
+    Colored patternDetector;
     public Pose2d shootPos = new Pose2d(Params.HALF_MAT, Params.HALF_MAT, Math.toRadians(45));
 
     intakeUnit2026 motors;
@@ -25,14 +29,17 @@ public class AutoTest extends LinearOpMode {
         setRobotLocation();
         setStartPoses(leftOrRight);
         drive = new MecanumDrive(hardwareMap, newStartPose);
-        motors = new intakeUnit2026(hardwareMap, "launcher", "intake", "trigger");
-
+        motors = new intakeUnit2026(hardwareMap, "launcher", "intake", "triggerServo");
+        patternDetector = new Colored(hardwareMap);
         telemetry.addLine("Initialized. Waiting for start...");
         telemetry.update();
 
         waitForStart();
 
         if (opModeIsActive()) {
+
+            runtime.reset();
+
             // Try a few times to get a valid color reading
             double detectedColor = 0;
             for (int i = 0; i < 30 && opModeIsActive(); i++) { // up to ~0.3s

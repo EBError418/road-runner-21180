@@ -72,7 +72,7 @@ import java.util.List;
  */
 
 @Autonomous(name="Left side auto sliders", group="Concept")
-@Disabled
+//@Disabled
 public class AutoLeftSliders extends LinearOpMode {
 
     /** 1 for Red Front, 2 for Red back, 3 for Blue Front, and 4 for Blue back
