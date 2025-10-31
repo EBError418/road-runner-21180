@@ -83,7 +83,7 @@ public class AutoTest extends LinearOpMode {
         newStartPose = new Pose2d(
                 (-6 * Params.HALF_MAT + Params.CHASSIS_LENGTH / 2),
                 (leftRight * Params.CHASSIS_HALF_WIDTH),
-                0.0
+                180.0
         );
     }
 
@@ -114,32 +114,32 @@ public class AutoTest extends LinearOpMode {
                             sortArtifacts((int) detectedPattern);
                             shootArtifacts();
                         })
-                        // Move to first artifact position
-                        .strafeToLinearHeading(new Vector2d(-3 * Params.HALF_MAT, 3 * Params.HALF_MAT), Math.toRadians(90))
-                        // Move forward to collect artifacts
-                        .strafeTo(new Vector2d(-3 * Params.HALF_MAT, 3.75 * Params.HALF_MAT))
-                        // Move slightly back
-                        .strafeTo(new Vector2d(-3 * Params.HALF_MAT, 3 * Params.HALF_MAT))
-                        // Return to shooting position
-                        .strafeToLinearHeading(shootPos.position, shootPos.heading)
-                        .afterDisp(distanceToShootPos, () -> {
-                            sortArtifacts((int) detectedPattern);
-                            shootArtifacts();
-                        })
-                        // Move to second artifact position
-                        .strafeToLinearHeading(new Vector2d(-1 * Params.HALF_MAT, 2 * Params.HALF_MAT), Math.toRadians(90))
-                        // Move forward to collect artifacts
-                        .strafeTo(new Vector2d(-1 * Params.HALF_MAT, 3.75 * Params.HALF_MAT))
-                        // Move slightly back
-                        .strafeTo(new Vector2d(-1 * Params.HALF_MAT, 3 * Params.HALF_MAT))
-                        // Return to shooting position
-                        .strafeToLinearHeading(shootPos.position, shootPos.heading)
-                        .afterDisp(distanceToShootPos, () -> {
-                            sortArtifacts((int) detectedPattern);
-                            shootArtifacts();
-                        })
-                        // Empty artifacts
-                        .strafeToLinearHeading(new Vector2d(-0.75 * Params.HALF_MAT, 4 * Params.HALF_MAT), Math.toRadians(90))
+//                        // Move to first artifact position
+//                        .strafeToLinearHeading(new Vector2d(-3 * Params.HALF_MAT, 3 * Params.HALF_MAT), Math.toRadians(90))
+//                        // Move forward to collect artifacts
+//                        .strafeTo(new Vector2d(-3 * Params.HALF_MAT, 3.75 * Params.HALF_MAT))
+//                        // Move slightly back
+//                        .strafeTo(new Vector2d(-3 * Params.HALF_MAT, 3 * Params.HALF_MAT))
+//                        // Return to shooting position
+//                        .strafeToLinearHeading(shootPos.position, shootPos.heading)
+//                        .afterDisp(distanceToShootPos, () -> {
+//                            sortArtifacts((int) detectedPattern);
+//                            shootArtifacts();
+//                        })
+//                        // Move to second artifact position
+//                        .strafeToLinearHeading(new Vector2d(-1 * Params.HALF_MAT, 2 * Params.HALF_MAT), Math.toRadians(90))
+//                        // Move forward to collect artifacts
+//                        .strafeTo(new Vector2d(-1 * Params.HALF_MAT, 3.75 * Params.HALF_MAT))
+//                        // Move slightly back
+//                        .strafeTo(new Vector2d(-1 * Params.HALF_MAT, 3 * Params.HALF_MAT))
+//                        // Return to shooting position
+//                        .strafeToLinearHeading(shootPos.position, shootPos.heading)
+//                        .afterDisp(distanceToShootPos, () -> {
+//                            sortArtifacts((int) detectedPattern);
+//                            shootArtifacts();
+//                        })
+//                        // Empty artifacts
+//                        .strafeToLinearHeading(new Vector2d(-0.75 * Params.HALF_MAT, 4 * Params.HALF_MAT), Math.toRadians(90))
                         .build()
         );
     }
@@ -150,8 +150,10 @@ public class AutoTest extends LinearOpMode {
         calibrateShootPosition(position);
         telemetry.update();
         motors.startLauncher();
+        motors.triggerOpen();
         sleep(4000);
         motors.stopLauncher();
+        motors.triggerClose();
     }
 
     private void sortArtifacts(int pattern) {

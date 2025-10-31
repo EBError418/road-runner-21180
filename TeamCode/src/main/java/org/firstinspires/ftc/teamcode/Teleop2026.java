@@ -100,8 +100,6 @@ public class Teleop2026 extends LinearOpMode {
 
         //preset positions used for teleop commands
 
-
-
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Mode", "waiting for start.");
 
