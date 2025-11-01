@@ -71,8 +71,8 @@ public class intakeUnit2026
         The motor is to do its best to run at targeted velocity.
         An encoder must be affixed to the motor in order to use this mode. This is a PID mode.
          */
-        //launcherMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        launcherMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        launcherMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        //launcherMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // trigger servo
         triggerServo = hardwareMap.get(Servo.class, trigger);
