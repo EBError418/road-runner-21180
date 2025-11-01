@@ -15,15 +15,6 @@ public class AutoNear2026 extends LinearOpMode {
 
     intakeUnit2026 motors;
     Colored patternDetector = new Colored(hardwareMap);
-    // Try a few times to get a valid color reading
-//    double detectedColor = 0;
-//            for (int i = 0; i < 30 && opModeIsActive(); i++) { // up to ~0.3s
-//        detectedColor = patternDetector.returnId();
-//        telemetry.addData("Detected Color", detectedColor);
-//        telemetry.update();
-//        if (detectedColor != 0) break;
-//        sleep(10);
-//    }
     public double detectedPattern;
 
     @Override
@@ -54,29 +45,28 @@ public class AutoNear2026 extends LinearOpMode {
         Actions.runBlocking(
                 drive.actionBuilder(StartPose)
                         // Move to shooting position
+                        .strafeTo(new Vector2d(-6 * Params.HALF_MAT, leftOrRight * Params.HALF_MAT))
+                        .afterDisp(6 * Params.HALF_MAT, () -> {
+                            detectedPattern = 0;
+                            for (int i = 0; i < 30 && opModeIsActive(); i++) { // up to ~0.3s
+                                detectedPattern = patternDetector.returnId();
+                                telemetry.addData("Detected Pattern", detectedPattern);
+                                telemetry.update();
+                                if (detectedPattern != 0) break;
+                                sleep(10);
+                            }
+                        })
                         .strafeToLinearHeading(shootPos.position, shootPos.heading)
                         .afterDisp(distanceToShootPos, () -> {
                             sortArtifacts((int) detectedPattern);
                             shootArtifacts();
                         })
-                        // Move to first artifact position
-                        .strafeToLinearHeading(new Vector2d(-3 * Params.HALF_MAT, 3 * Params.HALF_MAT), Math.toRadians(90))
+                        // Move to the right row based on detected pattern
+                        .strafeToLinearHeading(rowChoose(detectedPattern), Math.toRadians(90))
                         // Move forward to collect artifacts
-                        .strafeTo(new Vector2d(-3 * Params.HALF_MAT, 3.75 * Params.HALF_MAT))
+                        .lineToX(-3 * Params.HALF_MAT)
                         // Move slightly back
-                        .strafeTo(new Vector2d(-3 * Params.HALF_MAT, 3 * Params.HALF_MAT))
-                        // Return to shooting position
-                        .strafeToLinearHeading(shootPos.position, shootPos.heading)
-                        .afterDisp(distanceToShootPos, () -> {
-                            sortArtifacts((int) detectedPattern);
-                            shootArtifacts();
-                        })
-                        // Move to second artifact position
-                        .strafeToLinearHeading(new Vector2d(-1 * Params.HALF_MAT, 2 * Params.HALF_MAT), Math.toRadians(90))
-                        // Move forward to collect artifacts
-                        .strafeTo(new Vector2d(-1 * Params.HALF_MAT, 3.75 * Params.HALF_MAT))
-                        // Move slightly back
-                        .strafeTo(new Vector2d(-1 * Params.HALF_MAT, 3 * Params.HALF_MAT))
+                        .lineToX(-2.5 * Params.HALF_MAT)
                         // Return to shooting position
                         .strafeToLinearHeading(shootPos.position, shootPos.heading)
                         .afterDisp(distanceToShootPos, () -> {
@@ -126,5 +116,14 @@ public class AutoNear2026 extends LinearOpMode {
                 break;
         }
         telemetry.update();
+    }
+
+    // function that chooses the right row based on detected pattern, returns a Vector2d
+    private Vector2d rowChoose(double pattern) {
+        double rowIndex = pattern - 20;
+        return new Vector2d(
+                -Params.HALF_MAT + rowIndex * 2 * Params.HALF_MAT,
+                leftOrRight * 3 * Params.HALF_MAT
+        );
     }
 }
