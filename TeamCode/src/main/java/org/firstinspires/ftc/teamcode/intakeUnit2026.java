@@ -47,8 +47,8 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class intakeUnit2026
 {
     double intakePower = -0.86;
-    double farPower = 0.78; //Power for launching from far triangle
-    double closePower = 0.7267; //Power for launching from close triangle(x=1, y=1)
+    double farPower = 0.98; //Power for launching from far triangle
+    double closePower = 0.65; //Power for launching from close triangle(x=1, y=1)
     double trigger_close = 0.05;
     double trigger_open = 0.4;
 
@@ -67,6 +67,13 @@ public class intakeUnit2026
         intakeMotor = hardwareMap.get(DcMotor.class, intake);
         launcherMotor = hardwareMap.get(DcMotor.class, launcher);
 
+        /*
+        The motor is to do its best to run at targeted velocity.
+        An encoder must be affixed to the motor in order to use this mode. This is a PID mode.
+         */
+        //launcherMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        launcherMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
         // trigger servo
         triggerServo = hardwareMap.get(Servo.class, trigger);
 
@@ -81,13 +88,17 @@ public class intakeUnit2026
     }
 
     public void startLauncher() {
-        launcherMotor.setPower(farPower);
+        launcherMotor.setPower(closePower);
     }
 
     // always close trigger when launcher stops to avoid artifact stuck between launcher wheels.
     public void stopLauncher() {
         launcherMotor.setPower(0.0);
         triggerClose();
+    }
+
+    public  double getLauncherPower() {
+        return launcherMotor.getPower();
     }
 
     /*

@@ -179,11 +179,18 @@ public class Teleop2026 extends LinearOpMode {
                 motors.triggerClose();
             }
 
+            if(gpButtons.launchArtifacts) {
+                shootArtifacts();
+            }
+
             telemetry.update();
             if (debugFlag) {
 
                 // display trigger servo position for testing purpose.
                 telemetry.addData("trigger servo", "position = %.3f", motors.getTriggerPosition());
+
+                telemetry.addData("launcher motor", "power = %.3f", motors.getLauncherPower());
+
 
                 telemetry.addData("heading", " %.3f", Math.toDegrees(drive.localizer.getPose().heading.log()));
 
@@ -191,12 +198,35 @@ public class Teleop2026 extends LinearOpMode {
 
                 telemetry.addData(" --- ", " --- ");
                 telemetry.update(); // update message at the end of while loop
+
             }
 
         }
 
         //intake.armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         // The motor stop on their own but power is still applied. Turn off motor.
+    }
+
+    private void shootArtifacts() {
+        telemetry.addLine("Shooting...");
+
+        telemetry.update();
+        motors.startLauncher();
+        sleep(3000);
+        motors.triggerOpen(); // shoot first
+        sleep(300);
+        motors.triggerClose();
+        motors.startIntake();
+        sleep(1000);
+        motors.triggerOpen(); // shoot second
+        sleep(300);
+        motors.stopIntake();
+        motors.triggerClose();
+        sleep(1000);
+        motors.triggerOpen();  // shoot third
+        sleep(1000);
+        motors.stopLauncher();
+        motors.triggerClose();
     }
 
     private void updateProfileAccel(boolean fastMode) {

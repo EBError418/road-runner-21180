@@ -62,6 +62,7 @@ public class GamePadButtons2026 {
     public boolean intakeOff;
     public boolean triggerOpen;
     public boolean triggerClose;
+    public boolean launchArtifacts;
 
     public void checkGamepadButtons(@NonNull Gamepad gamepad1, @NonNull Gamepad gamepad2) {
         //game pad 1 buttons
@@ -97,6 +98,8 @@ public class GamePadButtons2026 {
         // trigger servo buttons
         triggerOpen = gamepad1.y;
         triggerClose = gamepad1.x;
+
+        launchArtifacts = gamepad1.dpad_left;
 
     }
 }

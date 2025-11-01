@@ -14,7 +14,7 @@ public class AutoTest extends LinearOpMode {
 
     private ElapsedTime runtime = new ElapsedTime();
 
-    private int leftOrRight = 1;
+    private int leftOrRight = 1;  // left is blue = 1; right is red = 0;
     public Pose2d newStartPose;
 
     // Limelight detector
@@ -95,7 +95,7 @@ public class AutoTest extends LinearOpMode {
     }
 
     private void auto(double detectedPattern) {
-        motors.startIntake();
+        //motors.startIntake();
 
         double distanceToShootPos = Math.hypot(
                 shootPos.position.x - newStartPose.position.x,
@@ -150,8 +150,18 @@ public class AutoTest extends LinearOpMode {
         calibrateShootPosition(position);
         telemetry.update();
         motors.startLauncher();
-        motors.triggerOpen();
-        sleep(4000);
+        sleep(1000);
+        motors.triggerOpen(); // shooot first
+        sleep(1000);
+        motors.triggerClose();
+        motors.startIntake();
+        sleep(1000);
+        motors.triggerOpen(); // shoot second
+        sleep(1000);
+        motors.triggerClose();
+        sleep(1000);
+        motors.triggerOpen();  // shoot third
+        sleep(1000);
         motors.stopLauncher();
         motors.triggerClose();
     }
