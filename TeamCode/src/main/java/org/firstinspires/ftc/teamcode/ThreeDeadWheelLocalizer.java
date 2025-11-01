@@ -15,6 +15,7 @@ import com.acmerobotics.roadrunner.ftc.PositionVelocityPair;
 import com.acmerobotics.roadrunner.ftc.RawEncoder;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 
 import org.firstinspires.ftc.teamcode.messages.ThreeDeadWheelInputsMessage;
@@ -25,10 +26,10 @@ public final class ThreeDeadWheelLocalizer implements Localizer {
         // May have a bug for the signs of par0YTicks and par1YTicks.
         // The set here is opposite with the actual physical location.
         // But test values are correct.
-        double weight = 1.035;
-        public double par0YTicks =  -1417.85 * weight;// * 1.016; //-6.75 / 0.00294 // y position of the first parallel encoder (in tick units)
-        public double par1YTicks = 1457.92 * weight;//   * 1.016; //6.75 / 0.00294; // y position of the second parallel encoder (in tick units)
-        public double perpXTicks = -1022.5 * weight; //-6.75 / 0.00294; // x position of the perpendicular encoder (in tick units)
+        double weight = 0.9814;
+        public double par0YTicks = 2005.7026590728692; //1870.15625 * weight;// * 1.016; //-6.75 / 0.00294 // y position of the first parallel encoder (in tick units)
+        public double par1YTicks = -1671.5530435376281; //-1870.15625 * weight;// * 1.016; //6.75 / 0.00294; // y position of the second parallel encoder (in tick units)
+        public double perpXTicks = 3832.8043366206184; //3490.9583 * weight; //-6.75 / 0.00294; // x position of the perpendicular encoder (in tick units)
     }
 
     public static Params PARAMS = new Params();
@@ -45,6 +46,9 @@ public final class ThreeDeadWheelLocalizer implements Localizer {
         // TODO: make sure your config has **motors** with these names (or change them)
         //   the encoders should be plugged into the slot matching the named motor
         //   see https://ftc-docs.firstinspires.org/en/latest/hardware_and_software_configuration/configuring/index.html
+
+        // 2025 robot dead wheels
+        /*
         par0 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "FrontRight")));
         par1 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "FrontLeft")));
         perp = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "BackRight")));
@@ -52,6 +56,16 @@ public final class ThreeDeadWheelLocalizer implements Localizer {
         par1.setDirection(DcMotor.Direction.REVERSE);
         par0.setDirection(DcMotor.Direction.FORWARD);
         perp.setDirection(DcMotor.Direction.REVERSE);
+        */
+
+        // 2026 robot dead wheels
+        par0 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "BackRight")));
+        par1 = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "BackLeft")));
+        perp = new OverflowEncoder(new RawEncoder(hardwareMap.get(DcMotorEx.class, "FrontLeft")));
+
+        par1.setDirection(DcMotor.Direction.FORWARD);
+        par0.setDirection(DcMotor.Direction.FORWARD);
+        perp.setDirection(DcMotor.Direction.FORWARD);
 
         // TODO: reverse encoder directions if needed
         //   par0.setDirection(DcMotorSimple.Direction.REVERSE);

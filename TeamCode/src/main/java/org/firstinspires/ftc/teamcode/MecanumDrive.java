@@ -58,22 +58,24 @@ public final class MecanumDrive {
         // TODO: fill in these values based on
         //   see https://ftc-docs.firstinspires.org/en/latest/programming_resources/imu/imu.html?highlight=imu#physical-hub-mounting
         public RevHubOrientationOnRobot.LogoFacingDirection logoFacingDirection =
-                RevHubOrientationOnRobot.LogoFacingDirection.BACKWARD;
+                RevHubOrientationOnRobot.LogoFacingDirection.RIGHT;
         public RevHubOrientationOnRobot.UsbFacingDirection usbFacingDirection =
-                RevHubOrientationOnRobot.UsbFacingDirection.DOWN;
+                RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
 
         // drive model parameters
 
         // Gobilda odometry: 48mm diameter(1.89 inch), 2048 tick per revolution, inPerTick = 0.0029.
         public boolean useDeadWheel = true;
-        public double inPerTick = useDeadWheel? 0.00294 : 0.02208155454144; // WHEEL_RADIUS(1.8898) * 2 * Math.PI / TICKS_PER_REV(537.6)
-        public double lateralInPerTick = useDeadWheel? 0.002622 : 0.019/0.9786;
-        public double trackWidthTicks = useDeadWheel? 3365.026 : 1033.694878742297; //3542.133
+
+        // for new version of odometry: 32 mm diameter onni wheel with 2000 PPR encoder. 0.001979 inPerTick.
+        public double inPerTick = useDeadWheel? 0.001979 : 0.02208155454144; // WHEEL_RADIUS(1.8898) * 2 * Math.PI / TICKS_PER_REV(537.6)
+        public double lateralInPerTick = useDeadWheel? 0.0016688 : 0.019/0.9786;
+        public double trackWidthTicks = useDeadWheel? 5854.197009014739 : 1033.694878742297; //3365.026
 
         // feedforward parameters (in tick units)
-        public double kS = useDeadWheel? 0.239 : 0.3626963142056274;
-        public double kV = useDeadWheel? 0.00068 : 0.004996510332010479;
-        public double kA = useDeadWheel? 0.00013 : 0.0;
+        public double kS = useDeadWheel? 1.1 : 0.3626963142056274;
+        public double kV = useDeadWheel? 0.00029 : 0.004996510332010479;
+        public double kA = useDeadWheel? 0.000092 : 0.0;
 
         // path profile parameters (in inches)
         public double maxWheelVel = useDeadWheel? 65 : 50;
@@ -86,12 +88,12 @@ public final class MecanumDrive {
 
         // path controller gains
         public double axialGain = 9.0; // 0.0
-        public double lateralGain = 8.0;  // 0.0 ; 8 is based on testing without dead wheels
-        public double headingGain = 12.0; // 0.0; //shared with turn
+        public double lateralGain = 9.0;  // 0.0 ; 8 is based on testing without dead wheels
+        public double headingGain = 9.0; // 0.0; //shared with turn
 
-        public double axialVelGain = 0.1; // 0.0
+        public double axialVelGain = 0.0; // 0.0
         public double lateralVelGain = 0.0;
-        public double headingVelGain = 0.3; // 0.0; //shared with turn
+        public double headingVelGain = 0.0; // 0.0; //shared with turn
     }
 
     public static Params PARAMS = new Params();

@@ -31,6 +31,7 @@ package org.firstinspires.ftc.teamcode;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.Servo;
 
 
 /**
@@ -45,21 +46,41 @@ import com.qualcomm.robotcore.hardware.DcMotor;
  */
 public class intakeUnit2026
 {
+    double intakePower = -0.86;
+    double farPower = 0.98; //Power for launching from far triangle
+    double closePower = 0.65; //Power for launching from close triangle(x=1, y=1)
+    double trigger_close = 0.05;
+    double trigger_open = 0.4;
+
+
     HardwareMap hardwareMap;
     private final DcMotor intakeMotor;
     private final DcMotor launcherMotor;
+    private Servo triggerServo = null;
 
-    public intakeUnit2026(HardwareMap hardwareMap, String launcher, String intake) {
+
+    public intakeUnit2026(HardwareMap hardwareMap, String launcher, String intake, String trigger) {
         // Save reference to Hardware map
         this.hardwareMap = hardwareMap;
 
         // Define and Initialize Motors
         intakeMotor = hardwareMap.get(DcMotor.class, intake);
         launcherMotor = hardwareMap.get(DcMotor.class, launcher);
+
+        /*
+        The motor is to do its best to run at targeted velocity.
+        An encoder must be affixed to the motor in order to use this mode. This is a PID mode.
+         */
+        //launcherMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        launcherMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+
+        // trigger servo
+        triggerServo = hardwareMap.get(Servo.class, trigger);
+
     }
 
     public void startIntake() {
-        intakeMotor.setPower(-0.67);
+        intakeMotor.setPower(intakePower);
     }
 
     public void stopIntake() {
@@ -67,10 +88,37 @@ public class intakeUnit2026
     }
 
     public void startLauncher() {
-        launcherMotor.setPower(1.0);
+        launcherMotor.setPower(closePower);
     }
 
+    // always close trigger when launcher stops to avoid artifact stuck between launcher wheels.
     public void stopLauncher() {
         launcherMotor.setPower(0.0);
+        triggerClose();
+    }
+
+    public  double getLauncherPower() {
+        return launcherMotor.getPower();
+    }
+
+    /*
+    Close trigger servo during intake
+     */
+    public void triggerClose() {
+        triggerServo.setPosition(trigger_close);
+    }
+
+    /*
+    Open trigger servo before launch
+     */
+    public void triggerOpen() {
+        triggerServo.setPosition(trigger_open);
+    }
+
+    /*
+    Get trigger servo position for display during debug/testing
+     */
+    public double getTriggerPosition() {
+        return triggerServo.getPosition();
     }
 }

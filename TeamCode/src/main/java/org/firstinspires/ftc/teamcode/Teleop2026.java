@@ -90,7 +90,7 @@ public class Teleop2026 extends LinearOpMode {
         drive = new MecanumDrive(hardwareMap, Params.currentPose);
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        motors = new intakeUnit2026(hardwareMap, "launcher", "intake");
+        motors = new intakeUnit2026(hardwareMap, "launcher", "intake", "triggerServo");
 
         // bulk reading setting - auto refresh mode
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
@@ -99,8 +99,6 @@ public class Teleop2026 extends LinearOpMode {
         }
 
         //preset positions used for teleop commands
-
-
 
         // Wait for the game to start (driver presses PLAY)
         telemetry.addData("Mode", "waiting for start.");
@@ -112,7 +110,6 @@ public class Teleop2026 extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-            motors.startIntake();
 
             //gamepad1 buttons
             gpButtons.checkGamepadButtons(gamepad1, gamepad2);
@@ -132,6 +129,8 @@ public class Teleop2026 extends LinearOpMode {
                     ),
                     -gpButtons.robotTurn * maxDrivePower
             ));
+
+
 
 //            if (gpButtons.servoStart) {
 //                intake.setMotorPower(5000);
@@ -153,30 +152,81 @@ public class Teleop2026 extends LinearOpMode {
 //                );
 //            }
 
+            // launch actions
             if (gpButtons.launch) {
                 motors.startLauncher();
-            } else {
-                motors.stopLauncher();
+            }
+            if (gpButtons.launchOff) {
+            motors.stopLauncher();
+            }
+            
+
+            // intake actions
+            if (gpButtons.intakeOn) {
+                motors.startIntake();
             }
 
-            //if (gpButtons.servoStop) {
-            //    telemetry.addData("Stopped!!!", "%.3f", intake.servoPos());
-            //    intake.setServo1Position(0.5);
-            //}
+            if (gpButtons.intakeOff) {
+                motors.stopIntake();
+            }
+
+            // trigger servo actions
+            if (gpButtons.triggerOpen) {
+                motors.triggerOpen();
+            }
+
+            if (gpButtons.triggerClose) {
+                motors.triggerClose();
+            }
+
+            if(gpButtons.launchArtifacts) {
+                shootArtifacts();
+            }
+
             telemetry.update();
             if (debugFlag) {
+
+                // display trigger servo position for testing purpose.
+                telemetry.addData("trigger servo", "position = %.3f", motors.getTriggerPosition());
+
+                telemetry.addData("launcher motor", "power = %.3f", motors.getLauncherPower());
+
+
                 telemetry.addData("heading", " %.3f", Math.toDegrees(drive.localizer.getPose().heading.log()));
 
                 telemetry.addData("location", " %s", drive.localizer.getPose().position.toString());
 
                 telemetry.addData(" --- ", " --- ");
                 telemetry.update(); // update message at the end of while loop
+
             }
 
         }
 
         //intake.armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         // The motor stop on their own but power is still applied. Turn off motor.
+    }
+
+    private void shootArtifacts() {
+        telemetry.addLine("Shooting...");
+
+        telemetry.update();
+        motors.startLauncher();
+        sleep(3000);
+        motors.triggerOpen(); // shoot first
+        sleep(300);
+        motors.triggerClose();
+        motors.startIntake();
+        sleep(1000);
+        motors.triggerOpen(); // shoot second
+        sleep(300);
+        motors.stopIntake();
+        motors.triggerClose();
+        sleep(1000);
+        motors.triggerOpen();  // shoot third
+        sleep(1000);
+        motors.stopLauncher();
+        motors.triggerClose();
     }
 
     private void updateProfileAccel(boolean fastMode) {
