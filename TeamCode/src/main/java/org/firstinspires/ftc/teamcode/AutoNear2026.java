@@ -1,82 +1,94 @@
 package org.firstinspires.ftc.teamcode;
 
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.InstantAction;
+import com.acmerobotics.roadrunner.ftc.Actions;
+import com.acmerobotics.roadrunner.Action;
+import com.acmerobotics.roadrunner.ParallelAction;
+import com.acmerobotics.roadrunner.SequentialAction;
 import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 @Autonomous(name = "Auto Near 2026", group = "Concept")
 public class AutoNear2026 extends LinearOpMode {
     private MecanumDrive drive;
-    private int leftOrRight = 1; // 1 for blue, -1 for red
-    public Pose2d StartPose;
-    public Pose2d shootPos = new Pose2d(-Params.HALF_MAT, leftOrRight * Params.HALF_MAT, Math.toRadians(45));
+    private intakeUnit2026 motors;
+    private Colored patternDetector;
 
-    intakeUnit2026 motors;
-    Colored patternDetector = new Colored(hardwareMap);
-    public double detectedPattern;
+    private int leftOrRight = 1; // 1 for blue, -1 for red
+    private double detectedPattern;
+
+    private Pose2d StartPose;
+    private Pose2d shootPos;
 
     @Override
     public void runOpMode() {
+        // connect the hardware map to color discrimination system
+        patternDetector = new Colored(hardwareMap);
+        motors = new intakeUnit2026(hardwareMap, "launcher", "intake", "triggerServo");
+
         // Initialize drive and vision system
         StartPose = new Pose2d(
-                (-6 * Params.HALF_MAT + Params.CHASSIS_LENGTH / 2),
-                (leftOrRight * Params.CHASSIS_HALF_WIDTH),
-                180.0
+                (6 * Params.HALF_MAT - Params.CHASSIS_HALF_LENGTH),
+                (leftOrRight * Params.CHASSIS_HALF_WIDTH), Math.toRadians(180)
         );
+        shootPos = new Pose2d(2*Params.HALF_MAT, leftOrRight * Params.HALF_MAT, Math.toRadians(225));
+
         drive = new MecanumDrive(hardwareMap, StartPose);
-        motors = new intakeUnit2026(hardwareMap, "launcher", "intake", "triggerServo");
+
         telemetry.addLine("Initialized. Waiting for start...");
         telemetry.update();
+
         waitForStart();
+
         if (opModeIsActive()) {
-            auto();
+            run_auto();
         }
     }
 
-    private void auto() {
-        motors.startIntake();
-        double distanceToShootPos = Math.hypot(
-                shootPos.position.x - StartPose.position.x,
-                shootPos.position.y - StartPose.position.y
-        );
-
-        Actions.runBlocking(
-                drive.actionBuilder(StartPose)
-                        // Move to shooting position
-                        .strafeTo(new Vector2d(-6 * Params.HALF_MAT, leftOrRight * Params.HALF_MAT))
-                        .afterDisp(6 * Params.HALF_MAT, () -> {
-                            detectedPattern = 0;
-                            for (int i = 0; i < 30 && opModeIsActive(); i++) { // up to ~0.3s
-                                detectedPattern = patternDetector.returnId();
-                                telemetry.addData("Detected Pattern", detectedPattern);
-                                telemetry.update();
-                                if (detectedPattern != 0) break;
-                                sleep(10);
-                            }
-                        })
-                        .strafeToLinearHeading(shootPos.position, shootPos.heading)
-                        .afterDisp(distanceToShootPos, () -> {
-                            sortArtifacts((int) detectedPattern);
-                            shootArtifacts();
-                        })
-                        // Move to the right row based on detected pattern
-                        .strafeToLinearHeading(rowChoose(detectedPattern), Math.toRadians(90))
-                        // Move forward to collect artifacts
-                        .lineToX(-3 * Params.HALF_MAT)
-                        // Move slightly back
-                        .lineToX(-2.5 * Params.HALF_MAT)
-                        // Return to shooting position
-                        .strafeToLinearHeading(shootPos.position, shootPos.heading)
-                        .afterDisp(distanceToShootPos, () -> {
-                            sortArtifacts((int) detectedPattern);
-                            shootArtifacts();
-                        })
-                        // Empty artifacts
-                        .strafeToLinearHeading(new Vector2d(-0.75 * Params.HALF_MAT, 4 * Params.HALF_MAT), Math.toRadians(90))
-                        .build()
-        );
+    private void run_auto() {
+//        motors.startIntake();
+        motors.triggerClose();
+        // Moving backwards to detect position
+        Action leg1 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToConstantHeading(new Vector2d(shootPos.position.x, drive.localizer.getPose().position.y)).build();
+        // After detect, go to shoot position
+        Action leg2 = drive.actionBuilder(new Pose2d(shootPos.position.x, drive.localizer.getPose().position.y, drive.localizer.getPose().heading.real))
+                .strafeToLinearHeading(shootPos.position, shootPos.heading).build();
+        // Move to the right row based on detected pattern
+        Action leg3 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(rowChoose(detectedPattern), Math.toRadians(90))
+                .strafeToConstantHeading(new Vector2d(drive.localizer.getPose().position.x,3 * Params.HALF_MAT))
+                .strafeToConstantHeading(new Vector2d(drive.localizer.getPose().position.x, -2.5 * Params.HALF_MAT))
+                .strafeToLinearHeading(shootPos.position, shootPos.heading)
+                .build();
+        Action leg4 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(new Vector2d(-0.75 * Params.HALF_MAT, 4 * Params.HALF_MAT), Math.toRadians(90))
+                .build();
+        Actions.runBlocking(leg1);
+        Logging.log("Running leg1 complete, x pos: %.2f, y pos: %.2f", drive.localizer.getPose().position.x, drive.localizer.getPose().position.y);
+        detectedPattern = 0;
+        for (int i = 0; i < 30; i++) { // up to ~0.3s
+            detectedPattern = patternDetector.returnId();
+            telemetry.addData("Detected Pattern", detectedPattern);
+            telemetry.update();
+            sleep(1);
+            if (detectedPattern != 0) {
+                Actions.runBlocking(leg2);
+                shootArtifacts();
+                Actions.runBlocking(leg3);
+                shootArtifacts();
+                Actions.runBlocking(leg4);
+            } else if (i == 29) {
+                Actions.runBlocking(leg2);
+                shootArtifacts();
+                Actions.runBlocking(leg3);
+                shootArtifacts();
+                Actions.runBlocking(leg4);
+            }
+        }
     }
 
     private void shootArtifacts() {
@@ -122,7 +134,7 @@ public class AutoNear2026 extends LinearOpMode {
     private Vector2d rowChoose(double pattern) {
         double rowIndex = pattern - 20;
         return new Vector2d(
-                -Params.HALF_MAT + rowIndex * 2 * Params.HALF_MAT,
+                -3 * Params.HALF_MAT + rowIndex * 2 * Params.HALF_MAT,
                 leftOrRight * 3 * Params.HALF_MAT
         );
     }
