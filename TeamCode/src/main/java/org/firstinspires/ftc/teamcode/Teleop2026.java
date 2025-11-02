@@ -208,23 +208,28 @@ public class Teleop2026 extends LinearOpMode {
     }
 
     public void shootArtifacts() {
-        // start launcher motor
-        motors.startLauncher();
-        sleep(1200); // waiting time for launcher motor ramp up
+        int waitTimeForTriggerClose = 300;
+        int waitTimeForTriggerOpen = 800;
+
+        // start launcher motor if it has not been launched
+        if (motors.getLauncherPower() < 0.1) {
+            motors.startLauncher();
+            sleep(waitTimeForTriggerOpen + 400); // waiting time for launcher motor ramp up
+        }
 
         motors.triggerOpen(); // shoot first
-        sleep(250);
+        sleep(waitTimeForTriggerClose);
         motors.triggerClose(); //close trigger to wait launcher motor speed up after first launching
 
         motors.startIntake(); // start intake motor to move 3rd artifacts into launcher
-        sleep(800);// waiting time for launcher motor ramp up
+        sleep(waitTimeForTriggerOpen);// waiting time for launcher motor ramp up
         motors.triggerOpen(); // shoot second
-        sleep(250);
+        sleep(waitTimeForTriggerClose);
 
         motors.triggerClose();
-        sleep(800); // waiting time for launcher motor ramp up
+        sleep(waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
         motors.triggerOpen();  // shoot third
-        sleep(250);
+        sleep(waitTimeForTriggerClose);
 
         motors.triggerClose();
         motors.stopIntake();
