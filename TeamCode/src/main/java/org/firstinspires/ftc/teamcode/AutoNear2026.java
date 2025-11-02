@@ -1,5 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
+import androidx.annotation.NonNull;
+
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.InstantAction;
 import com.acmerobotics.roadrunner.ftc.Actions;
@@ -32,9 +34,15 @@ public class AutoNear2026 extends LinearOpMode {
         // Initialize drive and vision system
         StartPose = new Pose2d(
                 (6 * Params.HALF_MAT - Params.CHASSIS_HALF_LENGTH),
-                (leftOrRight * Params.CHASSIS_HALF_WIDTH), Math.toRadians(180)
+                (leftOrRight * Params.CHASSIS_HALF_WIDTH), Math.toRadians(180.0)
         );
-        shootPos = new Pose2d(2*Params.HALF_MAT, leftOrRight * Params.HALF_MAT, Math.toRadians(225));
+
+        // define shoot position, calculate shoot angle based on location x, y
+        double shootPosX = 1.8 * Params.HALF_MAT;
+        double shootPosY = leftOrRight * Params.HALF_MAT;
+        double shootPosTheta;
+        shootPosTheta = Math.atan2(6 * Params.HALF_MAT - shootPosY, 6 * Params.HALF_MAT - shootPosX);
+        shootPos = new Pose2d(shootPosX, shootPosY, shootPosTheta);
 
         drive = new MecanumDrive(hardwareMap, StartPose);
 
@@ -49,14 +57,47 @@ public class AutoNear2026 extends LinearOpMode {
     }
 
     private void run_auto() {
-//        motors.startIntake();
         motors.triggerClose();
-        // Moving backwards to detect position
+        detectedPattern = 0;
+
+        // Detect April Tag while Moving backwards to detect position
+        // Then turn to shoot position angle.
         Action leg1 = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToConstantHeading(new Vector2d(shootPos.position.x, drive.localizer.getPose().position.y)).build();
-        // After detect, go to shoot position
-        Action leg2 = drive.actionBuilder(new Pose2d(shootPos.position.x, drive.localizer.getPose().position.y, drive.localizer.getPose().heading.real))
-                .strafeToLinearHeading(shootPos.position, shootPos.heading).build();
+                .strafeToConstantHeading(new Vector2d(shootPos.position.x, shootPos.position.y))
+                .afterTime(0.001, new startLauncherAction())
+                .turnTo(shootPos.heading)
+                .build();
+
+        // detect April Tag while moving backwards to shoot position.
+        Actions.runBlocking(
+                new ParallelAction(
+                        new limeLightCamera(), // detect April Tag, save the detected pattern in detectedPattern.
+                        leg1 // moving action
+                )
+        );
+
+        // shoot preload artifacts
+        shootArtifacts();
+
+        // moving to detect patten row of artifacts to pick up
+        Action actIntake1 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(rowChoose(detectedPattern), Math.toRadians(90.0))
+                .build();
+        Actions.runBlocking(actIntake1);
+
+        // start intake motor
+        motors.startIntake();
+
+        //moving forward to pick up artifacts, checking speed
+        Action actIntake2 = drive.actionBuilder(drive.localizer.getPose())
+                .strafeToConstantHeading(new Vector2d(drive.localizer.getPose().position.x,3 * Params.HALF_MAT))
+                .build();
+        Actions.runBlocking(actIntake2);
+
+        // stop intake motor
+        motors.stopIntake();
+
+
         // Move to the right row based on detected pattern
         Action leg3 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(rowChoose(detectedPattern), Math.toRadians(90))
@@ -67,28 +108,7 @@ public class AutoNear2026 extends LinearOpMode {
         Action leg4 = drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(new Vector2d(-0.75 * Params.HALF_MAT, 4 * Params.HALF_MAT), Math.toRadians(90))
                 .build();
-        Actions.runBlocking(leg1);
-        Logging.log("Running leg1 complete, x pos: %.2f, y pos: %.2f", drive.localizer.getPose().position.x, drive.localizer.getPose().position.y);
-        detectedPattern = 0;
-        for (int i = 0; i < 30; i++) { // up to ~0.3s
-            detectedPattern = patternDetector.returnId();
-            telemetry.addData("Detected Pattern", detectedPattern);
-            telemetry.update();
-            sleep(1);
-            if (detectedPattern != 0) {
-                Actions.runBlocking(leg2);
-                shootArtifacts();
-                Actions.runBlocking(leg3);
-                shootArtifacts();
-                Actions.runBlocking(leg4);
-            } else if (i == 29) {
-                Actions.runBlocking(leg2);
-                shootArtifacts();
-                Actions.runBlocking(leg3);
-                shootArtifacts();
-                Actions.runBlocking(leg4);
-            }
-        }
+
     }
 
     private void shootArtifacts() {
@@ -140,10 +160,45 @@ public class AutoNear2026 extends LinearOpMode {
 
     // function that chooses the right row based on detected pattern, returns a Vector2d
     private Vector2d rowChoose(double pattern) {
+        if (pattern == 0) {
+            telemetry.addLine("No pattern detected");
+            telemetry.update();
+            pattern = 23; // default to PPG if no pattern is detected
+        }
         double rowIndex = pattern - 20;
         return new Vector2d(
                 -3 * Params.HALF_MAT + rowIndex * 2 * Params.HALF_MAT,
                 leftOrRight * 3 * Params.HALF_MAT
         );
     }
+
+    private class limeLightCamera implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            for (int i = 0; i < 100; i++) { // up to ~0.3s
+                detectedPattern = patternDetector.returnId();
+                telemetry.addData("Detected Pattern", detectedPattern);
+                telemetry.update();
+                if ((detectedPattern > 20) && (detectedPattern < 24)) {
+                    return true;
+                }
+                sleep(1);
+            }
+            return false;
+        }
+    }
+
+    private class startLauncherAction implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            motors.startLauncher();
+            return true;
+        }
+    }
+
+    // Update profile acceleration for MecanumDrive
+    private void updateProfileSpeed(double speed) {
+        MecanumDrive.PARAMS.maxWheelVel = speed;
+    }
+
 }

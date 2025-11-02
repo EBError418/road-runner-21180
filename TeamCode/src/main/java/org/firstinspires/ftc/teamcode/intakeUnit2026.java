@@ -74,9 +74,9 @@ public class intakeUnit2026
         launcherMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //launcherMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        // trigger servo
+        // trigger servo, initial with closed position
         triggerServo = hardwareMap.get(Servo.class, trigger);
-
+        triggerServo.setPosition(0.0);
     }
 
     public void startIntake() {
