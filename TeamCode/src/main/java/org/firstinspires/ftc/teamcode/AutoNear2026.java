@@ -1,6 +1,7 @@
 package org.firstinspires.ftc.teamcode;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.widget.VectorEnabledTintResources;
 
 import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
 import com.acmerobotics.roadrunner.InstantAction;
@@ -81,22 +82,34 @@ public class AutoNear2026 extends LinearOpMode {
         shootArtifacts();
 
         // moving to detect patten row of artifacts to pick up
-        Vector2d pickupPos = rowChoose(detectedPattern);
+        for (int pickupIndex = 0; pickupIndex < 3; pickupIndex++ ) {
+            Vector2d pickupPos;
+            Vector2d pickupEndPos;
 
-        Action actIntake1 = drive.actionBuilder(drive.localizer.getPose())
-                .strafeToLinearHeading(pickupPos, Math.toRadians(90.0))
-                .strafeToConstantHeading(new Vector2d(pickupPos.x, pickupPos.y + leftOrRight * 2 * Params.HALF_MAT))
-                .afterTime(0.001, new startLauncherAction())
-                .strafeToLinearHeading(shootPos, shootHeading)
-                .build();
-        Actions.runBlocking(actIntake1);
+            pickupPos = rowChoose(detectedPattern);
+            if (pickupIndex >0) // second and third pickup
+            {
+                // update pickupPos.x
 
-        // shoot first picked up artifacts
-        shootArtifacts();
+            }
 
-        // stop intake motor
-        motors.stopIntake();
+            pickupEndPos = new Vector2d(pickupPos.x, pickupPos.y + leftOrRight * (2 + ((pickupPos.x>0)? 0 : 1))* Params.HALF_MAT );
 
+            Action actIntake1 = drive.actionBuilder(drive.localizer.getPose())
+                    .strafeToLinearHeading(pickupPos, Math.toRadians(90.0))
+                    .afterTime(0.001, new startIntakeAction())
+                    .strafeToConstantHeading(pickupEndPos) // picking up artifacts
+                    .afterTime(0.001, new startLauncherAction())
+                    .strafeToLinearHeading(shootPos, shootHeading)
+                    .build();
+            Actions.runBlocking(actIntake1);
+
+            // shoot first picked up artifacts
+            shootArtifacts();
+
+            // stop intake motor
+            motors.stopIntake();
+        }
 
         // Move to the right row based on detected pattern
         Action leg3 = drive.actionBuilder(drive.localizer.getPose())
@@ -195,6 +208,15 @@ public class AutoNear2026 extends LinearOpMode {
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             Logging.log("start launcher motor.");
             motors.startLauncher();
+            return false;
+        }
+    }
+
+    private class startIntakeAction implements Action {
+        @Override
+        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
+            Logging.log("start intake motor.");
+            motors.startIntake();
             return false;
         }
     }
