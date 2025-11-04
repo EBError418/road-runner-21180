@@ -48,7 +48,7 @@ public class intakeUnit2026
 {
     double intakePower = -0.86;
     double farPower = 0.98; //Power for launching from far triangle
-    double closePower = 0.62; //Power for launching from close triangle(x=1, y=1)
+    double closePower = 0.55;//0.5 ; //Power for launching from close triangle(x=1, y=1)
     double trigger_close = 0.05;
     double trigger_open = 0.4;
 
@@ -74,9 +74,9 @@ public class intakeUnit2026
         launcherMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         //launcherMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        // trigger servo
+        // trigger servo, initial with closed position
         triggerServo = hardwareMap.get(Servo.class, trigger);
-
+        triggerServo.setPosition(0.0);
     }
 
     public void startIntake() {
@@ -99,6 +99,10 @@ public class intakeUnit2026
 
     public  double getLauncherPower() {
         return launcherMotor.getPower();
+    }
+
+    public  int getLauncherPos() {
+        return launcherMotor.getCurrentPosition();
     }
 
     /*

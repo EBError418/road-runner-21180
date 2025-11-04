@@ -48,13 +48,21 @@ public final class Colored {
     }
     public double returnId() {
         LLResult result = limelight.getLatestResult();
-        if (result == null) return 0;
+        if (result == null)
+        {
+            return 0;
+        }
 
         double[] pythonOutputs = result.getPythonOutput();
-        if (pythonOutputs == null || pythonOutputs.length < 5) return 0;
+        if (pythonOutputs == null || pythonOutputs.length < 5)
+        {
+            return 0;
+        }
+
         // Each detection is 5 values long: [colorCode, x, y, w, h]
         for (int i = 0; i < pythonOutputs.length; i += 5) {
             double colorCode = pythonOutputs[i];
+            Logging.log("color code[%d] =  %f", i, colorCode);
             // x, y, w, h not needed right now
             if (colorCode == 21 || colorCode == 22 || colorCode == 23) {
                 return colorCode;

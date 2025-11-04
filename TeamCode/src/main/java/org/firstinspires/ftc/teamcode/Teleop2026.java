@@ -207,26 +207,33 @@ public class Teleop2026 extends LinearOpMode {
         // The motor stop on their own but power is still applied. Turn off motor.
     }
 
-    private void shootArtifacts() {
-        telemetry.addLine("Shooting...");
+    public void shootArtifacts() {
+        int waitTimeForTriggerClose = 300;
+        int waitTimeForTriggerOpen = 800;
 
-        telemetry.update();
-        motors.startLauncher();
-        sleep(3000);
+        // start launcher motor if it has not been launched
+        if (motors.getLauncherPower() < 0.1) {
+            motors.startLauncher();
+            sleep(waitTimeForTriggerOpen + 400); // waiting time for launcher motor ramp up
+        }
+
         motors.triggerOpen(); // shoot first
-        sleep(300);
-        motors.triggerClose();
-        motors.startIntake();
-        sleep(1000);
+        sleep(waitTimeForTriggerClose);
+        motors.triggerClose(); //close trigger to wait launcher motor speed up after first launching
+
+        motors.startIntake(); // start intake motor to move 3rd artifacts into launcher
+        sleep(waitTimeForTriggerOpen);// waiting time for launcher motor ramp up
         motors.triggerOpen(); // shoot second
-        sleep(300);
-        motors.stopIntake();
+        sleep(waitTimeForTriggerClose);
+
         motors.triggerClose();
-        sleep(1000);
+        sleep(waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
         motors.triggerOpen();  // shoot third
-        sleep(1000);
-        motors.stopLauncher();
+        sleep(waitTimeForTriggerClose);
+
         motors.triggerClose();
+        motors.stopIntake();
+        motors.stopLauncher();
     }
 
     private void updateProfileAccel(boolean fastMode) {
