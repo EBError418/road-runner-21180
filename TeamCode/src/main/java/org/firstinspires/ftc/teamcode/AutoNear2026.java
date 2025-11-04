@@ -126,7 +126,7 @@ public class AutoNear2026 extends LinearOpMode {
 
     private void shootArtifacts() {
         int waitTimeForTriggerClose = 300;
-        int waitTimeForTriggerOpen = 800;
+        int waitTimeForTriggerOpen = 1200;
         Logging.log("start shooting.");
         // start launcher motor if it has not been launched
         if (motors.getLauncherPower() < 0.1) {

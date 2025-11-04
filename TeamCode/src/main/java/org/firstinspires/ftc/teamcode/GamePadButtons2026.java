@@ -88,8 +88,8 @@ public class GamePadButtons2026 {
         alignShootPos = gamepad1.a; // temp button can chang later
         autoPark = gamepad1.b; // temp button can change later
 
-        launch = gamepad2.left_bumper; // temp button can change later
-        launchOff = gamepad2.right_bumper; // temp button can change later
+        launch = gamepad1.left_bumper; // temp button can change later
+        launchOff = gamepad1.right_bumper; // temp button can change later
 
         // intake buttons
         intakeOn = gamepad1.left_trigger > 0.1;
@@ -99,7 +99,7 @@ public class GamePadButtons2026 {
         triggerOpen = gamepad1.y;
         triggerClose = gamepad1.x;
 
-        launchArtifacts = gamepad2.dpad_left;
+        launchArtifacts = gamepad1.dpad_left;
 
     }
 }
