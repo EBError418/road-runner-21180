@@ -130,24 +130,10 @@ public class Teleop2026 extends LinearOpMode {
                     -gpButtons.robotTurn * maxDrivePower
             ));
 
-
-
-//            if (gpButtons.servoStart) {
-//                intake.setMotorPower(5000);
-//            }
-
 //            if (gpButtons.alignShootPos) {
 //                Actions.runBlocking(
 //                        drive.actionBuilder(new AutoTest().newStartPose)
 //                                .strafeToLinearHeading(new AutoTest().shootPos.position, new AutoTest().shootPos.heading)
-//                                .build()
-//                );
-//            }
-//
-//            if (gpButtons.autoPark) {
-//                Actions.runBlocking(
-//                        drive.actionBuilder(new AutoTest().newStartPose)
-//                                .strafeToLinearHeading(new Vector2d(-4 * Params.HALF_MAT, 2 * Params.HALF_MAT), Math.toRadians(90))
 //                                .build()
 //                );
 //            }

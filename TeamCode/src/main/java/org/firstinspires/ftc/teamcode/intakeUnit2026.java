@@ -56,7 +56,7 @@ public class intakeUnit2026
     HardwareMap hardwareMap;
     private final DcMotor intakeMotor;
     private final DcMotor launcherMotor;
-    private Servo triggerServo = null;
+    private Servo triggerServo;
 
 
     public intakeUnit2026(HardwareMap hardwareMap, String launcher, String intake, String trigger) {
@@ -124,5 +124,9 @@ public class intakeUnit2026
      */
     public double getTriggerPosition() {
         return triggerServo.getPosition();
+    }
+
+    public void alignShootPos() {
+
     }
 }
