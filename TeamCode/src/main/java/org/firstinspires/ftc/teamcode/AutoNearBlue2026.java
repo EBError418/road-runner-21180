@@ -67,9 +67,9 @@ public class AutoNearBlue2026 extends LinearOpMode {
         shootArtifacts();
         // the following is a velocity constraint for moving to pick up artifacts
         // TODO: See if this can be simplified AND change speed to optimal value
-        VelConstraint pickupSpeed = (robotPose, _path, _disp) -> 20.0;
+        VelConstraint pickupSpeed = (robotPose, _path, _disp) -> 8.0;
         // Loop to go through all 3 rows to pick up artifacts and shoot them
-        for (int pickupIndex = 0; pickupIndex < 3; pickupIndex++) {
+        for (int pickupIndex = 0; pickupIndex < 2; pickupIndex++) {
             Vector2d pickupPos;
             Vector2d pickupEndPos;
             // calculate pickup position and end position based on detected pattern and pickup index
@@ -77,7 +77,7 @@ public class AutoNearBlue2026 extends LinearOpMode {
             // fixed polarity below (there was a double negative sign before)
             pickupEndPos = new Vector2d(
                     pickupPos.x,
-                    pickupPos.y + (2 + ((pickupPos.x > 0) ? 0 : 1)) * Params.HALF_MAT * Math.signum(pickupPos.y)
+                    pickupPos.y + (2.3 + ((pickupPos.x > 0) ? 0 : 1)) * Params.HALF_MAT * Math.signum(pickupPos.y)
             );
             // path to pick up artifacts then move to shooting position
             // TODO: See if this code can be simplified
@@ -145,7 +145,7 @@ public class AutoNearBlue2026 extends LinearOpMode {
     private Vector2d rowChoose(double rownumber) {
         return new Vector2d(
                 (1 - (rownumber * 2)) * Params.HALF_MAT,
-                leftOrRight * (2 * Params.HALF_MAT + Params.CHASSIS_HALF_LENGTH)
+                leftOrRight * (2 * Params.HALF_MAT + Params.CHASSIS_HALF_LENGTH / 2)
         );
     }
 
@@ -189,12 +189,11 @@ public class AutoNearBlue2026 extends LinearOpMode {
     }
 
     // function to update profile acceleration for maxMode (EXPERIMENTAL)
-    // TODO: Optimize this in order to compromise accuracy and speed
     private void updateProfileAccel(boolean maxMode) {
         if (maxMode) {
-            MecanumDrive.PARAMS.maxWheelVel = 10000;
-            MecanumDrive.PARAMS.maxProfileAccel = 10000;
-            MecanumDrive.PARAMS.minProfileAccel = -10000;
+            MecanumDrive.PARAMS.maxWheelVel = 70;
+            MecanumDrive.PARAMS.maxProfileAccel = 70;
+            MecanumDrive.PARAMS.minProfileAccel = -70;
         } else {
             MecanumDrive.PARAMS.maxWheelVel = 65;
             MecanumDrive.PARAMS.maxProfileAccel = 50;
