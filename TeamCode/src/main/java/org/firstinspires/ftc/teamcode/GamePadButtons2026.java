@@ -60,6 +60,7 @@ public class GamePadButtons2026 {
     public boolean launchOff;
     public boolean intakeOn;
     public boolean intakeOff;
+    public boolean autoLaunchPos;
     public boolean triggerOpen;
     public boolean triggerClose;
     public boolean launchArtifacts;
@@ -100,6 +101,6 @@ public class GamePadButtons2026 {
         triggerClose = gamepad1.x || gamepad2.x;
 
         launchArtifacts = gamepad1.dpad_left || gamepad2.dpad_left;
-
+        autoLaunchPos = gamepad1.square || gamepad2.square;
     }
 }

@@ -17,7 +17,7 @@ public class AutoNearBlue2026 extends LinearOpMode {
     private intakeUnit2026 motors;
     private Colored patternDetector;
 
-    private final int leftOrRight = 1; // 1 for blue, -1 for red
+    private final int leftOrRight = Params.blueOrRed; // 1 for blue, -1 for red
     private double detectedPattern; // limelight detected pattern
 
     private Vector2d shootPos; // where the robot should shoot
@@ -55,18 +55,16 @@ public class AutoNearBlue2026 extends LinearOpMode {
     private void run_auto() {
         motors.triggerClose();
         // Run the first leg of the path: move to shooting position while detecting pattern
-        updateProfileAccel(true); //TODO: Experiment with maxMode for faster movement
+        updateProfileAccel(true);
         Actions.runBlocking(drive.actionBuilder(drive.localizer.getPose())
                 .afterDisp(3 * Params.HALF_MAT, new limeLightCamera()) // start limelight detection after moving 3 half mats
                 .afterDisp(3.1 * Params.HALF_MAT, new startLauncherAction()) // start launcher motor after moving 3.1 half mats
-                // TODO: Check if the following can be combined into strafeToLinearHeading to save time
                 .strafeToConstantHeading(shootPos) // move to shooting position
                 .turnTo(shootHeading) // turn to shooting direction
                 .build());
         // shoot preload artifacts
         shootArtifacts();
         // the following is a velocity constraint for moving to pick up artifacts
-        // TODO: See if this can be simplified AND change speed to optimal value
         VelConstraint pickupSpeed = (robotPose, _path, _disp) -> 8.0;
         // Loop to go through all 3 rows to pick up artifacts and shoot them
         for (int pickupIndex = 0; pickupIndex < 2; pickupIndex++) {
@@ -108,10 +106,11 @@ public class AutoNearBlue2026 extends LinearOpMode {
             shootArtifacts();
             motors.stopIntake();
         }
+        // move out of the Triangle
+        Actions.runBlocking(drive.actionBuilder(drive.localizer.getPose()).strafeToConstantHeading(new Vector2d(Params.CHASSIS_HALF_LENGTH, drive.localizer.getPose().position.y)).build());
     }
 
     // function to shoot 3 artifacts
-    // TODO: Adjust timing based on actual robot performance
     private void shootArtifacts() {
         int waitTimeForTriggerClose = 300;
         int waitTimeForTriggerOpen = 950;
