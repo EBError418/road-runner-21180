@@ -16,8 +16,11 @@ public class AutoNearBlue2026 extends LinearOpMode {
     private MecanumDrive drive;
     private intakeUnit2026 motors;
     private Colored patternDetector;
+    public int leftOrRight; // 1 for blue, -1 for red
 
-    private final int leftOrRight = Params.blueOrRed; // 1 for blue, -1 for red
+    public void setSide() {
+        leftOrRight = 1;
+    }
     private double detectedPattern; // limelight detected pattern
 
     private Vector2d shootPos; // where the robot should shoot
@@ -25,6 +28,8 @@ public class AutoNearBlue2026 extends LinearOpMode {
 
     @Override
     public void runOpMode() {
+        setSide();
+
         // connect the hardware map to color discrimination system and prepare launcher, intake, and trigger
         patternDetector = new Colored(hardwareMap);
         motors = new intakeUnit2026(hardwareMap, "launcher", "intake", "triggerServo");

@@ -90,10 +90,10 @@ public class Teleop2026 extends LinearOpMode {
 
         motors = new intakeUnit2026(hardwareMap, "launcher", "intake", "triggerServo");
 
+        //set shoot position
         int leftOrRight = 1;
         double shootPosX = 1 * Params.HALF_MAT;
         double shootPosY = leftOrRight * Params.HALF_MAT;
-        // made the following polarity change to shootHeading calculation
         double shootHeading = Math.toRadians(180) + Math.atan2(leftOrRight * (6 * Params.HALF_MAT - Math.abs(shootPosY)), 6 * Params.HALF_MAT - shootPosX);
         Vector2d shootPos = new Vector2d(shootPosX, shootPosY);
 

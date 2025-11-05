@@ -29,6 +29,7 @@ public class testprogram extends LinearOpMode {
 
     private void run_auto() {
         motors.triggerClose();
+
         shootArtifacts();
     }
 
@@ -40,7 +41,7 @@ public class testprogram extends LinearOpMode {
         // start launcher motor if it has not been launched
         if (motors.getLauncherPower() < 0.1) {
             Logging.log("start launcher motor since it is stopped.");
-            motors.startLauncher();
+            motors.startLauncherFar();
             sleep(waitTimeForTriggerOpen + 500); // waiting time for launcher motor ramp up
         }
 
@@ -60,25 +61,5 @@ public class testprogram extends LinearOpMode {
 
         motors.triggerClose();
         motors.stopLauncher();
-    }
-
-    // action to start launcher motor
-    private class startLauncherAction implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            Logging.log("start launcher motor.");
-            motors.startLauncherFar();
-            return false;
-        }
-    }
-
-    // action to start intake motor
-    private class startIntakeAction implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            Logging.log("start intake motor.");
-            motors.startIntake();
-            return false;
-        }
     }
 }
