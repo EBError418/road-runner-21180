@@ -231,9 +231,9 @@ public class AutoNear2026 extends LinearOpMode {
             MecanumDrive.PARAMS.maxProfileAccel = 50;
             MecanumDrive.PARAMS.minProfileAccel = -40;
         } else {
-            MecanumDrive.PARAMS.maxWheelVel = 10000;
-            MecanumDrive.PARAMS.maxProfileAccel = 10000;
-            MecanumDrive.PARAMS.minProfileAccel = -10000;
+            MecanumDrive.PARAMS.maxWheelVel = 70;
+            MecanumDrive.PARAMS.maxProfileAccel = 70;
+            MecanumDrive.PARAMS.minProfileAccel = -70;
         }
     }
 }

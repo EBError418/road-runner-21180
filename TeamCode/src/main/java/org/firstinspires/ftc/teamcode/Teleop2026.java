@@ -85,8 +85,6 @@ public class Teleop2026 extends LinearOpMode {
 
         GamePadButtons2026 gpButtons = new GamePadButtons2026();
 
-        updateProfileAccel(true);
-
         drive = new MecanumDrive(hardwareMap, Params.currentPose);
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
@@ -209,7 +207,7 @@ public class Teleop2026 extends LinearOpMode {
 
     public void shootArtifacts() {
         int waitTimeForTriggerClose = 300;
-        int waitTimeForTriggerOpen = 800;
+        int waitTimeForTriggerOpen = 950;
 
         // start launcher motor if it has not been launched
         if (motors.getLauncherPower() < 0.1) {
@@ -234,13 +232,6 @@ public class Teleop2026 extends LinearOpMode {
         motors.triggerClose();
         motors.stopIntake();
         motors.stopLauncher();
-    }
-
-    private void updateProfileAccel(boolean fastMode) {
-        if (fastMode) {
-            MecanumDrive.PARAMS.minProfileAccel = -40;
-            MecanumDrive.PARAMS.maxProfileAccel = 60;
-        }
     }
 
 }

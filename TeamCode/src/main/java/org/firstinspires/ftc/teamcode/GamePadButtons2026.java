@@ -88,18 +88,18 @@ public class GamePadButtons2026 {
         alignShootPos = gamepad1.a; // temp button can chang later
         autoPark = gamepad1.b; // temp button can change later
 
-        launch = gamepad1.left_bumper; // temp button can change later
-        launchOff = gamepad1.right_bumper; // temp button can change later
+        launch = gamepad1.left_bumper || gamepad2.left_bumper; // temp button can change later
+        launchOff = gamepad1.right_bumper || gamepad2.right_bumper; // temp button can change later
 
         // intake buttons
-        intakeOn = gamepad1.left_trigger > 0.1;
-        intakeOff = gamepad1.right_trigger > 0.1 ;
+        intakeOn = (gamepad1.left_trigger > 0.1) || (gamepad2.left_trigger > 0.1);
+        intakeOff = (gamepad1.right_trigger > 0.1) || (gamepad2.right_trigger > 0.1);
 
         // trigger servo buttons
-        triggerOpen = gamepad1.y;
-        triggerClose = gamepad1.x;
+        triggerOpen = gamepad1.y || gamepad2.y;
+        triggerClose = gamepad1.x || gamepad2.x;
 
-        launchArtifacts = gamepad1.dpad_left;
+        launchArtifacts = gamepad1.dpad_left || gamepad2.dpad_left;
 
     }
 }
