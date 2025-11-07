@@ -57,6 +57,7 @@ public class GamePadButtons2026 {
     public boolean alignShootPos;
     public boolean autoPark;
     public boolean launch;
+    public boolean launchFar;
     public boolean launchOff;
     public boolean intakeOn;
     public boolean intakeOff;
@@ -64,6 +65,7 @@ public class GamePadButtons2026 {
     public boolean triggerOpen;
     public boolean triggerClose;
     public boolean launchArtifacts;
+    public boolean launchArtifactsFar;
 
     public void checkGamepadButtons(@NonNull Gamepad gamepad1, @NonNull Gamepad gamepad2) {
         //game pad 1 buttons
@@ -90,6 +92,7 @@ public class GamePadButtons2026 {
         autoPark = gamepad1.b; // temp button can change later
 
         launch = gamepad1.left_bumper || gamepad2.left_bumper; // temp button can change later
+        launchFar = gamepad1.dpad_up || gamepad2.dpad_up;
         launchOff = gamepad1.right_bumper || gamepad2.right_bumper; // temp button can change later
 
         // intake buttons
@@ -100,7 +103,10 @@ public class GamePadButtons2026 {
         triggerOpen = gamepad1.y || gamepad2.y;
         triggerClose = gamepad1.x || gamepad2.x;
 
+        // launcher buttons
         launchArtifacts = gamepad1.dpad_left || gamepad2.dpad_left;
+        launchArtifactsFar = gamepad1.dpad_right || gamepad2.dpad_right;
+
         autoLaunchPos = gamepad1.square || gamepad2.square;
     }
 }

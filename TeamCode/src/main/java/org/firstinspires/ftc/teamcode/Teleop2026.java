@@ -78,12 +78,13 @@ public class Teleop2026 extends LinearOpMode {
     private DistanceSensor distSensorHanging;
     private DistanceSensor distSensorF;
     boolean debugFlag = true;
+    GamePadButtons2026 gpButtons = new GamePadButtons2026();
 
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
 
-        GamePadButtons2026 gpButtons = new GamePadButtons2026();
+
 
         drive = new MecanumDrive(hardwareMap, Params.currentPose);
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -162,9 +163,12 @@ public class Teleop2026 extends LinearOpMode {
                 motors.startLauncher();
             }
             if (gpButtons.launchOff) {
-            motors.stopLauncher();
+                motors.stopLauncher();
             }
-            
+
+            if (gpButtons.launchFar) {
+                motors.startLauncherFar();
+            }
 
             // intake actions
             if (gpButtons.intakeOn) {
@@ -185,7 +189,11 @@ public class Teleop2026 extends LinearOpMode {
             }
 
             if(gpButtons.launchArtifacts) {
-                shootArtifacts();
+                shootArtifacts(false);
+            }
+
+            if (gpButtons.launchArtifactsFar) {
+                shootArtifacts(true);
             }
 
             if(gpButtons.autoLaunchPos) {
@@ -220,14 +228,33 @@ public class Teleop2026 extends LinearOpMode {
         // The motor stop on their own but power is still applied. Turn off motor.
     }
 
-    public void shootArtifacts() {
+    public void shootArtifacts(boolean farLaunch) {
         int waitTimeForTriggerClose = 300;
         int waitTimeForTriggerOpen = 950;
 
+        //stop driver motors
+        drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0, 0), 0));
+
         // start launcher motor if it has not been launched
         if (motors.getLauncherPower() < 0.1) {
-            motors.startLauncher();
+            if (farLaunch) {
+                motors.startLauncherFar();
+            }
+            else {
+                motors.startLauncher();
+            }
             sleep(waitTimeForTriggerOpen + 400); // waiting time for launcher motor ramp up
+        }
+        // launcher is started but with near launching power
+        else if ((motors.getLauncherPower() < motors.farPower) && farLaunch) {
+            motors.startLauncherFar();
+            sleep(500);
+        }
+        // launcher is started but with higher power
+        else if ((motors.getLauncherPower() > motors.closePower) && !farLaunch)
+        {
+            motors.startLauncher();
+            sleep(500);
         }
 
         motors.triggerOpen(); // shoot first
@@ -247,6 +274,20 @@ public class Teleop2026 extends LinearOpMode {
         motors.triggerClose();
         motors.stopIntake();
         motors.stopLauncher();
+    }
+
+    private void sleepWithDriving(int msecond) {
+        double startTime = runtime.milliseconds();
+        while ((runtime.milliseconds() - startTime) < msecond) {
+            drive.setDrivePowers(new PoseVelocity2d(
+                    new Vector2d(
+                            -gpButtons.robotDrive * Params.POWER_NORMAL,
+                            -gpButtons.robotStrafe * Params.POWER_NORMAL
+                    ),
+                    -gpButtons.robotTurn * Params.POWER_NORMAL
+            ));
+        }
+
     }
 
 }
