@@ -75,16 +75,25 @@ public class AutoNearBlue2026 extends LinearOpMode {
         for (int pickupIndex = 0; pickupIndex < 2; pickupIndex++) {
             Vector2d pickupPos;
             Vector2d pickupEndPos;
-            // calculate pickup position and end position based on detected pattern and pickup index
+            // 23 is the closest row to start position, then 22, then 21, so new if staetment below will optimize pathing
+            if (pickupIndex == 1) {
+                if (detectedPattern == 21 || detectedPattern == 22) {
+                    detectedPattern = 23;
+                    telemetry.addData("Going to 23 cuz it's faster", 0);
+                    telemetry.update();
+                } else if (detectedPattern == 23) {
+                    detectedPattern = 22;
+                    telemetry.addData("Going to 22 cuz it's faster", 0);
+                    telemetry.update();
+                }
+            }
             pickupPos = rowChoose((detectedPattern + pickupIndex) % 3);
             // fixed polarity below (there was a double negative sign before)
             pickupEndPos = new Vector2d(
                     pickupPos.x,
-                    pickupPos.y + (2.3 + ((pickupPos.x > 0) ? 0 : 1)) * Params.HALF_MAT * Math.signum(pickupPos.y)
+                    pickupPos.y + 2.1 * Params.HALF_MAT * Math.signum(pickupPos.y)
             );
             // path to pick up artifacts then move to shooting position
-            // TODO: See if this code can be simplified
-            // TODO: Maybe ALWAYS take row 21 after pattern row since it takes the least time?
             Action actIntake1;
             if ((detectedPattern + pickupIndex) % 3 > 0) {
                 // after pickup, need to go back a bit to avoid obstacles from other rows
@@ -112,7 +121,7 @@ public class AutoNearBlue2026 extends LinearOpMode {
             motors.stopIntake();
         }
         // move out of the Triangle
-        Actions.runBlocking(drive.actionBuilder(drive.localizer.getPose()).strafeToConstantHeading(new Vector2d(Params.CHASSIS_HALF_LENGTH, drive.localizer.getPose().position.y)).build());
+        Actions.runBlocking(drive.actionBuilder(drive.localizer.getPose()).strafeToLinearHeading(new Vector2d(0, leftOrRight*3.8*Params.HALF_MAT), Math.toRadians(180)).build());
     }
 
     // function to shoot 3 artifacts
@@ -148,7 +157,7 @@ public class AutoNearBlue2026 extends LinearOpMode {
     // function that chooses the right row based on detected pattern, returns a Vector2d
     private Vector2d rowChoose(double rownumber) {
         return new Vector2d(
-                (1 - (rownumber * 2)) * Params.HALF_MAT,
+                (-3 + (rownumber * 2)) * Params.HALF_MAT,
                 leftOrRight * (2 * Params.HALF_MAT + Params.CHASSIS_HALF_LENGTH / 2)
         );
     }
@@ -167,7 +176,7 @@ public class AutoNearBlue2026 extends LinearOpMode {
                 }
                 sleep(1);
             }
-            detectedPattern = 21; // default pattern if limelight can't detect
+            detectedPattern = 23; // default pattern if limelight can't detect
             return false;
         }
     }

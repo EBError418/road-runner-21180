@@ -73,6 +73,9 @@ public class Teleop2026 extends LinearOpMode {
     // chassis
     MecanumDrive drive;
 
+    // initialize limelight
+    private Colored patternDetector;
+
     //claw and arm unit
     private intakeUnit2026 motors;
     private DistanceSensor distSensorHanging;
@@ -84,7 +87,7 @@ public class Teleop2026 extends LinearOpMode {
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
 
-
+        patternDetector = new Colored(hardwareMap);
 
         drive = new MecanumDrive(hardwareMap, Params.currentPose);
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
@@ -116,6 +119,8 @@ public class Teleop2026 extends LinearOpMode {
 
         // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
+            // refresh pattern detector
+            patternDetector = new Colored(hardwareMap);
 
             //gamepad1 buttons
             gpButtons.checkGamepadButtons(gamepad1, gamepad2);
@@ -205,14 +210,17 @@ public class Teleop2026 extends LinearOpMode {
 
                 // display trigger servo position for testing purpose.
                 telemetry.addData("trigger servo", "position = %.3f", motors.getTriggerPosition());
-
                 telemetry.addData("launcher motor", "power = %.3f", motors.getLauncherPower());
-
-
                 telemetry.addData("heading", " %.3f", Math.toDegrees(drive.localizer.getPose().heading.log()));
-
                 telemetry.addData("location", " %s", drive.localizer.getPose().position.toString());
-
+                // return angle of detected pattern if any
+                double[] patternPos = patternDetector.returnPosition();
+                // use the coordinates of the april tag to detect how much the robot need to turn
+                if (patternPos.length >= 2) {
+                    telemetry.addData("Pattern ", "X: %.1f Y: %.1f Angle: %.1f", patternPos[0], patternPos[1], Math.toDegrees(Math.atan2(patternPos[0], patternPos[1])));
+                } else {
+                    telemetry.addData("Pattern ", "not detected");
+                }
                 telemetry.addData(" --- ", " --- ");
                 telemetry.update(); // update message at the end of while loop
 
