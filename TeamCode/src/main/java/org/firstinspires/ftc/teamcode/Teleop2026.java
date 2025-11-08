@@ -65,7 +65,7 @@ import java.util.List;
  *          "Finger"
  */
 
-@TeleOp(name="Teleop 2026", group="Concept")
+@TeleOp(name="Teleop - 2026", group="Concept")
 public class Teleop2026 extends LinearOpMode {
     // Declare OpMode members.
     private final ElapsedTime runtime = new ElapsedTime();
@@ -78,19 +78,25 @@ public class Teleop2026 extends LinearOpMode {
     private DistanceSensor distSensorHanging;
     private DistanceSensor distSensorF;
     boolean debugFlag = true;
+    GamePadButtons2026 gpButtons = new GamePadButtons2026();
 
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
 
-        GamePadButtons2026 gpButtons = new GamePadButtons2026();
 
-        updateProfileAccel(true);
 
         drive = new MecanumDrive(hardwareMap, Params.currentPose);
         drive.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         motors = new intakeUnit2026(hardwareMap, "launcher", "intake", "triggerServo");
+
+        //set shoot position
+        int leftOrRight = 1;
+        double shootPosX = 1 * Params.HALF_MAT;
+        double shootPosY = leftOrRight * Params.HALF_MAT;
+        double shootHeading = Math.toRadians(180) + Math.atan2(leftOrRight * (6 * Params.HALF_MAT - Math.abs(shootPosY)), 6 * Params.HALF_MAT - shootPosX);
+        Vector2d shootPos = new Vector2d(shootPosX, shootPosY);
 
         // bulk reading setting - auto refresh mode
         List<LynxModule> allHubs = hardwareMap.getAll(LynxModule.class);
@@ -131,11 +137,6 @@ public class Teleop2026 extends LinearOpMode {
             ));
 
 
-
-//            if (gpButtons.servoStart) {
-//                intake.setMotorPower(5000);
-//            }
-
 //            if (gpButtons.alignShootPos) {
 //                Actions.runBlocking(
 //                        drive.actionBuilder(new AutoTest().newStartPose)
@@ -157,9 +158,12 @@ public class Teleop2026 extends LinearOpMode {
                 motors.startLauncher();
             }
             if (gpButtons.launchOff) {
-            motors.stopLauncher();
+                motors.stopLauncher();
             }
-            
+
+            if (gpButtons.launchFar) {
+                motors.startLauncherFar();
+            }
 
             // intake actions
             if (gpButtons.intakeOn) {
@@ -180,7 +184,20 @@ public class Teleop2026 extends LinearOpMode {
             }
 
             if(gpButtons.launchArtifacts) {
-                shootArtifacts();
+                shootArtifacts(false);
+            }
+
+            if (gpButtons.launchArtifactsFar) {
+                shootArtifacts(true);
+            }
+
+            // TODO : not implemented correctly yet
+            if(gpButtons.autoLaunchPos) {
+//                Actions.runBlocking(
+//                        drive.actionBuilder(drive.localizer.getPose())
+//                                .strafeToLinearHeading(shootPos, shootHeading)
+//                                .build()
+//                );
             }
 
             telemetry.update();
@@ -203,44 +220,68 @@ public class Teleop2026 extends LinearOpMode {
 
         }
 
-        //intake.armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         // The motor stop on their own but power is still applied. Turn off motor.
     }
 
-    public void shootArtifacts() {
+    public void shootArtifacts(boolean farLaunch) {
         int waitTimeForTriggerClose = 300;
-        int waitTimeForTriggerOpen = 800;
+        int waitTimeForTriggerOpen = 950;
 
         // start launcher motor if it has not been launched
         if (motors.getLauncherPower() < 0.1) {
+            if (farLaunch) {
+                motors.startLauncherFar();
+            }
+            else {
+                motors.startLauncher();
+            }
+            sleepWithDriving(waitTimeForTriggerOpen + 400); // waiting time for launcher motor ramp up
+        }
+        // launcher is started but with near launching power
+        else if ((motors.getLauncherPower() < motors.farPower) && farLaunch) {
+            motors.startLauncherFar();
+            sleepWithDriving(500);
+        }
+        // launcher is started but with higher power
+        else if ((motors.getLauncherPower() > motors.closePower) && !farLaunch)
+        {
             motors.startLauncher();
-            sleep(waitTimeForTriggerOpen + 400); // waiting time for launcher motor ramp up
+            sleepWithDriving(500);
         }
 
         motors.triggerOpen(); // shoot first
-        sleep(waitTimeForTriggerClose);
+        sleepWithDriving(waitTimeForTriggerClose);
         motors.triggerClose(); //close trigger to wait launcher motor speed up after first launching
 
         motors.startIntake(); // start intake motor to move 3rd artifacts into launcher
-        sleep(waitTimeForTriggerOpen);// waiting time for launcher motor ramp up
+        sleepWithDriving(waitTimeForTriggerOpen);// waiting time for launcher motor ramp up
         motors.triggerOpen(); // shoot second
-        sleep(waitTimeForTriggerClose);
+        sleepWithDriving(waitTimeForTriggerClose);
 
         motors.triggerClose();
-        sleep(waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
+        sleepWithDriving(waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
         motors.triggerOpen();  // shoot third
-        sleep(waitTimeForTriggerClose);
+        sleepWithDriving(waitTimeForTriggerClose);
 
         motors.triggerClose();
         motors.stopIntake();
         motors.stopLauncher();
     }
 
-    private void updateProfileAccel(boolean fastMode) {
-        if (fastMode) {
-            MecanumDrive.PARAMS.minProfileAccel = -40;
-            MecanumDrive.PARAMS.maxProfileAccel = 60;
+    // sleep for other motors than driving motors
+    private void sleepWithDriving(int msecond) {
+        double startTime = runtime.milliseconds();
+        while ((runtime.milliseconds() - startTime) < msecond) {
+            gpButtons.checkGamepadButtons(gamepad1, gamepad2);
+            drive.setDrivePowers(new PoseVelocity2d(
+                    new Vector2d(
+                            -gpButtons.robotDrive * Params.POWER_NORMAL,
+                            -gpButtons.robotStrafe * Params.POWER_NORMAL
+                    ),
+                    -gpButtons.robotTurn * Params.POWER_NORMAL
+            ));
         }
+
     }
 
 }
