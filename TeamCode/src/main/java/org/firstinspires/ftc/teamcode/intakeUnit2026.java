@@ -106,12 +106,8 @@ public class intakeUnit2026
         triggerClose();
     }
 
-    public  double getLauncherPower() {
+    public double getLauncherPower() {
         return launcherMotor.getPower();
-    }
-
-    public  int getLauncherPos() {
-        return launcherMotor.getCurrentPosition();
     }
 
     /*

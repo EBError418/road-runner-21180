@@ -65,7 +65,7 @@ import java.util.List;
  *          "Finger"
  */
 
-@TeleOp(name="Teleop 2026", group="Concept")
+@TeleOp(name="Teleop - 2026", group="Concept")
 public class Teleop2026 extends LinearOpMode {
     // Declare OpMode members.
     private final ElapsedTime runtime = new ElapsedTime();
@@ -137,11 +137,6 @@ public class Teleop2026 extends LinearOpMode {
             ));
 
 
-
-//            if (gpButtons.servoStart) {
-//                intake.setMotorPower(5000);
-//            }
-
 //            if (gpButtons.alignShootPos) {
 //                Actions.runBlocking(
 //                        drive.actionBuilder(new AutoTest().newStartPose)
@@ -196,12 +191,13 @@ public class Teleop2026 extends LinearOpMode {
                 shootArtifacts(true);
             }
 
+            // TODO : not implemented correctly yet
             if(gpButtons.autoLaunchPos) {
-                Actions.runBlocking(
-                        drive.actionBuilder(drive.localizer.getPose())
-                                .strafeToLinearHeading(shootPos, shootHeading)
-                                .build()
-                );
+//                Actions.runBlocking(
+//                        drive.actionBuilder(drive.localizer.getPose())
+//                                .strafeToLinearHeading(shootPos, shootHeading)
+//                                .build()
+//                );
             }
 
             telemetry.update();
@@ -224,16 +220,12 @@ public class Teleop2026 extends LinearOpMode {
 
         }
 
-        //intake.armMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.FLOAT);
         // The motor stop on their own but power is still applied. Turn off motor.
     }
 
     public void shootArtifacts(boolean farLaunch) {
         int waitTimeForTriggerClose = 300;
         int waitTimeForTriggerOpen = 950;
-
-        //stop driver motors
-        drive.setDrivePowers(new PoseVelocity2d(new Vector2d(0, 0), 0));
 
         // start launcher motor if it has not been launched
         if (motors.getLauncherPower() < 0.1) {
@@ -243,42 +235,44 @@ public class Teleop2026 extends LinearOpMode {
             else {
                 motors.startLauncher();
             }
-            sleep(waitTimeForTriggerOpen + 400); // waiting time for launcher motor ramp up
+            sleepWithDriving(waitTimeForTriggerOpen + 400); // waiting time for launcher motor ramp up
         }
         // launcher is started but with near launching power
         else if ((motors.getLauncherPower() < motors.farPower) && farLaunch) {
             motors.startLauncherFar();
-            sleep(500);
+            sleepWithDriving(500);
         }
         // launcher is started but with higher power
         else if ((motors.getLauncherPower() > motors.closePower) && !farLaunch)
         {
             motors.startLauncher();
-            sleep(500);
+            sleepWithDriving(500);
         }
 
         motors.triggerOpen(); // shoot first
-        sleep(waitTimeForTriggerClose);
+        sleepWithDriving(waitTimeForTriggerClose);
         motors.triggerClose(); //close trigger to wait launcher motor speed up after first launching
 
         motors.startIntake(); // start intake motor to move 3rd artifacts into launcher
-        sleep(waitTimeForTriggerOpen);// waiting time for launcher motor ramp up
+        sleepWithDriving(waitTimeForTriggerOpen);// waiting time for launcher motor ramp up
         motors.triggerOpen(); // shoot second
-        sleep(waitTimeForTriggerClose);
+        sleepWithDriving(waitTimeForTriggerClose);
 
         motors.triggerClose();
-        sleep(waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
+        sleepWithDriving(waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
         motors.triggerOpen();  // shoot third
-        sleep(waitTimeForTriggerClose);
+        sleepWithDriving(waitTimeForTriggerClose);
 
         motors.triggerClose();
         motors.stopIntake();
         motors.stopLauncher();
     }
 
+    // sleep for other motors than driving motors
     private void sleepWithDriving(int msecond) {
         double startTime = runtime.milliseconds();
         while ((runtime.milliseconds() - startTime) < msecond) {
+            gpButtons.checkGamepadButtons(gamepad1, gamepad2);
             drive.setDrivePowers(new PoseVelocity2d(
                     new Vector2d(
                             -gpButtons.robotDrive * Params.POWER_NORMAL,
