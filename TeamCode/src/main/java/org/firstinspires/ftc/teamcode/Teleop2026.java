@@ -256,6 +256,10 @@ public class Teleop2026 extends LinearOpMode {
             motors.startLauncher();
             sleepWithDriving(500);
         }
+        else
+        {
+            sleepWithDriving(500);
+        }
 
         motors.triggerOpen(); // shoot first
         sleepWithDriving(waitTimeForTriggerClose);
@@ -283,10 +287,10 @@ public class Teleop2026 extends LinearOpMode {
             gpButtons.checkGamepadButtons(gamepad1, gamepad2);
             drive.setDrivePowers(new PoseVelocity2d(
                     new Vector2d(
-                            -gpButtons.robotDrive * Params.POWER_LOW,
-                            -gpButtons.robotStrafe * Params.POWER_LOW
+                            -gpButtons.robotDrive * Params.POWER_LOW / 2.0,
+                            -gpButtons.robotStrafe * Params.POWER_LOW / 2.0
                     ),
-                    -gpButtons.robotTurn * Params.POWER_LOW
+                    -gpButtons.robotTurn * Params.POWER_LOW / 2.0
             ));
         }
 

@@ -76,7 +76,7 @@ public class AutoNearBlue2026 extends LinearOpMode {
         shootArtifacts();
 
         // the following is a velocity constraint for moving to pick up artifacts
-        VelConstraint pickupSpeed = (robotPose, _path, _disp) -> 8.0;
+        VelConstraint pickupSpeed = (robotPose, _path, _disp) -> 8;
 
         setupPickupOrder((int)detectedPattern);
 
@@ -89,18 +89,22 @@ public class AutoNearBlue2026 extends LinearOpMode {
 
             pickupPos = rowChoose(rowNum);
             // fixed polarity below (there was a double negative sign before)
-            pickupEndPos = new Vector2d(pickupPos.x,pickupPos.y + 2.0 * Params.HALF_MAT * Math.signum(pickupPos.y));
+            pickupEndPos = new Vector2d(pickupPos.x,pickupPos.y + 1.7 * Params.HALF_MAT * Math.signum(pickupPos.y));
 
             // action for picking up artifacts
             Action actIntake0 = drive.actionBuilder(drive.localizer.getPose())
                     .strafeToLinearHeading(pickupPos, Math.toRadians(90.0*leftOrRight))
-                    .afterTime(0.001, new startIntakeAction())
-                    .strafeToConstantHeading(pickupEndPos, pickupSpeed) // picking up artifacts
                     .build();
-            Actions.runBlocking(actIntake0); // complete pickup artifacts
+            Actions.runBlocking(actIntake0); // ready for pickup artifacts
 
             // only shooting first and second pickups, no time for the third.
             if (pickupIndex < 2) {
+                // starting intake motor
+                motors.startIntake();
+                Action actIntake = drive.actionBuilder(drive.localizer.getPose())
+                        .strafeToConstantHeading(pickupEndPos, pickupSpeed) // picking up artifacts
+                        .build();
+                Actions.runBlocking(actIntake); // complete pickup artifacts
 
                 // only need to go back a little bit for row 2nd and 3rd
                 if (rowNum > pickupOrder[pickupIndex + 1]) {
@@ -141,6 +145,10 @@ public class AutoNearBlue2026 extends LinearOpMode {
             motors.startLauncher();
             sleep(waitTimeForTriggerOpen + 500); // waiting time for launcher motor ramp up
         }
+        else {
+            // launcher has started, sleep less time for ramping up
+            sleep(500);
+        }
 
         motors.triggerOpen(); // shoot first
         sleep(waitTimeForTriggerClose);
@@ -164,7 +172,7 @@ public class AutoNearBlue2026 extends LinearOpMode {
     // function that chooses the right row based on detected pattern, returns a Vector2d
     private Vector2d rowChoose(double rownumber) {
         return new Vector2d(
-                (-3 + (rownumber * 2)) * Params.HALF_MAT,
+                (-rownumber * 2 + 3) * Params.HALF_MAT,
                 leftOrRight * (2 * Params.HALF_MAT + Params.CHASSIS_HALF_LENGTH / 2)
         );
     }
