@@ -18,6 +18,8 @@ public class AutoNearBlue2026 extends LinearOpMode {
     private Colored patternDetector;
     public int leftOrRight; // 1 for blue, -1 for red
 
+    private int[] pickupOrder = {23, 22, 21};
+
     public void setSide() {
         leftOrRight = 1;
     }
@@ -51,6 +53,9 @@ public class AutoNearBlue2026 extends LinearOpMode {
         // set up driving system
         drive = new MecanumDrive(hardwareMap, startPose);
 
+        // init position of trigger
+        motors.triggerClose();
+
         waitForStart();
         if (opModeIsActive()) {
             run_auto();
@@ -69,24 +74,19 @@ public class AutoNearBlue2026 extends LinearOpMode {
                 .build());
         // shoot preload artifacts
         shootArtifacts();
+
         // the following is a velocity constraint for moving to pick up artifacts
         VelConstraint pickupSpeed = (robotPose, _path, _disp) -> 8.0;
+
+        sortPickup((int)detectedPattern);
+
         // Loop to go through all 3 rows to pick up artifacts and shoot them
         for (int pickupIndex = 0; pickupIndex < 2; pickupIndex++) {
             Vector2d pickupPos;
             Vector2d pickupEndPos;
             // 23 is the closest row to start position, then 22, then 21, so new if staetment below will optimize pathing
-            if (pickupIndex == 1) {
-                if (detectedPattern == 21 || detectedPattern == 22) {
-                    detectedPattern = 23;
-                    telemetry.addData("Going to 23 cuz it's faster", 0);
-                    telemetry.update();
-                } else if (detectedPattern == 23) {
-                    detectedPattern = 22;
-                    telemetry.addData("Going to 22 cuz it's faster", 0);
-                    telemetry.update();
-                }
-            }
+            detectedPattern = pickupOrder[pickupIndex];
+
             pickupPos = rowChoose((detectedPattern + pickupIndex) % 3);
             // fixed polarity below (there was a double negative sign before)
             pickupEndPos = new Vector2d(
@@ -211,6 +211,21 @@ public class AutoNearBlue2026 extends LinearOpMode {
             MecanumDrive.PARAMS.maxWheelVel = 65;
             MecanumDrive.PARAMS.maxProfileAccel = 50;
             MecanumDrive.PARAMS.minProfileAccel = -40;
+        }
+    }
+
+    private void sortPickup(int pt) {
+        switch (pt) {
+            case 21:
+                pickupOrder = new int[]{21, 23, 22};
+                break;
+            case 22:
+                pickupOrder = new int[]{22, 23, 21};
+                break;
+            case 23:
+            default:
+                // 23, 22, 21
+                break;
         }
     }
 

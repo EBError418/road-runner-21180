@@ -78,8 +78,7 @@ public class Teleop2026 extends LinearOpMode {
 
     //claw and arm unit
     private intakeUnit2026 motors;
-    private DistanceSensor distSensorHanging;
-    private DistanceSensor distSensorF;
+
     boolean debugFlag = true;
     GamePadButtons2026 gpButtons = new GamePadButtons2026();
 
@@ -125,6 +124,7 @@ public class Teleop2026 extends LinearOpMode {
             //gamepad1 buttons
             gpButtons.checkGamepadButtons(gamepad1, gamepad2);
 
+            // drive speed control
             double maxDrivePower;
             if (gpButtons.speedUp) {
                 maxDrivePower = Params.POWER_HIGH;
