@@ -18,7 +18,7 @@ public class AutoNearBlue2026 extends LinearOpMode {
     private Colored patternDetector;
     public int leftOrRight; // 1 for blue, -1 for red
 
-    private int[] pickupOrder = {23, 22, 21};
+    private int[] pickupOrder = {1, 2, 3}; // 1: the artifacts row closest to the shooting target
 
     public void setSide() {
         leftOrRight = 1;
@@ -78,50 +78,56 @@ public class AutoNearBlue2026 extends LinearOpMode {
         // the following is a velocity constraint for moving to pick up artifacts
         VelConstraint pickupSpeed = (robotPose, _path, _disp) -> 8.0;
 
-        sortPickup((int)detectedPattern);
+        setupPickupOrder((int)detectedPattern);
 
         // Loop to go through all 3 rows to pick up artifacts and shoot them
-        for (int pickupIndex = 0; pickupIndex < 2; pickupIndex++) {
+        for (int pickupIndex = 0; pickupIndex < 3; pickupIndex++) {
             Vector2d pickupPos;
             Vector2d pickupEndPos;
             // 23 is the closest row to start position, then 22, then 21, so new if staetment below will optimize pathing
-            detectedPattern = pickupOrder[pickupIndex];
+            int rowNum = pickupOrder[pickupIndex];
 
-            pickupPos = rowChoose((detectedPattern + pickupIndex) % 3);
+            pickupPos = rowChoose(rowNum);
             // fixed polarity below (there was a double negative sign before)
-            pickupEndPos = new Vector2d(
-                    pickupPos.x,
-                    pickupPos.y + 2.1 * Params.HALF_MAT * Math.signum(pickupPos.y)
-            );
-            // path to pick up artifacts then move to shooting position
-            Action actIntake1;
-            if ((detectedPattern + pickupIndex) % 3 > 0) {
-                // after pickup, need to go back a bit to avoid obstacles from other rows
-                actIntake1 = drive.actionBuilder(drive.localizer.getPose())
-                        .strafeToLinearHeading(pickupPos, Math.toRadians(90.0*leftOrRight))
-                        .afterTime(0.001, new startIntakeAction())
-                        .strafeToConstantHeading(pickupEndPos, pickupSpeed) // picking up artifacts
-                        .strafeToConstantHeading(pickupPos)
-                        .afterTime(0.001, new startLauncherAction())
+            pickupEndPos = new Vector2d(pickupPos.x,pickupPos.y + 2.0 * Params.HALF_MAT * Math.signum(pickupPos.y));
+
+            // action for picking up artifacts
+            Action actIntake0 = drive.actionBuilder(drive.localizer.getPose())
+                    .strafeToLinearHeading(pickupPos, Math.toRadians(90.0*leftOrRight))
+                    .afterTime(0.001, new startIntakeAction())
+                    .strafeToConstantHeading(pickupEndPos, pickupSpeed) // picking up artifacts
+                    .build();
+            Actions.runBlocking(actIntake0); // complete pickup artifacts
+
+            // only shooting first and second pickups, no time for the third.
+            if (pickupIndex < 2) {
+
+                // only need to go back a little bit for row 2nd and 3rd
+                if (rowNum > pickupOrder[pickupIndex + 1]) {
+                    // after pickup, need to go back a bit to avoid obstacles from other rows
+                    Action actIntake1;
+                    actIntake1 = drive.actionBuilder(drive.localizer.getPose())
+                            .strafeToConstantHeading(pickupPos)
+                            .build();
+                    Actions.runBlocking(actIntake1);
+                }
+
+                motors.startLauncher(); // start launcher before moving to shooting pos
+                Action actIntake2 = drive.actionBuilder(drive.localizer.getPose())
                         .strafeToLinearHeading(shootPos, shootHeading)
                         .build();
-            } else {
-                // don't need to back to pickupPos after picking up artifacts in row closest to start bc no obstacles in the way
-                actIntake1 = drive.actionBuilder(drive.localizer.getPose())
-                        .strafeToLinearHeading(pickupPos, Math.toRadians(90.0*leftOrRight))
-                        .afterTime(0.001, new startIntakeAction())
-                        .strafeToConstantHeading(pickupEndPos, pickupSpeed) // picking up artifacts
-                        .afterTime(0.001, new startLauncherAction())
-                        .strafeToLinearHeading(shootPos, shootHeading)
-                        .build();
+                Actions.runBlocking(actIntake2);
+
+                // shoot picked up artifacts
+                shootArtifacts();
             }
-            Actions.runBlocking(actIntake1);
-            // shoot picked up artifacts
-            shootArtifacts();
-            motors.stopIntake();
         }
         // move out of the Triangle
-        Actions.runBlocking(drive.actionBuilder(drive.localizer.getPose()).strafeToLinearHeading(new Vector2d(0, leftOrRight*3.8*Params.HALF_MAT), Math.toRadians(180)).build());
+        /*
+        Actions.runBlocking(drive.actionBuilder(drive.localizer.getPose())
+                .strafeToLinearHeading(new Vector2d(0, leftOrRight*3.8*Params.HALF_MAT), Math.toRadians(180))
+                .build());
+         */
     }
 
     // function to shoot 3 artifacts
@@ -152,6 +158,7 @@ public class AutoNearBlue2026 extends LinearOpMode {
 
         motors.triggerClose();
         motors.stopLauncher();
+        motors.stopIntake();
     }
 
     // function that chooses the right row based on detected pattern, returns a Vector2d
@@ -214,16 +221,17 @@ public class AutoNearBlue2026 extends LinearOpMode {
         }
     }
 
-    private void sortPickup(int pt) {
+    private void setupPickupOrder(int pt) {
         switch (pt) {
             case 21:
-                pickupOrder = new int[]{21, 23, 22};
+                pickupOrder = new int[]{3, 1, 2};
                 break;
             case 22:
-                pickupOrder = new int[]{22, 23, 21};
+                pickupOrder = new int[]{2, 1, 3};
                 break;
             case 23:
             default:
+                pickupOrder = new int[]{1, 2, 3};
                 // 23, 22, 21
                 break;
         }

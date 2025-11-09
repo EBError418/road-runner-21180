@@ -283,10 +283,10 @@ public class Teleop2026 extends LinearOpMode {
             gpButtons.checkGamepadButtons(gamepad1, gamepad2);
             drive.setDrivePowers(new PoseVelocity2d(
                     new Vector2d(
-                            -gpButtons.robotDrive * Params.POWER_NORMAL,
-                            -gpButtons.robotStrafe * Params.POWER_NORMAL
+                            -gpButtons.robotDrive * Params.POWER_LOW,
+                            -gpButtons.robotStrafe * Params.POWER_LOW
                     ),
-                    -gpButtons.robotTurn * Params.POWER_NORMAL
+                    -gpButtons.robotTurn * Params.POWER_LOW
             ));
         }
 
