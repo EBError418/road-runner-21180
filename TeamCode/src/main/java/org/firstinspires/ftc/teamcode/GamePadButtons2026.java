@@ -51,9 +51,6 @@ public class GamePadButtons2026 {
     public float robotTurn;
     public boolean speedDown;
     public boolean speedUp;
-    public boolean speedCtrl;
-    public boolean servoStart;
-    public boolean servoStop;
     public boolean alignShootPos;
     public boolean autoPark;
     public boolean launch;
@@ -82,18 +79,12 @@ public class GamePadButtons2026 {
         robotTurn = gamepad1.right_stick_x * gamepad1.right_stick_x * gamepad1.right_stick_x;
 
         //speed controls
-        speedCtrl = gamepad1.right_bumper || gamepad2.back;
-        speedDown = speedCtrl;
+        speedUp = gamepad1.right_bumper;
+        speedDown = gamepad1.left_bumper;
 
-        servoStart = gamepad1.dpad_up;
-        servoStop = gamepad1.dpad_down;
-
-        alignShootPos = gamepad1.a; // temp button can chang later
-        autoPark = gamepad1.b; // temp button can change later
-
-        launch = gamepad1.left_bumper || gamepad2.left_bumper; // temp button can change later
+        launch = gamepad2.left_bumper; // temp button can change later
         launchFar = gamepad1.dpad_up || gamepad2.dpad_up;
-        launchOff = gamepad1.right_bumper || gamepad2.right_bumper; // temp button can change later
+        launchOff = gamepad2.right_bumper; // temp button can change later
 
         // intake buttons
         intakeOn = (gamepad1.left_trigger > 0.1) || (gamepad2.left_trigger > 0.1);
@@ -108,5 +99,7 @@ public class GamePadButtons2026 {
         launchArtifactsFar = gamepad1.dpad_right || gamepad2.dpad_right;
 
         autoLaunchPos = gamepad1.square || gamepad2.square;
+        alignShootPos = gamepad1.a; // temp button can chang later
+        autoPark = gamepad1.b; // temp button can change later
     }
 }
