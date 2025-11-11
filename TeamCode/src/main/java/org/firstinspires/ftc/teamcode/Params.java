@@ -55,8 +55,8 @@ public class Params {
     static final double HALF_MAT = 23.625/2.0;  // 60 cm. 11.8inch
 
     // robot size
-    static final double CHASSIS_HALF_WIDTH = 13.5 / 2.0;
-    static final double CHASSIS_LENGTH = 14;
+    static final double CHASSIS_HALF_WIDTH = 15.0 / 2.0;
+    static final double CHASSIS_LENGTH = 15.5;
     static final double CHASSIS_HALF_LENGTH = CHASSIS_LENGTH / 2.0;
     static final double CHASSIS_START_EXTRA = 3.25;
 

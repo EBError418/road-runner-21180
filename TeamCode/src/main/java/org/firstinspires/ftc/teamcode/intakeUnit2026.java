@@ -46,11 +46,13 @@ import com.qualcomm.robotcore.hardware.Servo;
  */
 public class intakeUnit2026
 {
-    double intakePower = -0.86;
+    double intakePower = -0.96;
     double farPower = 0.63; //Power for launching from far triangle
-    double closePower = 0.55;//0.5 ; //Power for launching from close triangle(x=1, y=1)
-    double trigger_close = 0.05;
-    double trigger_open = 0.4;
+    double firstArtifactPowerFar = farPower + 0.025; // based on testing
+    double closePower = 0.5;//0.5 ; //Power for launching from close triangle(x=1, y=1)
+    double firstArtifactPower = closePower + 0.04; // based on testing
+    double trigger_close = 0.08;
+    double trigger_open = 0.36;
 
 
     HardwareMap hardwareMap;
@@ -83,8 +85,16 @@ public class intakeUnit2026
         intakeMotor.setPower(intakePower);
     }
 
+    public void startIntake(double intakeP) {
+        intakeMotor.setPower(intakeP);
+    }
+
     public void stopIntake() {
         intakeMotor.setPower(0.0);
+    }
+
+    public void revertIntake() {
+        intakeMotor.setPower(-intakePower);
     }
 
     public void startLauncher() {
@@ -95,7 +105,7 @@ public class intakeUnit2026
         launcherMotor.setPower(farPower);
     }
 
-    public void startLauncherFar(double p) {
+    public void startLauncher(double p) {
         if (p>1.0) p = 1.0;
         if (p<-1.0) p = -1.0;
         launcherMotor.setPower(p);

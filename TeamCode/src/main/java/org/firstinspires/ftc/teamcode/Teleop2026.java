@@ -233,27 +233,27 @@ public class Teleop2026 extends LinearOpMode {
 
     public void shootArtifacts(boolean farLaunch) {
         int waitTimeForTriggerClose = 300;
-        int waitTimeForTriggerOpen = 950;
+        int waitTimeForTriggerOpen = 700; //950; TODO: checking if it is ok for far shooting
 
         // start launcher motor if it has not been launched
         if (motors.getLauncherPower() < 0.1) {
             if (farLaunch) {
-                motors.startLauncherFar();
+                motors.startLauncher(motors.firstArtifactPowerFar); // far power
             }
             else {
-                motors.startLauncher();
+                motors.startLauncher(motors.firstArtifactPower); // near
             }
             sleepWithDriving(waitTimeForTriggerOpen + 400); // waiting time for launcher motor ramp up
         }
         // launcher is started but with near launching power
         else if ((motors.getLauncherPower() < motors.farPower) && farLaunch) {
-            motors.startLauncherFar();
+            motors.startLauncher(motors.firstArtifactPowerFar);
             sleepWithDriving(500);
         }
         // launcher is started but with higher power
         else if ((motors.getLauncherPower() > motors.closePower) && !farLaunch)
         {
-            motors.startLauncher();
+            motors.startLauncher(motors.firstArtifactPower);
             sleepWithDriving(500);
         }
         else
@@ -264,6 +264,16 @@ public class Teleop2026 extends LinearOpMode {
         motors.triggerOpen(); // shoot first
         sleepWithDriving(waitTimeForTriggerClose);
         motors.triggerClose(); //close trigger to wait launcher motor speed up after first launching
+
+        // reset launcher power for the left artifacts
+        if (farLaunch)
+        {
+            motors.startLauncherFar();
+        }
+        else
+        {
+            motors.startLauncher();
+        }
 
         motors.startIntake(); // start intake motor to move 3rd artifacts into launcher
         sleepWithDriving(waitTimeForTriggerOpen);// waiting time for launcher motor ramp up
