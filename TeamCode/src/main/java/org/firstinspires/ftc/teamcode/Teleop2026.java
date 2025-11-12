@@ -198,11 +198,11 @@ public class Teleop2026 extends LinearOpMode {
 
             // TODO : not implemented correctly yet
             if(gpButtons.autoLaunchPos) {
-//                Actions.runBlocking(
-//                        drive.actionBuilder(drive.localizer.getPose())
-//                                .strafeToLinearHeading(shootPos, shootHeading)
-//                                .build()
-//                );
+                Actions.runBlocking(
+                        drive.actionBuilder(drive.localizer.getPose())
+                                .strafeToLinearHeading(shootPos, shootHeading)
+                                .build()
+                );
             }
 
             telemetry.update();
@@ -272,7 +272,7 @@ public class Teleop2026 extends LinearOpMode {
         }
         else
         {
-            motors.startLauncher();
+            motors.startLauncher(motors.secondArtifactPower);
         }
 
         motors.startIntake(); // start intake motor to move 3rd artifacts into launcher
@@ -281,6 +281,9 @@ public class Teleop2026 extends LinearOpMode {
         sleepWithDriving(waitTimeForTriggerClose);
 
         motors.triggerClose();
+        if (!farLaunch) {
+            motors.startLauncher();
+        }
         sleepWithDriving(waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
         motors.triggerOpen();  // shoot third
         sleepWithDriving(waitTimeForTriggerClose);

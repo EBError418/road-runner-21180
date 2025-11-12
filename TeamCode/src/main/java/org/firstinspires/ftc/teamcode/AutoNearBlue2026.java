@@ -177,12 +177,13 @@ public class AutoNearBlue2026 extends LinearOpMode {
         sleep(waitTimeForTriggerClose);
         motors.triggerClose(); //close trigger to wait launcher motor speed up after first launching
 
-        motors.startLauncher();  // reset power after first artifacts
+        motors.startLauncher(motors.secondArtifactPower);  // use second artifact power
         motors.startIntake(); // start intake motor to move 3rd artifacts into launcher
         sleep(waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
         motors.triggerOpen(); // shoot second
 
         motors.revertIntake(); // temp reverse intake
+        motors.startLauncher(); // reset to use normal power
         int tmpSleep = 100;
         sleep(tmpSleep);
         motors.stopIntake();

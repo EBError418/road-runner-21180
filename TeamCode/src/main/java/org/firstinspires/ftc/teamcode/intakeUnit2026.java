@@ -47,10 +47,11 @@ import com.qualcomm.robotcore.hardware.Servo;
 public class intakeUnit2026
 {
     double intakePower = -0.96;
-    double farPower = 0.63; //Power for launching from far triangle
-    double firstArtifactPowerFar = farPower + 0.025; // based on testing
+    double farPower = 0.58; //Power for launching from far triangle
+    double firstArtifactPowerFar = farPower + 0.01; // based on testing
     double closePower = 0.5;//0.5 ; //Power for launching from close triangle(x=1, y=1)
     double firstArtifactPower = closePower + 0.04; // based on testing
+    double secondArtifactPower = closePower + 0.02; //modify based on testing
     double trigger_close = 0.08;
     double trigger_open = 0.36;
 
