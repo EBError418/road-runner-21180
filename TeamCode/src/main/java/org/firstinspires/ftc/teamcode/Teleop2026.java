@@ -39,6 +39,8 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DistanceSensor;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
+import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -198,11 +200,11 @@ public class Teleop2026 extends LinearOpMode {
 
             // TODO : not implemented correctly yet
             if(gpButtons.autoLaunchPos) {
-                Actions.runBlocking(
-                        drive.actionBuilder(drive.localizer.getPose())
-                                .strafeToLinearHeading(shootPos, shootHeading)
-                                .build()
-                );
+//                Actions.runBlocking(
+//                        drive.actionBuilder(drive.localizer.getPose())
+//                                .strafeToLinearHeading(shootPos, shootHeading)
+//                                .build()
+//                );
             }
 
             telemetry.update();
@@ -211,6 +213,10 @@ public class Teleop2026 extends LinearOpMode {
                 // display trigger servo position for testing purpose.
                 telemetry.addData("trigger servo", "position = %.3f", motors.getTriggerPosition());
                 telemetry.addData("launcher motor", "power = %.3f", motors.getLauncherPower());
+                telemetry.addData("launcher motor", "velocity = %.3f", motors.getLaunchVelocity());
+
+                Logging.log("launcher motor velocity : %.1f. power = %.3f", motors.getLaunchVelocity(), motors.getLauncherPower());
+
                 telemetry.addData("heading", " %.3f", Math.toDegrees(drive.localizer.getPose().heading.log()));
                 telemetry.addData("location", " %s", drive.localizer.getPose().position.toString());
                 // return angle of detected pattern if any
@@ -233,47 +239,31 @@ public class Teleop2026 extends LinearOpMode {
 
     public void shootArtifacts(boolean farLaunch) {
         int waitTimeForTriggerClose = 300;
-        int waitTimeForTriggerOpen = 700; //950; TODO: checking if it is ok for far shooting
-
+        int waitTimeForTriggerOpen = 300; //950; TODO: checking if it is ok for far shooting
+        int rampUpTime = 400;
         // start launcher motor if it has not been launched
         if (motors.getLauncherPower() < 0.1) {
             if (farLaunch) {
-                motors.startLauncher(motors.firstArtifactPowerFar); // far power
+                motors.startLauncherFar(); // far power
             }
             else {
-                motors.startLauncher(motors.firstArtifactPower); // near
+                motors.startLauncher(); // near
             }
-            sleepWithDriving(waitTimeForTriggerOpen + 400); // waiting time for launcher motor ramp up
         }
         // launcher is started but with near launching power
         else if ((motors.getLauncherPower() < motors.farPower) && farLaunch) {
-            motors.startLauncher(motors.firstArtifactPowerFar);
-            sleepWithDriving(500);
+            motors.startLauncherFar();
         }
         // launcher is started but with higher power
         else if ((motors.getLauncherPower() > motors.closePower) && !farLaunch)
         {
-            motors.startLauncher(motors.firstArtifactPower);
-            sleepWithDriving(500);
+            motors.startLauncher();
         }
-        else
-        {
-            sleepWithDriving(500);
-        }
+        sleepWithDriving(rampUpTime);
 
         motors.triggerOpen(); // shoot first
         sleepWithDriving(waitTimeForTriggerClose);
         motors.triggerClose(); //close trigger to wait launcher motor speed up after first launching
-
-        // reset launcher power for the left artifacts
-        if (farLaunch)
-        {
-            motors.startLauncherFar();
-        }
-        else
-        {
-            motors.startLauncher(motors.secondArtifactPower);
-        }
 
         motors.startIntake(); // start intake motor to move 3rd artifacts into launcher
         sleepWithDriving(waitTimeForTriggerOpen);// waiting time for launcher motor ramp up
@@ -281,9 +271,7 @@ public class Teleop2026 extends LinearOpMode {
         sleepWithDriving(waitTimeForTriggerClose);
 
         motors.triggerClose();
-        if (!farLaunch) {
-            motors.startLauncher();
-        }
+
         sleepWithDriving(waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
         motors.triggerOpen();  // shoot third
         sleepWithDriving(waitTimeForTriggerClose);
@@ -298,13 +286,13 @@ public class Teleop2026 extends LinearOpMode {
         double startTime = runtime.milliseconds();
         while ((runtime.milliseconds() - startTime) < msecond) {
             gpButtons.checkGamepadButtons(gamepad1, gamepad2);
-            drive.setDrivePowers(new PoseVelocity2d(
-                    new Vector2d(
-                            -gpButtons.robotDrive * Params.POWER_LOW / 2.0,
-                            -gpButtons.robotStrafe * Params.POWER_LOW / 2.0
-                    ),
-                    -gpButtons.robotTurn * Params.POWER_LOW / 2.0
-            ));
+//            drive.setDrivePowers(new PoseVelocity2d(
+//                    new Vector2d(
+//                            -gpButtons.robotDrive * Params.POWER_LOW / 2.0,
+//                            -gpButtons.robotStrafe * Params.POWER_LOW / 2.0
+//                    ),
+//                    -gpButtons.robotTurn * Params.POWER_LOW / 2.0
+//            ));
         }
 
     }

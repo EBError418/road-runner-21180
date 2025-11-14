@@ -98,7 +98,8 @@ public class GamePadButtons2026 {
         launchArtifacts = gamepad1.dpad_left || gamepad2.dpad_left;
         launchArtifactsFar = gamepad1.dpad_right || gamepad2.dpad_right;
 
-        autoLaunchPos = gamepad1.square || gamepad2.square;
+        autoLaunchPos = gamepad2.a;
+
         alignShootPos = gamepad1.a; // temp button can chang later
         autoPark = gamepad1.b; // temp button can change later
     }

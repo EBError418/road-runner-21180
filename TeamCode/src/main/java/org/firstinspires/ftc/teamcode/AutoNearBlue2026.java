@@ -42,7 +42,7 @@ public class AutoNearBlue2026 extends LinearOpMode {
         // set the starting position at (6 HALFMATS - HALF OF ROBOT LENGTH, HALF OF ROBOT WIDTH [sign depends on sign]) and with heading in reverse
         // where the robot is placed at the start
         Pose2d startPose = new Pose2d(
-                (6 * Params.HALF_MAT - Params.CHASSIS_HALF_LENGTH),
+                (6 * Params.HALF_MAT - Params.CHASSIS_HALF_LENGTH + 1.0), // add additional 1.0 inch according to testing
                 (leftOrRight * Params.CHASSIS_HALF_WIDTH), Math.toRadians(180.0)
         );
 
@@ -68,20 +68,20 @@ public class AutoNearBlue2026 extends LinearOpMode {
     }
 
     private void run_auto() {
-        motors.triggerClose();
+
         // Run the first leg of the path: move to shooting position while detecting pattern
         updateProfileAccel(true);
         Actions.runBlocking(drive.actionBuilder(drive.localizer.getPose())
                 .afterDisp(3 * Params.HALF_MAT, new limeLightCamera()) // start limelight detection after moving 3 half mats
-                .afterDisp(3.1 * Params.HALF_MAT, new startLauncherAction()) // start launcher motor after moving 3.1 half mats
                 .strafeToConstantHeading(shootPos) // move to shooting position
+                .afterTime(0.01, new startLauncherAction()) // start launcher motor
                 .turnTo(shootHeading) // turn to shooting direction
                 .build());
         // shoot preload artifacts
         shootArtifacts();
 
         // the following is a velocity constraint for moving to pick up artifacts
-        VelConstraint pickupSpeed = (robotPose, _path, _disp) -> 8.5;
+        VelConstraint pickupSpeed = (robotPose, _path, _disp) -> 9.0;
 
         setupPickupOrder((int)detectedPattern);
 
@@ -94,122 +94,113 @@ public class AutoNearBlue2026 extends LinearOpMode {
 
             pickupPos = rowChoose(rowNum);
             // fixed polarity below (there was a double negative sign before)
-            pickupEndPos = new Vector2d(pickupPos.x,pickupPos.y + 1.3 * Params.HALF_MAT * Math.signum(pickupPos.y));
+            pickupEndPos = new Vector2d(pickupPos.x, pickupPos.y + 1.25 * Params.HALF_MAT * Math.signum(pickupPos.y));
 
             // action for picking up artifacts
             Action actMoveToPickup = drive.actionBuilder(drive.localizer.getPose())
                     // add 4 degree more for row1 according to test results
-                    .strafeToLinearHeading(pickupPos, Math.toRadians(90.0*leftOrRight))
+                    .strafeToLinearHeading(pickupPos, Math.toRadians(90.0 * leftOrRight))
                     .build();
             Actions.runBlocking(actMoveToPickup); // ready for pickup artifacts
 
-            //correct heading for first row picking up
-            //if (rowNum == 1)
-            /*
-            {
-                Actions.runBlocking(
-                        drive.actionBuilder(drive.localizer.getPose())
-                                .turnTo(Math.toRadians(90.0))
-                                .build()
-                );
-            }
+            // close launching trigger before pickup artifacts
+            motors.stopLauncher();
 
-             */
+            // starting intake motor
+            motors.startIntake();
+            Action actIntake = drive.actionBuilder(drive.localizer.getPose())
+                    .strafeToConstantHeading(pickupEndPos, pickupSpeed) // picking up artifacts
+                    .build();
+            Actions.runBlocking(actIntake); // complete pickup artifacts
 
-            // only shooting first and second pickups, no time for the third.
-            //if (pickupIndex < 2) {
-            if (runtime.milliseconds() < 28.0 * 1000 ) // 2.0 second left for pickup
-            {
-                // starting intake motor
-                motors.startIntake();
-                Action actIntake = drive.actionBuilder(drive.localizer.getPose())
-                        .strafeToConstantHeading(pickupEndPos, pickupSpeed) // picking up artifacts
+            // only need to go back a little bit for row 2nd and 3rd
+            if ((pickupIndex < 2) && (rowNum > pickupOrder[pickupIndex + 1])) {
+                // after pickup, need to go back a bit to avoid obstacles from other rows
+                Action actMoveBack;
+                actMoveBack = drive.actionBuilder(drive.localizer.getPose())
+                        // reverse intake to get rid of last artifacts if it is still not picked up
+                        // this is for the case that there is additional artifact has been in the robot
+                        // which is failed to shoot out.
+                        //.afterTime(0.01, new revertIntakeAction())
+                        .strafeToConstantHeading(pickupPos)
                         .build();
-                Actions.runBlocking(actIntake); // complete pickup artifacts
-
-                if (pickupIndex < 2) {
-                    // only need to go back a little bit for row 2nd and 3rd
-                    if (rowNum > pickupOrder[pickupIndex + 1]) {
-                        // after pickup, need to go back a bit to avoid obstacles from other rows
-                        Action actMoveBack;
-                        actMoveBack = drive.actionBuilder(drive.localizer.getPose())
-                                // reverse intake to get rid of last artifacts if it is still not picked up
-                                // this is for the case that there is additional artifact has been in the robot
-                                // which is failed to shoot out.
-                                .afterTime(0.01, new revertIntakeAction())
-                                .strafeToConstantHeading(pickupPos)
-                                .build();
-                        Actions.runBlocking(actMoveBack);
-                    }
-
-                    Action actMoveToLaunch = drive.actionBuilder(drive.localizer.getPose())
-                            .afterTime(0.01, new revertIntakeAction())
-                            .strafeToLinearHeading(shootPos, shootHeading)
-                            .build();
-                    Actions.runBlocking(actMoveToLaunch);
-
-                    // shoot picked up artifacts
-                    shootArtifacts();
-                }
+                Actions.runBlocking(actMoveBack);
             }
+
+            Action actMoveToLaunch = drive.actionBuilder(drive.localizer.getPose())
+                    //.afterTime(0.01, new revertIntakeAction())
+                    .afterTime(0.3, new startLauncherAction()) // start launcher motor
+                    .strafeToLinearHeading(shootPos, shootHeading)
+                    .build();
+            Actions.runBlocking(actMoveToLaunch);
+
+            // shoot picked up artifacts
+            shootArtifacts();
         }
+
+        // stop launcher before parking
+        motors.stopLauncher();
+
         // move out of the Triangle
-        /*
         Actions.runBlocking(drive.actionBuilder(drive.localizer.getPose())
                 .strafeToLinearHeading(new Vector2d(0, leftOrRight*3.8*Params.HALF_MAT), Math.toRadians(180))
                 .build());
-         */
     }
 
     // function to shoot 3 artifacts
     private void shootArtifacts() {
-        int waitTimeForTriggerClose = 300;
-        int waitTimeForTriggerOpen = 700;
+        int waitTimeForTriggerClose = 200;
+        int waitTimeForTriggerOpen = 350;
+        int rampUpTime = 300;
         Logging.log("start shooting.");
         // start launcher motor if it has not been launched
         if (motors.getLauncherPower() < 0.1) {
             Logging.log("start launcher motor since it is stopped.");
-            motors.startLauncher(motors.firstArtifactPower);
-            sleep(waitTimeForTriggerOpen + 500); // waiting time for launcher motor ramp up
+            motors.startLauncher();
+            recordVelocity(rampUpTime); // waiting time for launcher motor ramp up
         }
 
         motors.triggerOpen(); // shoot first
-        sleep(waitTimeForTriggerClose);
+        Logging.log("launcher velocity for first one: %.1f.", motors.getLaunchVelocity());
+        recordVelocity(waitTimeForTriggerClose);
         motors.triggerClose(); //close trigger to wait launcher motor speed up after first launching
 
-        motors.startLauncher(motors.secondArtifactPower);  // use second artifact power
         motors.startIntake(); // start intake motor to move 3rd artifacts into launcher
-        sleep(waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
+        recordVelocity(waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
         motors.triggerOpen(); // shoot second
+        Logging.log("launcher velocity for second one: %.2f.", motors.getLaunchVelocity());
 
         motors.revertIntake(); // temp reverse intake
-        motors.startLauncher(); // reset to use normal power
         int tmpSleep = 100;
-        sleep(tmpSleep);
+        recordVelocity(tmpSleep);
         motors.stopIntake();
-        sleep(waitTimeForTriggerClose - tmpSleep);
+        recordVelocity(waitTimeForTriggerClose - tmpSleep);
         motors.triggerClose();
         motors.startIntake(); // start intake again
 
-        sleep(waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
+        recordVelocity(waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
         motors.triggerOpen(); // shoot third
-        sleep(waitTimeForTriggerClose);
+        Logging.log("launcher velocity for 3rd one: %f.", motors.getLaunchVelocity());
+        recordVelocity(waitTimeForTriggerClose);
 
         motors.triggerClose();
-        sleep(waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
+        recordVelocity(waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
         motors.triggerOpen(); // shoot forth in case one artifact left.
-        sleep(waitTimeForTriggerClose + 200);
+        Logging.log("launcher velocity for 4th one: %f.", motors.getLaunchVelocity());
 
-        motors.triggerClose();
-        motors.stopLauncher();
-        motors.stopIntake();
+        recordVelocity(waitTimeForTriggerClose);
+
+        // don't close trigger and launcher immediately in case there is one artifacts left in Robot.
+        //motors.triggerClose();
+        //motors.stopLauncher();
+        //motors.stopIntake();
     }
 
     // function that chooses the right row based on detected pattern, returns a Vector2d
     private Vector2d rowChoose(double rownumber) {
         return new Vector2d(
                 (-rownumber * 2 + 3) * Params.HALF_MAT,
-                leftOrRight * (2.3 * Params.HALF_MAT + Params.CHASSIS_HALF_LENGTH / 2)
+                leftOrRight * (2.2 * Params.HALF_MAT + Params.CHASSIS_HALF_LENGTH / 2)
         );
     }
 
@@ -237,7 +228,7 @@ public class AutoNearBlue2026 extends LinearOpMode {
         @Override
         public boolean run(@NonNull TelemetryPacket telemetryPacket) {
             Logging.log("start launcher motor.");
-            motors.startLauncher(motors.firstArtifactPower);
+            motors.startLauncher();
             return false;
         }
     }
@@ -289,6 +280,15 @@ public class AutoNearBlue2026 extends LinearOpMode {
                 pickupOrder = new int[]{1, 2, 3};
                 //pickupOrder = new int[]{3, 1, 2};
                 break;
+        }
+    }
+
+    private void recordVelocity(int msec) {
+        double startTime = runtime.milliseconds();
+        while ((runtime.milliseconds() - startTime) < msec) {
+            double speed = motors.getLaunchVelocity();
+            Logging.log("launcher motor velocity : %.1f.", speed);
+
         }
     }
 

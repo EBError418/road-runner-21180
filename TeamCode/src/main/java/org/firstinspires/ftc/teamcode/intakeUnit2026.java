@@ -29,9 +29,13 @@
 
 package org.firstinspires.ftc.teamcode;
 
+import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
+
+import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
 
 /**
@@ -48,17 +52,18 @@ public class intakeUnit2026
 {
     double intakePower = -0.96;
     double farPower = 0.58; //Power for launching from far triangle
-    double firstArtifactPowerFar = farPower + 0.01; // based on testing
     double closePower = 0.5;//0.5 ; //Power for launching from close triangle(x=1, y=1)
-    double firstArtifactPower = closePower + 0.04; // based on testing
-    double secondArtifactPower = closePower + 0.02; //modify based on testing
+
+    double launchSpeedNear = 170; // degree/sec
+    double launcherSpeedFar = 200; // need more testing
+
     double trigger_close = 0.08;
     double trigger_open = 0.36;
 
 
     HardwareMap hardwareMap;
     private final DcMotor intakeMotor;
-    private final DcMotor launcherMotor;
+    public final DcMotorEx launcherMotor;
     private Servo triggerServo = null;
 
 
@@ -68,14 +73,20 @@ public class intakeUnit2026
 
         // Define and Initialize Motors
         intakeMotor = hardwareMap.get(DcMotor.class, intake);
-        launcherMotor = hardwareMap.get(DcMotor.class, launcher);
+        launcherMotor = hardwareMap.get(DcMotorEx.class, launcher);
+
+        // update launcher motor PID for quick ramp up and keep the speed
+        double p = 100.0;
+        double i = 20.0;
+        double d = 0.2;
+        double f = 0.00361;
+        launcherMotor.setVelocityPIDFCoefficients(p, i, d, f);
 
         /*
         The motor is to do its best to run at targeted velocity.
         An encoder must be affixed to the motor in order to use this mode. This is a PID mode.
          */
         launcherMotor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        //launcherMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
         // trigger servo, initial with closed position
         triggerServo = hardwareMap.get(Servo.class, trigger);
@@ -84,10 +95,6 @@ public class intakeUnit2026
 
     public void startIntake() {
         intakeMotor.setPower(intakePower);
-    }
-
-    public void startIntake(double intakeP) {
-        intakeMotor.setPower(intakeP);
     }
 
     public void stopIntake() {
@@ -99,18 +106,20 @@ public class intakeUnit2026
     }
 
     public void startLauncher() {
-        launcherMotor.setPower(closePower);
+        //launcherMotor.setPower(closePower);
+        launcherMotor.setVelocity(launchSpeedNear, AngleUnit.DEGREES);
+        Logging.log("start launcher by setting velocity %.2f.", launchSpeedNear);
     }
 
     public void startLauncherFar() {
-        launcherMotor.setPower(farPower);
+        launcherMotor.setVelocity(launcherSpeedFar, AngleUnit.DEGREES);
     }
 
-    public void startLauncher(double p) {
-        if (p>1.0) p = 1.0;
-        if (p<-1.0) p = -1.0;
-        launcherMotor.setPower(p);
+    public void setLauncherVelocity(double vDegreePerSec) {
+        launcherMotor.setVelocity(vDegreePerSec, AngleUnit.DEGREES);
+        Logging.log("set launcher velocity %.2f.", vDegreePerSec);
     }
+
     // always close trigger when launcher stops to avoid artifact stuck between launcher wheels.
     public void stopLauncher() {
         launcherMotor.setPower(0.0);
@@ -119,6 +128,10 @@ public class intakeUnit2026
 
     public double getLauncherPower() {
         return launcherMotor.getPower();
+    }
+
+    public double getLaunchVelocity() {
+        return launcherMotor.getVelocity(AngleUnit.DEGREES);
     }
 
     /*

@@ -107,32 +107,28 @@ public class AutoFarBlue2026 extends LinearOpMode {
     public void shootArtifacts(boolean farLaunch) {
         int waitTimeForTriggerClose = 300;
         int waitTimeForTriggerOpen = 700; //950; TODO: checking if it is ok for far shooting
+        int rampUpTime = 300;
 
         // start launcher motor if it has not been launched
         if (motors.getLauncherPower() < 0.1) {
             if (farLaunch) {
-                motors.startLauncher(motors.firstArtifactPowerFar); // far power
+                motors.startLauncherFar(); // far power
             }
             else {
-                motors.startLauncher(motors.firstArtifactPower); // near
+                motors.startLauncherFar(); // near
             }
-            sleep(waitTimeForTriggerOpen + 400); // waiting time for launcher motor ramp up
+            sleep(rampUpTime); // waiting time for launcher motor ramp up
         }
         // launcher is started but with near launching power
-        else if ((motors.getLauncherPower() < motors.farPower) && farLaunch) {
-            motors.startLauncher(motors.firstArtifactPowerFar);
-            sleep(500);
+        else if ((motors.getLaunchVelocity() < motors.launcherSpeedFar * 0.9) && farLaunch) {
+            motors.startLauncherFar();
         }
         // launcher is started but with higher power
-        else if ((motors.getLauncherPower() > motors.closePower) && !farLaunch)
+        else if ((motors.getLaunchVelocity() > motors.launchSpeedNear * 1.1) && !farLaunch)
         {
-            motors.startLauncher(motors.firstArtifactPower);
-            sleep(500);
+            motors.startLauncherFar();
         }
-        else
-        {
-            sleep(500);
-        }
+        sleep(rampUpTime);
 
         motors.triggerOpen(); // shoot first
         sleep(waitTimeForTriggerClose);
