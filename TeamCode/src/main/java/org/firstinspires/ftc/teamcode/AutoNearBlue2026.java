@@ -42,7 +42,7 @@ public class AutoNearBlue2026 extends LinearOpMode {
         // set the starting position at (6 HALFMATS - HALF OF ROBOT LENGTH, HALF OF ROBOT WIDTH [sign depends on sign]) and with heading in reverse
         // where the robot is placed at the start
         Pose2d startPose = new Pose2d(
-                (6 * Params.HALF_MAT - Params.CHASSIS_HALF_LENGTH + 1.0), // add additional 1.0 inch according to testing
+                (6 * Params.HALF_MAT - Params.CHASSIS_HALF_LENGTH + 0.5), // add additional 0.5 inch according to testing
                 (leftOrRight * Params.CHASSIS_HALF_WIDTH), Math.toRadians(180.0)
         );
 
@@ -199,7 +199,7 @@ public class AutoNearBlue2026 extends LinearOpMode {
     // function that chooses the right row based on detected pattern, returns a Vector2d
     private Vector2d rowChoose(double rownumber) {
         return new Vector2d(
-                (-rownumber * 2 + 3) * Params.HALF_MAT,
+                (-rownumber * 2 + 3) * Params.HALF_MAT - (rownumber - 1) / 2.0, // add additional inch according to testing.
                 leftOrRight * (2.2 * Params.HALF_MAT + Params.CHASSIS_HALF_LENGTH / 2)
         );
     }
