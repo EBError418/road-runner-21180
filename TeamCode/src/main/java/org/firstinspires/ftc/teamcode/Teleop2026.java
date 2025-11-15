@@ -190,7 +190,7 @@ public class Teleop2026 extends LinearOpMode {
                 motors.triggerClose();
             }
 
-            if(gpButtons.launchArtifacts) {
+            if (gpButtons.launchArtifacts) {
                 shootArtifacts(false);
             }
 
@@ -199,7 +199,7 @@ public class Teleop2026 extends LinearOpMode {
             }
 
             // TODO : not implemented correctly yet
-            if(gpButtons.autoLaunchPos) {
+            if (gpButtons.autoLaunchPos) {
 //                Actions.runBlocking(
 //                        drive.actionBuilder(drive.localizer.getPose())
 //                                .strafeToLinearHeading(shootPos, shootHeading)
@@ -238,15 +238,14 @@ public class Teleop2026 extends LinearOpMode {
     }
 
     public void shootArtifacts(boolean farLaunch) {
-        int waitTimeForTriggerClose = 300;
-        int waitTimeForTriggerOpen = 300; //950; TODO: checking if it is ok for far shooting
+        int waitTimeForTriggerClose = 1000;
+        int waitTimeForTriggerOpen = 500; //950; TODO: checking if it is ok for far shooting
         int rampUpTime = 400;
         // start launcher motor if it has not been launched
         if (motors.getLauncherPower() < 0.1) {
             if (farLaunch) {
                 motors.startLauncherFar(); // far power
-            }
-            else {
+            } else {
                 motors.startLauncher(); // near
             }
         }
@@ -255,30 +254,44 @@ public class Teleop2026 extends LinearOpMode {
             motors.startLauncherFar();
         }
         // launcher is started but with higher power
-        else if ((motors.getLauncherPower() > motors.closePower) && !farLaunch)
-        {
+        else if ((motors.getLauncherPower() > motors.closePower) && !farLaunch) {
             motors.startLauncher();
         }
         sleepWithDriving(rampUpTime);
 
         motors.triggerOpen(); // shoot first
-        sleepWithDriving(waitTimeForTriggerClose);
+        checkingLaunchVelocity(waitTimeForTriggerClose);
         motors.triggerClose(); //close trigger to wait launcher motor speed up after first launching
 
         motors.startIntake(); // start intake motor to move 3rd artifacts into launcher
         sleepWithDriving(waitTimeForTriggerOpen);// waiting time for launcher motor ramp up
         motors.triggerOpen(); // shoot second
-        sleepWithDriving(waitTimeForTriggerClose);
+        checkingLaunchVelocity(waitTimeForTriggerClose);
 
         motors.triggerClose();
 
         sleepWithDriving(waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
         motors.triggerOpen();  // shoot third
-        sleepWithDriving(waitTimeForTriggerClose);
+        checkingLaunchVelocity(waitTimeForTriggerClose);
 
         motors.triggerClose();
         motors.stopIntake();
         motors.stopLauncher();
+    }
+
+    /*
+    Return the average speed during msec time.
+    @param: msec - duration
+     */
+    private double averageVelocity(int msec) {
+        double startTime = runtime.milliseconds();
+        int sampleNum = 0;
+        double velocity = 0;
+        while ((startTime + msec) > runtime.milliseconds()) {
+            velocity += motors.getLaunchVelocity();
+            sampleNum++;
+        }
+        return (velocity / sampleNum);
     }
 
     // sleep for other motors than driving motors
@@ -286,15 +299,35 @@ public class Teleop2026 extends LinearOpMode {
         double startTime = runtime.milliseconds();
         while ((runtime.milliseconds() - startTime) < msecond) {
             gpButtons.checkGamepadButtons(gamepad1, gamepad2);
-//            drive.setDrivePowers(new PoseVelocity2d(
-//                    new Vector2d(
-//                            -gpButtons.robotDrive * Params.POWER_LOW / 2.0,
-//                            -gpButtons.robotStrafe * Params.POWER_LOW / 2.0
-//                    ),
-//                    -gpButtons.robotTurn * Params.POWER_LOW / 2.0
-//            ));
+            drive.setDrivePowers(new PoseVelocity2d(
+                    new Vector2d(
+                            -gpButtons.robotDrive * Params.POWER_LOW / 2.0,
+                            -gpButtons.robotStrafe * Params.POWER_LOW / 2.0
+                    ),
+                    -gpButtons.robotTurn * Params.POWER_LOW / 2.0
+            ));
         }
-
     }
 
+    private void checkingLaunchVelocity(int msecond) {
+        double startTime = runtime.milliseconds();
+
+        boolean artifactReached = false;
+        double stableVelocity;
+        stableVelocity = averageVelocity(20);
+
+        while (!artifactReached && ((runtime.milliseconds() - startTime) < msecond)) {
+            double currentVel = averageVelocity(20);
+            artifactReached = (currentVel < stableVelocity * 0.85); // when speed reduced to 85%
+
+            gpButtons.checkGamepadButtons(gamepad1, gamepad2);
+            drive.setDrivePowers(new PoseVelocity2d(
+                    new Vector2d(
+                            -gpButtons.robotDrive * Params.POWER_LOW / 2.0,
+                            -gpButtons.robotStrafe * Params.POWER_LOW / 2.0
+                    ),
+                    -gpButtons.robotTurn * Params.POWER_LOW / 2.0
+            ));
+        }
+    }
 }
