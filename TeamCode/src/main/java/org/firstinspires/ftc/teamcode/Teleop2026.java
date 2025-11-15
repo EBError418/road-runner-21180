@@ -25,25 +25,13 @@
 
 package org.firstinspires.ftc.teamcode;
 
-import androidx.annotation.NonNull;
-
-import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
-import com.acmerobotics.roadrunner.Action;
-import com.acmerobotics.roadrunner.Pose2d;
 import com.acmerobotics.roadrunner.PoseVelocity2d;
 import com.acmerobotics.roadrunner.Vector2d;
-import com.acmerobotics.roadrunner.ftc.Actions;
 import com.qualcomm.hardware.lynx.LynxModule;
-import com.qualcomm.robotcore.eventloop.opmode.Disabled;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DistanceSensor;
-import com.qualcomm.robotcore.hardware.PIDFCoefficients;
-import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 import com.qualcomm.robotcore.util.ElapsedTime;
-
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
 
 import java.util.List;
 
@@ -239,10 +227,15 @@ public class Teleop2026 extends LinearOpMode {
 
     public void shootArtifacts(boolean farLaunch) {
         int waitTimeForTriggerClose = 1000;
-        int waitTimeForTriggerOpen = 500; //950; TODO: checking if it is ok for far shooting
+        int waitTimeForTriggerOpen = 600; //950; TODO: checking if it is ok for far shooting
         int rampUpTime = 800;
+        double launchVelocity = motors.launchSpeedNear;
+        if (farLaunch) {
+            launchVelocity = motors.launchSpeedFar;
+        }
+
         // start launcher motor if it has not been launched
-        if (motors.getLauncherPower() < 0.1) {
+        if (motors.getLauncherPower() < 0.4) {
             if (farLaunch) {
                 motors.startLauncherFar(); // far power
             } else {
@@ -250,48 +243,28 @@ public class Teleop2026 extends LinearOpMode {
             }
         }
         // launcher is started but with near launching power
-        else if ((motors.getLauncherPower() < motors.farPower) && farLaunch) {
+        else if ((motors.getLaunchVelocity() < motors.launchSpeedFar) && farLaunch) {
             motors.startLauncherFar();
         }
-        // launcher is started but with higher power
-        else if ((motors.getLauncherPower() > motors.closePower) && !farLaunch) {
-            motors.startLauncher();
-        }
-        sleepWithDriving(rampUpTime);
 
+        reachTargetVelocity(launchVelocity, rampUpTime);
         motors.triggerOpen(); // shoot first
-        checkingLaunchVelocity(waitTimeForTriggerClose);
+        checkingVelocityRampDown(waitTimeForTriggerClose);
         motors.triggerClose(); //close trigger to wait launcher motor speed up after first launching
 
         motors.startIntake(); // start intake motor to move 3rd artifacts into launcher
-        sleepWithDriving(waitTimeForTriggerOpen);// waiting time for launcher motor ramp up
+        reachTargetVelocity(launchVelocity, waitTimeForTriggerOpen);// waiting time for launcher motor ramp up
         motors.triggerOpen(); // shoot second
-        checkingLaunchVelocity(waitTimeForTriggerClose);
-
+        checkingVelocityRampDown(waitTimeForTriggerClose);
         motors.triggerClose();
 
-        sleepWithDriving(waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
+        reachTargetVelocity(launchVelocity, waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
         motors.triggerOpen();  // shoot third
-        checkingLaunchVelocity(waitTimeForTriggerClose);
+        checkingVelocityRampDown(waitTimeForTriggerClose);
 
         motors.triggerClose();
         motors.stopIntake();
         motors.stopLauncher();
-    }
-
-    /*
-    Return the average speed during msec time.
-    @param: msec - duration
-     */
-    private double averageVelocity(int msec) {
-        double startTime = runtime.milliseconds();
-        int sampleNum = 0;
-        double velocity = 0;
-        while ((startTime + msec) > runtime.milliseconds()) {
-            velocity += motors.getLaunchVelocity();
-            sampleNum++;
-        }
-        return (velocity / sampleNum);
     }
 
     // sleep for other motors than driving motors
@@ -309,15 +282,15 @@ public class Teleop2026 extends LinearOpMode {
         }
     }
 
-    private void checkingLaunchVelocity(int msecond) {
+    private void checkingVelocityRampDown(int msecond) {
         double startTime = runtime.milliseconds();
 
         boolean artifactReached = false;
         double stableVelocity;
-        stableVelocity = averageVelocity(20);
+        stableVelocity = motors.launcherAverageVelocity(20);
 
         while (!artifactReached && ((runtime.milliseconds() - startTime) < msecond)) {
-            double currentVel = averageVelocity(20);
+            double currentVel = motors.launcherAverageVelocity(20);
             artifactReached = (currentVel < stableVelocity * 0.85); // when speed reduced to 85%
 
             gpButtons.checkGamepadButtons(gamepad1, gamepad2);
@@ -330,4 +303,25 @@ public class Teleop2026 extends LinearOpMode {
             ));
         }
     }
+
+    private void reachTargetVelocity(double targetVel, int msec) {
+        double startTime = runtime.milliseconds();
+        boolean rampedUp = false;
+
+        while (!rampedUp && ((runtime.milliseconds() - startTime) < msec)) {
+            double currentVel = motors.launcherAverageVelocity(20);
+            rampedUp = (currentVel > targetVel * 0.95); // when speed reduced to 85%
+            Logging.log("launcher motor average velocity : %.1f.", currentVel);
+            gpButtons.checkGamepadButtons(gamepad1, gamepad2);
+            drive.setDrivePowers(new PoseVelocity2d(
+                    new Vector2d(
+                            -gpButtons.robotDrive * Params.POWER_LOW / 2.0,
+                            -gpButtons.robotStrafe * Params.POWER_LOW / 2.0
+                    ),
+                    -gpButtons.robotTurn * Params.POWER_LOW / 2.0
+            ));
+        }
+        Logging.log("Total waiting duration = %.2f", runtime.milliseconds() - startTime);
+    }
+
 }

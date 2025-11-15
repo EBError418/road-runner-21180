@@ -81,7 +81,6 @@ public class AutoNearBlue2026 extends LinearOpMode {
     private void run_auto() {
 
         // Run the first leg of the path: move to shooting position while detecting pattern
-        updateProfileAccel(true);
         Actions.runBlocking(drive.actionBuilder(drive.localizer.getPose())
                 .afterDisp(3 * Params.HALF_MAT, new limeLightCamera()) // start limelight detection after moving 3 half mats
                 .strafeToConstantHeading(shootPos) // move to shooting position
@@ -161,25 +160,25 @@ public class AutoNearBlue2026 extends LinearOpMode {
     // function to shoot 3 artifacts
     private void shootArtifacts() {
         int waitTimeForTriggerClose = 1000;
-        int waitTimeForTriggerOpen = 500;
-        int rampUpTime = 300;
+        int waitTimeForTriggerOpen = 700;
+        int rampUpTime = 400;
 
         Logging.log("start shooting.");
         // start launcher motor if it has not been launched
-        if (motors.getLauncherPower() < 0.1) {
+        if (motors.getLauncherPower() < 0.4) {
             Logging.log("start launcher motor since it is stopped.");
             motors.startLauncher();
-            recordVelocity(rampUpTime); // waiting time for launcher motor ramp up
+            reachTargetVelocity(motors.launchSpeedNear, rampUpTime); // waiting time for launcher motor ramp up
         }
 
         motors.triggerOpen(); // shoot first
         Logging.log("launcher velocity for first one: %.1f.", motors.getLaunchVelocity());
-        checkingVelocity(waitTimeForTriggerClose);
+        velocityRampDown(waitTimeForTriggerClose);
         Logging.log("starting close trigger.");
         motors.triggerClose(); //close trigger to wait launcher motor speed up after first launching
 
         motors.startIntake(); // start intake motor to move 3rd artifacts into launcher
-        recordVelocity(waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
+        reachTargetVelocity(motors.launchSpeedNear, waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
         motors.triggerOpen(); // shoot second
         Logging.log("launcher velocity for second one: %.2f.", motors.getLaunchVelocity());
 
@@ -187,26 +186,14 @@ public class AutoNearBlue2026 extends LinearOpMode {
         int tmpSleep = 100;
         recordVelocity(tmpSleep);
         motors.stopIntake();
-        checkingVelocity(waitTimeForTriggerClose);
+        velocityRampDown(waitTimeForTriggerClose);
         motors.triggerClose();
         motors.startIntake(); // start intake again
 
-        recordVelocity(waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
+        reachTargetVelocity(motors.launchSpeedNear, waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
         motors.triggerOpen(); // shoot third
         Logging.log("launcher velocity for 3rd one: %f.", motors.getLaunchVelocity());
-        checkingVelocity(waitTimeForTriggerClose + waitTimeForTriggerOpen); // waiting more time for the third one.
-
-        //motors.triggerClose();
-        //checkingVelocity(waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
-        //motors.triggerOpen(); // shoot forth in case one artifact left.
-        //Logging.log("launcher velocity for 4th one: %f.", motors.getLaunchVelocity());
-
-        //recordVelocity(waitTimeForTriggerClose);
-
-        // don't close trigger and launcher immediately in case there is one artifacts left in Robot.
-        //motors.triggerClose();
-        //motors.stopLauncher();
-        //motors.stopIntake();
+        velocityRampDown(waitTimeForTriggerClose + waitTimeForTriggerOpen); // waiting more time for the third one.
     }
 
     // function that chooses the right row based on detected pattern, returns a Vector2d
@@ -247,40 +234,6 @@ public class AutoNearBlue2026 extends LinearOpMode {
         }
     }
 
-    // action to revert and stop intake
-    private class revertIntakeAction implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            //motors.startIntake(-0.8 * motors.intakePower); // revert with lower power.
-            sleep(100);
-            motors.stopIntake();
-            return false;
-        }
-    }
-
-    // action to start intake motor
-    private class startIntakeAction implements Action {
-        @Override
-        public boolean run(@NonNull TelemetryPacket telemetryPacket) {
-            Logging.log("start intake motor.");
-            motors.startIntake();
-            return false;
-        }
-    }
-
-    // function to update profile acceleration for maxMode (EXPERIMENTAL)
-    private void updateProfileAccel(boolean maxMode) {
-        if (maxMode) {
-            MecanumDrive.PARAMS.maxWheelVel = 70;
-            MecanumDrive.PARAMS.maxProfileAccel = 70;
-            MecanumDrive.PARAMS.minProfileAccel = -70;
-        } else {
-            MecanumDrive.PARAMS.maxWheelVel = 65;
-            MecanumDrive.PARAMS.maxProfileAccel = 50;
-            MecanumDrive.PARAMS.minProfileAccel = -40;
-        }
-    }
-
     private void setupPickupOrder(int pt) {
         switch (pt) {
             case 21:
@@ -306,15 +259,15 @@ public class AutoNearBlue2026 extends LinearOpMode {
         }
     }
 
-    private void checkingVelocity(int msec) {
+    private void velocityRampDown(int msec) {
         double startTime = runtime.milliseconds();
 
         boolean artifactReached = false;
         double stableVelocity;
-        stableVelocity = averageVelocity(20);
+        stableVelocity = motors.launcherAverageVelocity(20);
 
         while (!artifactReached && ((runtime.milliseconds() - startTime) < msec)) {
-            double currentVel = averageVelocity(20);
+            double currentVel = motors.launcherAverageVelocity(20);
             artifactReached = (currentVel < stableVelocity * 0.85); // when speed reduced to 85%
             double speed = motors.getLaunchVelocity();
             Logging.log("launcher motor velocity : %.1f.", speed);
@@ -323,27 +276,16 @@ public class AutoNearBlue2026 extends LinearOpMode {
         Logging.log("Total waiting duration = %.2f", runtime.milliseconds() - startTime);
     }
 
-    /*
-      Check if an artifact reached launcher motors according to motor speed changes
-     */
-    private void artifactLaunched() {
-        double v = motors.getLaunchVelocity();
-
-    }
-
-    /*
-    Return the average speed during msec time.
-    @param: msec - duration
-     */
-    private double averageVelocity(int msec) {
+    private void reachTargetVelocity(double targetVel, int msec) {
         double startTime = runtime.milliseconds();
-        int sampleNum = 0;
-        double velocity = 0;
-        while ((startTime + msec) > runtime.milliseconds()) {
-            velocity += motors.getLaunchVelocity();
-            sampleNum ++;
+        boolean rampedUp = false;
+
+        while (!rampedUp && ((runtime.milliseconds() - startTime) < msec)) {
+            double currentVel = motors.launcherAverageVelocity(20);
+            rampedUp = (currentVel > targetVel * 0.95); // when speed reduced to 85%
+            Logging.log("launcher motor average velocity : %.1f.", currentVel);
         }
-        return (velocity/sampleNum);
+        Logging.log("Total waiting duration = %.2f", runtime.milliseconds() - startTime);
     }
 
     // For future use when we have an artifact sorter mechanism

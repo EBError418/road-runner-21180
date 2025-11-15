@@ -34,6 +34,7 @@ import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.PIDFCoefficients;
 import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 
@@ -51,11 +52,9 @@ import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 public class intakeUnit2026
 {
     double intakePower = -0.96;
-    double farPower = 0.58; //Power for launching from far triangle
-    double closePower = 0.5;//0.5 ; //Power for launching from close triangle(x=1, y=1)
 
-    double launchSpeedNear = 170; // degree/sec
-    double launcherSpeedFar = 190; // need more testing
+    double launchSpeedNear = 166; // degree/sec speed for launching from close triangle(x=1, y=1)
+    double launchSpeedFar = 190; // need more testing
 
     double trigger_close = 0.08;
     double trigger_open = 0.36;
@@ -112,7 +111,7 @@ public class intakeUnit2026
     }
 
     public void startLauncherFar() {
-        launcherMotor.setVelocity(launcherSpeedFar, AngleUnit.DEGREES);
+        launcherMotor.setVelocity(launchSpeedFar, AngleUnit.DEGREES);
     }
 
     public void setLauncherVelocity(double vDegreePerSec) {
@@ -153,5 +152,22 @@ public class intakeUnit2026
      */
     public double getTriggerPosition() {
         return triggerServo.getPosition();
+    }
+
+
+    public double launcherAverageVelocity(long msec) {
+        long startTime = System.currentTimeMillis();
+
+        int sampleNum = 0;
+        double velocity = 0;
+        while ((startTime + msec) > System.currentTimeMillis()) {
+            double speed = getLaunchVelocity();
+            Logging.log("launcher motor velocity : %.1f.", speed);
+
+            velocity += speed;
+            sampleNum ++;
+        }
+        return (velocity / sampleNum);
+
     }
 }
