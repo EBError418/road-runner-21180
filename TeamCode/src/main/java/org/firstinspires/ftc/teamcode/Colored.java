@@ -9,13 +9,13 @@ import org.firstinspires.ftc.robotcore.internal.opmode.TelemetryInternal;
 
 @Config
 public final class Colored {
-    private final Limelight3A limelight;
+    public final Limelight3A limelight;
 
     public Colored(HardwareMap hardwareMap) {
         limelight = hardwareMap.get(Limelight3A.class, "limelight");
         limelight.setPollRateHz(100);  // poll 100x per second
         limelight.start();
-        limelight.pipelineSwitch(2);
+        limelight.pipelineSwitch(1);
     }
     public double[] returnPosition() {
         LLResult result = limelight.getLatestResult();

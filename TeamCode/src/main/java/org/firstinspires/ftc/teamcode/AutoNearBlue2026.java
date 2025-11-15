@@ -59,6 +59,17 @@ public class AutoNearBlue2026 extends LinearOpMode {
         // init position of trigger
         motors.triggerClose();
 
+//        while (!opModeIsActive()) {
+//            for (int i = 0; i < 30; i++) { // check for 30 cycles (~30 milliseconds) to detect pattern
+//                detectedPattern = patternDetector.returnId();
+//                Logging.log("pattern  = %f", detectedPattern);
+//                telemetry.addData("limelight", "Detected Pattern = %f", detectedPattern);
+//                telemetry.update();
+//                sleep(1);
+//            }
+//            detectedPattern = 23; // default pattern if limelight can't detect
+//        }
+
         waitForStart();
         runtime.reset();
 
@@ -153,7 +164,6 @@ public class AutoNearBlue2026 extends LinearOpMode {
         int waitTimeForTriggerOpen = 500;
         int rampUpTime = 300;
 
-        double stableVelocity = 0;
         Logging.log("start shooting.");
         // start launcher motor if it has not been launched
         if (motors.getLauncherPower() < 0.1) {
@@ -189,7 +199,7 @@ public class AutoNearBlue2026 extends LinearOpMode {
         //motors.triggerClose();
         //checkingVelocity(waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
         //motors.triggerOpen(); // shoot forth in case one artifact left.
-        Logging.log("launcher velocity for 4th one: %f.", motors.getLaunchVelocity());
+        //Logging.log("launcher velocity for 4th one: %f.", motors.getLaunchVelocity());
 
         //recordVelocity(waitTimeForTriggerClose);
 
@@ -222,6 +232,7 @@ public class AutoNearBlue2026 extends LinearOpMode {
                 sleep(1);
             }
             detectedPattern = 23; // default pattern if limelight can't detect
+            patternDetector.limelight.close(); //close limelight for safe wifi connection
             return false;
         }
     }
