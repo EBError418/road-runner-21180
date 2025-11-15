@@ -64,7 +64,7 @@ public class intakeUnit2026
     HardwareMap hardwareMap;
     private final DcMotor intakeMotor;
     public final DcMotorEx launcherMotor;
-    private Servo triggerServo = null;
+    public Servo triggerServo = null;
 
 
     public intakeUnit2026(HardwareMap hardwareMap, String launcher, String intake, String trigger) {

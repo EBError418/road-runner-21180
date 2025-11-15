@@ -149,9 +149,11 @@ public class AutoNearBlue2026 extends LinearOpMode {
 
     // function to shoot 3 artifacts
     private void shootArtifacts() {
-        int waitTimeForTriggerClose = 200;
-        int waitTimeForTriggerOpen = 350;
+        int waitTimeForTriggerClose = 1000;
+        int waitTimeForTriggerOpen = 500;
         int rampUpTime = 300;
+
+        double stableVelocity = 0;
         Logging.log("start shooting.");
         // start launcher motor if it has not been launched
         if (motors.getLauncherPower() < 0.1) {
@@ -162,7 +164,8 @@ public class AutoNearBlue2026 extends LinearOpMode {
 
         motors.triggerOpen(); // shoot first
         Logging.log("launcher velocity for first one: %.1f.", motors.getLaunchVelocity());
-        recordVelocity(waitTimeForTriggerClose);
+        checkingVelocity(waitTimeForTriggerClose);
+        Logging.log("starting close trigger.");
         motors.triggerClose(); //close trigger to wait launcher motor speed up after first launching
 
         motors.startIntake(); // start intake motor to move 3rd artifacts into launcher
@@ -174,21 +177,21 @@ public class AutoNearBlue2026 extends LinearOpMode {
         int tmpSleep = 100;
         recordVelocity(tmpSleep);
         motors.stopIntake();
-        recordVelocity(waitTimeForTriggerClose - tmpSleep);
+        checkingVelocity(waitTimeForTriggerClose);
         motors.triggerClose();
         motors.startIntake(); // start intake again
 
         recordVelocity(waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
         motors.triggerOpen(); // shoot third
         Logging.log("launcher velocity for 3rd one: %f.", motors.getLaunchVelocity());
-        recordVelocity(waitTimeForTriggerClose);
+        checkingVelocity(waitTimeForTriggerClose + waitTimeForTriggerOpen); // waiting more time for the third one.
 
-        motors.triggerClose();
-        recordVelocity(waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
-        motors.triggerOpen(); // shoot forth in case one artifact left.
+        //motors.triggerClose();
+        //checkingVelocity(waitTimeForTriggerOpen); // waiting time for launcher motor ramp up
+        //motors.triggerOpen(); // shoot forth in case one artifact left.
         Logging.log("launcher velocity for 4th one: %f.", motors.getLaunchVelocity());
 
-        recordVelocity(waitTimeForTriggerClose);
+        //recordVelocity(waitTimeForTriggerClose);
 
         // don't close trigger and launcher immediately in case there is one artifacts left in Robot.
         //motors.triggerClose();
@@ -288,8 +291,48 @@ public class AutoNearBlue2026 extends LinearOpMode {
         while ((runtime.milliseconds() - startTime) < msec) {
             double speed = motors.getLaunchVelocity();
             Logging.log("launcher motor velocity : %.1f.", speed);
-
+            Logging.log("Trigger position %.2f", motors.triggerServo.getPosition());
         }
+    }
+
+    private void checkingVelocity(int msec) {
+        double startTime = runtime.milliseconds();
+
+        boolean artifactReached = false;
+        double stableVelocity;
+        stableVelocity = averageVelocity(20);
+
+        while (!artifactReached && ((runtime.milliseconds() - startTime) < msec)) {
+            double currentVel = averageVelocity(20);
+            artifactReached = (currentVel < stableVelocity * 0.85); // when speed reduced to 85%
+            double speed = motors.getLaunchVelocity();
+            Logging.log("launcher motor velocity : %.1f.", speed);
+            Logging.log("Trigger position %.2f", motors.triggerServo.getPosition());
+        }
+        Logging.log("Total waiting duration = %.2f", runtime.milliseconds() - startTime);
+    }
+
+    /*
+      Check if an artifact reached launcher motors according to motor speed changes
+     */
+    private void artifactLaunched() {
+        double v = motors.getLaunchVelocity();
+
+    }
+
+    /*
+    Return the average speed during msec time.
+    @param: msec - duration
+     */
+    private double averageVelocity(int msec) {
+        double startTime = runtime.milliseconds();
+        int sampleNum = 0;
+        double velocity = 0;
+        while ((startTime + msec) > runtime.milliseconds()) {
+            velocity += motors.getLaunchVelocity();
+            sampleNum ++;
+        }
+        return (velocity/sampleNum);
     }
 
     // For future use when we have an artifact sorter mechanism
