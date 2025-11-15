@@ -240,7 +240,7 @@ public class Teleop2026 extends LinearOpMode {
     public void shootArtifacts(boolean farLaunch) {
         int waitTimeForTriggerClose = 1000;
         int waitTimeForTriggerOpen = 500; //950; TODO: checking if it is ok for far shooting
-        int rampUpTime = 400;
+        int rampUpTime = 800;
         // start launcher motor if it has not been launched
         if (motors.getLauncherPower() < 0.1) {
             if (farLaunch) {

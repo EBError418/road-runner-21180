@@ -55,7 +55,7 @@ public class intakeUnit2026
     double closePower = 0.5;//0.5 ; //Power for launching from close triangle(x=1, y=1)
 
     double launchSpeedNear = 170; // degree/sec
-    double launcherSpeedFar = 200; // need more testing
+    double launcherSpeedFar = 190; // need more testing
 
     double trigger_close = 0.08;
     double trigger_open = 0.36;

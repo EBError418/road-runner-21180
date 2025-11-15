@@ -38,7 +38,7 @@ public class AutoFarBlue2026 extends LinearOpMode {
         );
 
         //drive here to launch
-        launchPose = new Pose2d(- 4.5 * Params.HALF_MAT, leftOrRight * Params.HALF_MAT, Math.toRadians(-153.5 * leftOrRight));
+        launchPose = new Pose2d(- 4.5 * Params.HALF_MAT, leftOrRight * Params.HALF_MAT, Math.toRadians(-155.0 * leftOrRight));
 
         //drive here after launching
         endPose = new Vector2d(- 5 * Params.HALF_MAT, leftOrRight * 3 * Params.HALF_MAT);
