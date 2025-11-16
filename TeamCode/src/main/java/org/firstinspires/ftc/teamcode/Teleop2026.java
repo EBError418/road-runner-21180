@@ -310,15 +310,15 @@ public class Teleop2026 extends LinearOpMode {
 
         while (!rampedUp && ((runtime.milliseconds() - startTime) < msec)) {
             double currentVel = motors.launcherAverageVelocity(20);
-            rampedUp = (currentVel > targetVel * 0.95); // when speed reduced to 85%
+            rampedUp = (currentVel > targetVel * 0.90); // when speed reduced to 85%
             Logging.log("launcher motor average velocity : %.1f.", currentVel);
             gpButtons.checkGamepadButtons(gamepad1, gamepad2);
             drive.setDrivePowers(new PoseVelocity2d(
                     new Vector2d(
-                            -gpButtons.robotDrive * Params.POWER_LOW / 2.0,
-                            -gpButtons.robotStrafe * Params.POWER_LOW / 2.0
+                            -gpButtons.robotDrive * Params.POWER_LOW / 1.5,
+                            -gpButtons.robotStrafe * Params.POWER_LOW / 1.5
                     ),
-                    -gpButtons.robotTurn * Params.POWER_LOW / 2.0
+                    -gpButtons.robotTurn * Params.POWER_LOW / 1.5
             ));
         }
         Logging.log("Total waiting duration = %.2f", runtime.milliseconds() - startTime);

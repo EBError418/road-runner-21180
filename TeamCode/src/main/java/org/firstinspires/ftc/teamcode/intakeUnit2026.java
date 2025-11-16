@@ -53,8 +53,8 @@ public class intakeUnit2026
 {
     double intakePower = -0.96;
 
-    double launchSpeedNear = 166; // degree/sec speed for launching from close triangle(x=1, y=1)
-    double launchSpeedFar = 190; // need more testing
+    double launchSpeedNear = 170; // degree/sec speed for launching from close triangle(x=1, y=1)
+    double launchSpeedFar = 195; // need more testing
 
     double trigger_close = 0.08;
     double trigger_open = 0.36;
@@ -76,7 +76,7 @@ public class intakeUnit2026
 
         // update launcher motor PID for quick ramp up and keep the speed
         double p = 100.0;
-        double i = 20.0;
+        double i = 3.5;
         double d = 0.2;
         double f = 0.00361;
         launcherMotor.setVelocityPIDFCoefficients(p, i, d, f);
